@@ -1,41 +1,64 @@
-INCLUDE= \
-	 -I../util 
+CXX    := g++
+LD     := g++
+AR     := ar rc
 
-#CFLAG = -c -g -pg -Wall -fPIC 
-CFLAG = -O2 -pipe 
+INCS := -I. -I./cppcommon
 
+DEBUG_CXXFLAGS     := -g -Wall -DDEBUG 
+RELEASE_CXXFLAGS   := -Wall -O3
 
-GCC = g++
-CC = gcc
-.SUFFIXES: .o .cpp .c
+ifeq (YES, ${RELEASE})
+   CXXFLAGS     := ${RELEASE_CXXFLAGS}
+   LDFLAGS      := ${RELEASE_LDFLAGS}
+else
+   CXXFLAGS       := ${DEBUG_CXXFLAGS}
+   LDFLAGS      := ${DEBUG_LDFLAGS}
+endif
 
-OBJS = Daemon.o\
-	FileOperation.o\
-	XmlHttp.o\
-	ServerFrameLockAccept.o#\
-	#Dic.o\
-	InvertReader.o\
-	StringTrim.o\
-	TaDicW.o\
-	BitMapFile.o\
-	MMapFile.o\
+DOLINK := $(LD) $(LDFLAGS) -o $@ $^
+DOPACK := $(AR)  
+SOURCES = Daemon.cpp\
+	FileOperation.cpp\
+	XmlHttp.cpp\
+	ServerFrameLockAccept.cpp
+OBJS := $(patsubst %.cpp,%.o,$(SOURCES))
 
-.INTERMEDIATE: $(OBJS)
-all:  libutil.a 
+CMDIR := ../cppcommon
+CMLIB := $(CMDIR)/libcm.a
 
-Server: main.cpp Server.cpp
-	$(GCC) $(CFLAG) -o $@ $^ libutil.a -lpthread
+TMPDIR := ./huskytmp
 
-libutil.a: $(OBJS)
-	 ar -crv $@ $(OBJS);
+LIBA := libhusky.a
 
-.cpp.o:
-	$(GCC) -c $(CFLAG) -o $@ $< $(INCLUDE) -D_FILE_OFFSET_BITS=64  -DUSEBDB
+# remove the objs after compilation
+.INTERMEDIATE: 
+.PHONY: clean $(CMLIB) 
 
-.c.o:
-	$(GCC) -c $(CFLAG) -o $@ $< $(INCLUDE) -D_FILE_OFFSET_BITS=64  -DUSEBDB
+all: $(LIBA)
+
+%.o: %.cpp
+	$(CXX) -c $(CXXFLAGS) $<
+
+${LIBA}: $(TMPDIR) $(OBJS) $(CMLIB) 
+	cp $(CMLIB) $(TMPDIR) && cd $(TMPDIR) && ar x `basename $(CMLIB)`
+	$(DOPACK) $@ $(OBJS) $(TMPDIR)/*.o 
+	rm -rf $(TMPDIR)
+
+$(TMPDIR):
+	mkdir $@
+
+$(CMLIB):
+	cd $(CMDIR) && $(MAKE)
+
+all:  ${LIBA}
 
 clean:
-	rm -f *.o
-	rm -f libutil.a
+	rm -f *.o *.d $(LIBA)
+	cd $(CMDIR) && make clean
 
+sinclude $(SOURCES:.cpp=.d)
+%.d:%.cpp
+	@set -e; rm -f $@; \
+	$(CXX) -MM $< > $@.$$$$; \
+	sed 's,\($*\).o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
