@@ -1,58 +1,44 @@
-#include <algorithm>
-#include <string>
-#include <ctype.h>
-#include <string.h>
-#include "../src/headers.h"
+#include "husky_demo.h"
 
-struct SDerivedHandler:public SRequestHandler 
-{ 
-	bool Init()
-	{
-		return m.init();
-	}
-
-	bool Dispose()
-	{
-		m.dispose();
-		return true;
-	}
-	virtual void operator()(string &strRec, string &strSnd) 
-	{
-		m.HandleRequest(strRec,strSnd);
-	} 
-	Server m;
-};
-
-
-class CWorkerEx:public CWorker
+bool ServerDemo::init()
 {
-	public:
-		CWorkerEx(SDerivedHandler* pHandler):m_pHandler(pHandler){}
-		virtual bool Init(HIS&his)
-		{
-			int nPort,nThreadNum;
-			HISI i=his.find('n');   
-			if(i!=his.end())
-			  nThreadNum=atoi(i->second.c_str());
-			i=his.find('p');   
-			if(i!=his.end())
-			  nPort=atoi(i->second.c_str());
-			if(nThreadNum<=0||nPort<=0)
-			  return false;
-			if(!m_pHandler->Init())
-			  return false;
+	return true;
+}
 
-			return m_server.CreateServer(nPort, nThreadNum, m_pHandler);
-		}
-		virtual bool Run(){return m_server.RunServer();}
-		virtual bool Dispose(){return m_pHandler->Dispose();} 
-		virtual bool close(){return m_server.CloseServer();}
+bool ServerDemo::dispose()
+{
+	return false;
+}
 
-	private:
-		CServerFrame     m_server;
-		SDerivedHandler* m_pHandler;
+void ServerDemo::operator()(string &strQuery, string &strOut) 
+{
+	CXmlHttp xh;
+	const char* end;
+	const char* mid;
+	end = strstr(strQuery.c_str(), " HTTP");
+	mid = strstr(strQuery.c_str(), "/?");
+	if (end&&mid)
+	{
+		strQuery = string(mid+2, end);
+	}
+	string dstrQuery(strQuery);
+	strQuery = "";
+	string str = "";
+	strQuery = xh.URLDecode(dstrQuery, str);
+	HSS   hssParse;
+	HSSI  hssi;
+	xh.ParseRequest(strQuery,hssParse);
 
-};
+	hssi = hssParse.find("title"); 
+	if(hssi != hssParse.end() && hssi->second.length() > 0)
+	{
+		strOut = "<?xml version=\"1.0\" encoding=\"gbk\" ?><result><keyword><![CDATA[";
+		//strOut += keywordStr;
+		strOut += "]]></keyword></result>";
+		return;
+	}
+	strOut = "<result>Hello Husky</result>";
+} 
 
 int main(int argc,char* argv[])
 {
@@ -61,7 +47,7 @@ int main(int argc,char* argv[])
 		printf("usage: %s -n THREAD_NUMBER -p  PLISTEN_PORT -k start|STOP\n",argv[0]);
 		return -1;
 	}
-	SDerivedHandler s;
+	ServerDemo s;
 	CWorkerEx worker(&s);
 	CDaemon daemon(&worker);
 	return daemon.Run(argc,argv)!=true;

@@ -1,10 +1,8 @@
 #include "Daemon.h"
-#include <sys/wait.h>
-#include <sys/stat.h>
-#include <signal.h>
-#include <unistd.h>
+
 CWorker *CDaemon::m_pWorker=NULL;
 int CDaemon::m_nChildPid=0;
+
 CDaemon::CDaemon(void)
 {
 }
@@ -14,13 +12,66 @@ CDaemon::~CDaemon(void)
 }
 
 
+//bool SDerivedHandler::Init()
+//{
+//	return m.init();
+//}
+//
+//bool SDerivedHandler::Dispose()
+//{
+//	return m.dispose();
+//}
+//
+//void SDerivedHandler::operator()(string &strRec, string &strSnd)
+//{
+//	m(strRec, strSnd);
+//}
+
+CWorkerEx::CWorkerEx(SRequestHandler* pHandler):m_pHandler(pHandler)
+{
+}
+
+bool CWorkerEx::Init(HIS&his)
+{
+	int nPort,nThreadNum;
+	HISI i=his.find('n');   
+	if(i!=his.end())
+	  nThreadNum=atoi(i->second.c_str());
+	i=his.find('p');   
+	if(i!=his.end())
+	  nPort=atoi(i->second.c_str());
+	if(nThreadNum<=0||nPort<=0)
+	  return false;
+	if(!m_pHandler->init())
+	{
+		return false;
+	}
+
+	return m_server.CreateServer(nPort, nThreadNum, m_pHandler);
+}
+
+bool CWorkerEx::Run()
+{
+	return m_server.RunServer();
+}
+
+bool CWorkerEx::Dispose()
+{
+	return m_pHandler->dispose();
+} 
+
+bool CWorkerEx::close()
+{
+	return m_server.CloseServer();
+}
+
 
 //读文件第一行：buf ，读入缓冲区，maxCount最大字节数量，mode 文件打开方式，失败返回 0。
 int CDaemon::Read1LineFromFile(const char* fileName, char* buf, int maxCount, const char* mode)
 {
 	FILE* fp = fopen(fileName, mode);
 	if (!fp)
-		return 0;
+	  return 0;
 	int ret;
 	fgets(buf, maxCount, fp) ? ret = 1 : ret = 0;
 	fclose(fp);
@@ -32,7 +83,7 @@ int CDaemon::WriteBuff2File(const char* fileName, const char* buf, const char* m
 {
 	FILE* fp = fopen(fileName, mode);
 	if (!fp)
-		return 0;
+	  return 0;
 	int n = fprintf(fp, "%s", buf);
 	fclose(fp);
 	return n;
@@ -50,15 +101,15 @@ int CDaemon::WriteBuff2File(const char* fileName, const char* buf, const char* m
 int CDaemon::ParseCmdLine(int argc,char** argv)
 {
 	char* m_pName=argv[0];
-	
+
 	if(argc<2)return 0;
 	for (int i=1;i<argc;++i)
 	{
 		if (argv[i][0]!='-')
-			continue;
+		  continue;
 
 		if (i==argc-1)//后面还有
-			break;
+		  break;
 
 		if (argv[i+1][0]=='-')
 		{
@@ -73,10 +124,10 @@ int CDaemon::ParseCmdLine(int argc,char** argv)
 	const char* pchDir;
 	HISI it=m_hisOptVal.find('d');
 	if(it!=m_hisOptVal.end())
-		pchDir=it->second.c_str();
+	  pchDir=it->second.c_str();
 	else
-		pchDir=".";
-	
+	  pchDir=".";
+
 	struct stat st;	
 	if(stat(pchDir,&st)<0)
 	{
@@ -100,9 +151,9 @@ int CDaemon::ParseCmdLine(int argc,char** argv)
 }
 
 /* modify from book apue
-* 为防止子进程意外死亡, 主进程会重新生成子进程.
-* 除非:1.子进程以EXIT方式退出. 2. kill -9 杀死该进程
-*/
+ * 为防止子进程意外死亡, 主进程会重新生成子进程.
+ * 除非:1.子进程以EXIT方式退出. 2. kill -9 杀死该进程
+ */
 bool isAbnormalExit(int pid, int status)
 {
 	bool bRestart = true;
@@ -115,21 +166,21 @@ bool isAbnormalExit(int pid, int status)
 	{
 		fprintf(stderr, "abnormal termination, pid = %d, signal number = %d%s\n", pid, WTERMSIG(status),
 #ifdef	WCOREDUMP
-			WCOREDUMP(status) ? " (core file generated)" : "");
+					WCOREDUMP(status) ? " (core file generated)" : "");
 #else
-			"");
+		"");
 #endif
 
 		if (WTERMSIG(status) == SIGKILL)
 		{
 			bRestart = false;
-			 fprintf(stderr, "has been killed by user ??, exit pid = %d, status = %d", pid, WEXITSTATUS(status));
+			fprintf(stderr, "has been killed by user ??, exit pid = %d, status = %d", pid, WEXITSTATUS(status));
 		}
 	}
 	else if (WIFSTOPPED(status)) //暂停的子进程退出
-		 fprintf(stderr, "child stopped, pid = %d, signal number = %d\n", pid, WSTOPSIG(status));
+	  fprintf(stderr, "child stopped, pid = %d, signal number = %d\n", pid, WSTOPSIG(status));
 	else
-		 fprintf(stderr, "child other reason quit, pid = %d, signal number = %d\n", pid, WSTOPSIG(status));
+	  fprintf(stderr, "child other reason quit, pid = %d, signal number = %d\n", pid, WSTOPSIG(status));
 
 	return bRestart;
 }
@@ -142,7 +193,7 @@ bool CDaemon::Start()
 	//从文件获取正在运行的daemon的pid
 	char buf[640];
 	int masterPid;
-	
+
 	string strName = m_runPath + MASTER_PID_FILE ;
 	strName+=m_pName;
 	bool bStart=false;
@@ -180,7 +231,7 @@ bool CDaemon::Start()
 			signal(SIGTERM, SIG_IGN);
 			signal(SIGINT,  SIG_IGN);
 			signal(SIGQUIT, SIG_IGN);
-			
+
 			if (!m_pWorker->Init(m_hisOptVal))
 			{	
 				fprintf(stderr, "Worker init  fail!\n");
@@ -222,7 +273,7 @@ bool CDaemon::Stop()
 {
 	char buf[640];
 	int masterPid;
-	
+
 	string strName = m_runPath + MASTER_PID_FILE ;
 	strName+=m_pName;
 
@@ -235,7 +286,7 @@ bool CDaemon::Stop()
 			int tryTime = 200;		
 			kill(masterPid, SIGTERM);
 			while (kill(masterPid, 0) == 0 && --tryTime)
-				sleep(1);			
+			  sleep(1);			
 
 			if (!tryTime && kill(masterPid, 0) == 0)
 			{
@@ -255,7 +306,7 @@ bool CDaemon::Stop()
 void CDaemon::initAsDaemon()
 {
 	if (fork() > 0)
-		exit(0);
+	  exit(0);
 	setsid();
 
 	signal(SIGPIPE, SIG_IGN);

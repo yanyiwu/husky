@@ -54,7 +54,8 @@ $(CMLIB):
 all:  ${LIBA}
 
 clean:
-	rm -f *.o *.d $(LIBA)
+	rm -f *.o *.d $(LIBA) 
+	rm -rf $(TMPDIR)
 	cd $(CMDIR) && make clean
 
 sinclude $(SOURCES:.cpp=.d)

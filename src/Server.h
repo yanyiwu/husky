@@ -10,17 +10,5 @@
 #include <ctype.h>
 #include <string.h>
 
-class Server
-{
-	public:
-		Server();
-		~Server();
-	public:
-		bool init();
-		bool dispose();
-
-	public:
-		int HandleRequest(string& strQuery,string& strOut);
-};
 
 #endif

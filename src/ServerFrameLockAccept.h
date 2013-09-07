@@ -28,9 +28,10 @@ using std::string;
 
 struct SRequestHandler 
 {
+	virtual bool init(){return true;}
+	virtual bool dispose(){return true;}
 	virtual void operator()(string &strRec, string &strSnd)
 	{
-		;
 	}
 
 };
