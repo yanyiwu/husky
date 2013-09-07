@@ -2,12 +2,7 @@
 #include <string>
 #include <ctype.h>
 #include <string.h>
-#include "ServerFrameLockAccept.h"
-#include "FileOperation.h"
-#include "UtilDef.h"
-#include "XmlHttp.h"
-#include "Daemon.h"
-#include "Server.h"
+#include "../src/headers.h"
 
 struct SDerivedHandler:public SRequestHandler 
 { 

@@ -20,7 +20,8 @@ DOPACK := $(AR)
 SOURCES = Daemon.cpp\
 	FileOperation.cpp\
 	XmlHttp.cpp\
-	ServerFrameLockAccept.cpp
+	ServerFrameLockAccept.cpp\
+	Server.cpp
 OBJS := $(patsubst %.cpp,%.o,$(SOURCES))
 
 CMDIR := ../cppcommon
