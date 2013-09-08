@@ -237,10 +237,8 @@ void* CServerFrame::ServerThread(void *lpParameter )
 		sprintf(chHttpHeader,   "HTTP/1.1 200 OK\r\n"
 			"Connection: close\r\n"
 			"Server: FrameServer/1.0.0\r\n"  //**¸Ä³ÉSELF
-			"Content-Type: text/xml; charset=",
-			RESPONSE_CHARSET_UTF8,
-			"\r\n"
-			"Content-Length: %d\r\n\r\n",strSnd.length());
+			"Content-Type: text/xml; charset=%s\r\n"
+			"Content-Length: %d\r\n\r\n",RESPONSE_CHARSET_UTF8,strSnd.length());
 		strHttpXml=chHttpHeader;
 		strHttpXml+=strSnd;
 

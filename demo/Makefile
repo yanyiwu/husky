@@ -43,7 +43,7 @@ $(SRCLIB):
 	cd $(SRCDIR) && $(MAKE)
 
 clean:
-	rm -f *.o *.ut *.d $(TARGET)
+	rm -f *.o *.ut *.d *.d.* $(TARGET)
 	cd $(SRCDIR) && make clean
 
 sinclude $(SOURCES:.cpp=.d)
