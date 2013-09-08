@@ -10,6 +10,10 @@ using std::vector;
 using std::set;
 using std::pair;
 
+
+const char* const RESPONSE_CHARSET_UTF8 = "UTF-8";
+const char* const RESPONSE_CHARSET_GB2312 = "GB2312";
+
 //-----------------------TYPE_DEFINE--------------------------------//
 typedef string   S;
 typedef vector<string>         VS;

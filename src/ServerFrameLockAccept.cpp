@@ -1,7 +1,9 @@
 #include "ServerFrameLockAccept.h"
 #include "SimpleThread.h"
+#include "UtilDef.h"
 #include <stdio.h>
 #include <string.h>
+
 #ifndef _WIN32
 	#include <sys/socket.h>
 	#include <sys/types.h>
@@ -235,7 +237,9 @@ void* CServerFrame::ServerThread(void *lpParameter )
 		sprintf(chHttpHeader,   "HTTP/1.1 200 OK\r\n"
 			"Connection: close\r\n"
 			"Server: FrameServer/1.0.0\r\n"  //**¸Ä³ÉSELF
-			"Content-Type: text/xml; charset=GB2312\r\n"
+			"Content-Type: text/xml; charset=",
+			RESPONSE_CHARSET_UTF8,
+			"\r\n"
 			"Content-Length: %d\r\n\r\n",strSnd.length());
 		strHttpXml=chHttpHeader;
 		strHttpXml+=strSnd;

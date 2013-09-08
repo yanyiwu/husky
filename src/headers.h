@@ -6,5 +6,6 @@
 #include "XmlHttp.h"
 #include "ServerFrameLockAccept.h"
 #include "Server.h"
+#include "../cppcommon/headers.h"
 
 #endif
