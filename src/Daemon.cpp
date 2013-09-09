@@ -100,7 +100,7 @@ int CDaemon::WriteBuff2File(const char* fileName, const char* buf, const char* m
 //************************************
 int CDaemon::ParseCmdLine(int argc,char** argv)
 {
-	char* m_pName=argv[0];
+	m_pName=argv[0];
 
 	if(argc<2)return 0;
 	for (int i=1;i<argc;++i)
@@ -138,7 +138,7 @@ int CDaemon::ParseCmdLine(int argc,char** argv)
 	if(0>chdir(pchDir))
 	{
 
-		fprintf(stderr, "work dir %s does not exist\n");
+		fprintf(stderr, "work dir %s does not exist\n",pchDir);
 		exit(0);
 	}
 
@@ -196,7 +196,6 @@ bool CDaemon::Start()
 
 	string strName = m_runPath + MASTER_PID_FILE ;
 	strName+=m_pName;
-	bool bStart=false;
 	if ( 0<Read1LineFromFile(strName.c_str(), buf, 64, "r") &&(masterPid = atoi(buf)) != 0)
 	{
 		printf("readlast %d:masterPid\n",masterPid);
@@ -277,7 +276,6 @@ bool CDaemon::Stop()
 	string strName = m_runPath + MASTER_PID_FILE ;
 	strName+=m_pName;
 
-	bool bStart=false;
 	if ( 0<Read1LineFromFile(strName.c_str(), buf, 64, "r") &&(masterPid = atoi(buf)) != 0)
 	{
 		if (kill(masterPid, 0) == 0)

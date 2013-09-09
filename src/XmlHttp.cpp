@@ -27,136 +27,136 @@ CXmlHttp::~CXmlHttp()
 //将URL_DECODE 后参数值原封不动的存入HASH_MAP中
 int CXmlHttp::ParseRequest(string strRecvPara,unordered_map<string,string>& hmStrStr)
 {
-	if(strRecvPara.length()==0)
-		return 0;
-	//strRecvPara=URLDecode(strRecvPara.c_str());
+    if(strRecvPara.length()==0)
+      return 0;
+    //strRecvPara=URLDecode(strRecvPara.c_str());
 
-	string::iterator itStr;
-	string::iterator itStrT;
-	string m_strEncodedKeyWord;
-	string strName,strValue;
-	// Parses & decodes the string in pairs name-value.
-	// ONLY standard requests are handled properly.
-	
+    string::iterator itStr;
+    string::iterator itStrT;
+    string m_strEncodedKeyWord;
+    string strName,strValue;
+    // Parses & decodes the string in pairs name-value.
+    // ONLY standard requests are handled properly.
 
-	for (itStr=strRecvPara.begin();itStr!=strRecvPara.end();++itStr)
-	{
-		itStrT=itStr;
-		while(itStr!=strRecvPara.end()&&*itStr!='=')
-		{
-			++itStr;
-		}
-		
 
-		if (itStr==strRecvPara.end())
-		{
-			break;			
-		}
-		else			
-		{
-			strName.assign(itStrT,itStr);
-			if (strValue.empty())
-			{
-				strValue="";
-			}
-			//cout<<endl<<"strName"<<strName.c_str()<<endl;
-			itStrT=itStr;
-		}
-		
-		while (itStr!=strRecvPara.end()&&*itStr!='&')
-		{
-			++itStr;
-		}
-		
-		strValue.assign(++itStrT,itStr);
-		if (strValue.empty())
-		{
-			strValue="";
-		}
-		//cout<<endl<<"strValue"<<strValue.c_str()<<endl;
-		
-		string ret;
-		URLDecode(strValue,ret);
-		gs_cc.Convert_t2s((char*)ret.c_str());
-		gs_cc.ConvertDigitAlpha((char*)ret.c_str());
-		ret=ret.c_str();
+    for (itStr=strRecvPara.begin();itStr!=strRecvPara.end();++itStr)
+    {
+        itStrT=itStr;
+        while(itStr!=strRecvPara.end()&&*itStr!='=')
+        {
+            ++itStr;
+        }
 
-		hmStrStr[strName]=ret;	
-		if (itStr==strRecvPara.end())
-		{
-			break;
-		}
-	}
-	return 0;
+
+        if (itStr==strRecvPara.end())
+        {
+            break;			
+        }
+        else			
+        {
+            strName.assign(itStrT,itStr);
+            if (strValue.empty())
+            {
+                strValue="";
+            }
+            //cout<<endl<<"strName"<<strName.c_str()<<endl;
+            itStrT=itStr;
+        }
+
+        while (itStr!=strRecvPara.end()&&*itStr!='&')
+        {
+            ++itStr;
+        }
+
+        strValue.assign(++itStrT,itStr);
+        if (strValue.empty())
+        {
+            strValue="";
+        }
+        //cout<<endl<<"strValue"<<strValue.c_str()<<endl;
+
+        string ret;
+        URLDecode(strValue,ret);
+        gs_cc.Convert_t2s((char*)ret.c_str());
+        gs_cc.ConvertDigitAlpha((char*)ret.c_str());
+        ret=ret.c_str();
+
+        hmStrStr[strName]=ret;	
+        if (itStr==strRecvPara.end())
+        {
+            break;
+        }
+    }
+    return 0;
 
 }
 string& CXmlHttp::XmlEncode(const char *str, string& s)
 {
-	if(!str) return s;
-	while(*str)
-	{
-		switch(*str)
-		{
-		case '<':
-			s+="&lt;";
-			break;
-		case '>':
-			s+="&gt;";
-			break;
-		case '&':
-			s+="&amp;";
-			break;
-		case '\'':
-			s+="&apos;";
-			break;
-		case '\"':
-			s+="&quot;";
-			break;
-		default:
-			if(*str>=0)
-			{
-				if((*str>=0x00&&*str<=0x08)||(*str==0x0c)||(*str==0x0b)||(*str>=0x0e&&*str<=0x1f))
-					;
-				else
-					s+=*str;
-			}
-			else
-			{
-				if(*(str+1)==0)
-			       return s;;
-				s+= *str++;				
-				s+=*str;
-			}	
-		}
-		str++;
-	}
-	return s;
+    if(!str) return s;
+    while(*str)
+    {
+        switch(*str)
+        {
+            case '<':
+                s+="&lt;";
+                break;
+            case '>':
+                s+="&gt;";
+                break;
+            case '&':
+                s+="&amp;";
+                break;
+            case '\'':
+                s+="&apos;";
+                break;
+                case '\"':
+                    s+="&quot;";
+                break;
+            default:
+                if(*str>=0)
+                {
+                    if((*str>=0x00&&*str<=0x08)||(*str==0x0c)||(*str==0x0b)||(*str>=0x0e&&*str<=0x1f))
+                      ;
+                    else
+                      s+=*str;
+                }
+                else
+                {
+                    if(*(str+1)==0)
+                      return s;;
+                    s+= *str++;				
+                    s+=*str;
+                }	
+        }
+        str++;
+    }
+    return s;
 }
 
 string& CXmlHttp::XmlPackText(const char *str, string& s)
 {
-	if(!str) return s;
-	s+="<![CDATA[ ";
-	while(*str)
-	{
-		if(*str>=0)
-		{
-			if((*str>=0x00&&*str<=0x08)||(*str==0x0c)||(*str==0x0b)||(*str>=0x0e&&*str<=0x1f))
-				;
-			else
-				s+=*str;
-		}
-		else
-		{
-			if(*(str+1)==0)
-				break;
-			s+= *str++;				
-			s+=*str;
-		}	
-		str++;
-	}
-	s+=" ]]>";
-	return s;
+    if(!str) return s;
+    s+="<![CDATA[ ";
+    while(*str)
+    {
+        if(*str>=0)
+        {
+            if((*str>=0x00&&*str<=0x08)||(*str==0x0c)||(*str==0x0b)||(*str>=0x0e&&*str<=0x1f))
+              ;
+            else
+              s+=*str;
+        }
+        else
+        {
+            if(*(str+1)==0)
+              break;
+            s+= *str++;				
+            s+=*str;
+        }	
+        str++;
+    }
+    s+=" ]]>";
+    return s;
 }
 
 
@@ -174,44 +174,35 @@ string& CXmlHttp::XmlPackText(const char *str, string& s)
 string CXmlHttp::URLEncode(string sIn)
 
 {
+    string sOut;
 
-	string sOut;
+    const int nLen = sIn.length();
+    unsigned char ch;
+    for(int i=0;i<nLen;i++)
+    {
+        ch=sIn[i];
 
-	const int nLen = sIn.length();
+        if(isalnum(ch))
 
-	const char* p=sIn.c_str();
+          sOut+=ch;
 
+        else if(isspace(ch))
 
+          sOut+="%20";
 
-	unsigned char ch;
+        else{
 
-	for(int i=0;i<nLen;i++)
+            sOut+="%";
 
-	{
+            sOut+=toHex(ch>>4);
 
-		ch=sIn[i];
+            sOut+=toHex(ch%16);
 
-		if(isalnum(ch))
+        }
 
-			sOut+=ch;
+    }
 
-		else if(isspace(ch))
-
-			sOut+="%20";
-
-		else{
-
-			sOut+="%";
-
-			sOut+=toHex(ch>>4);
-
-			sOut+=toHex(ch%16);
-
-		}
-
-	}
-
-	return sOut;
+    return sOut;
 
 }
 
@@ -222,67 +213,67 @@ string CXmlHttp::URLDecode(const string& in,string& ret)
 
 {
 
-	
-	string hex;
 
-	string::const_iterator it = in.begin();
+    string hex;
 
-	while(it != in.end())
-	{
+    string::const_iterator it = in.begin();
 
-		switch(*it) 
-		{
+    while(it != in.end())
+    {
 
-		case '+':
+        switch(*it) 
+        {
 
-			ret.push_back(' ');
+            case '+':
 
-			++it;
+                ret.push_back(' ');
 
-			break;
+                ++it;
 
-		case '%':
+                break;
 
-			hex = "";
+            case '%':
 
-			++it;
+                hex = "";
 
-			if(it != in.end()) 
-			{
+                ++it;
 
-				hex.push_back(*it);
+                if(it != in.end()) 
+                {
 
-				++it;
+                    hex.push_back(*it);
 
-				if(it != in.end()) 
-				{
+                    ++it;
 
-					hex.push_back(*it);
+                    if(it != in.end()) 
+                    {
 
-					long r = strtol(hex.c_str(), NULL, 16);
+                        hex.push_back(*it);
 
-					if((0 < r) && (r < 256))
+                        long r = strtol(hex.c_str(), NULL, 16);
 
-						ret.push_back(r);
+                        if((0 < r) && (r < 256))
 
-					++it;
+                          ret.push_back(r);
 
-				}
+                        ++it;
 
-			}
+                    }
 
-			break;
+                }
 
-		default:
+                break;
 
-			ret.push_back(*it);
+            default:
 
-			++it;
+                ret.push_back(*it);
 
-		}
+                ++it;
 
-	}
+        }
 
-	return ret;
+    }
+
+    return ret;
 
 }

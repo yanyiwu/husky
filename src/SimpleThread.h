@@ -177,7 +177,7 @@ namespace simpleThread
 			return WaitForMultipleObjects(m_vecHandle.size(),&m_vecHandle[0],bWaitAll,dwMilliseconds);
 #else
 			int nErrorcode;
-			for (int i=0;i<m_vecHandle.size();++i)
+			for (uint i=0;i<m_vecHandle.size();++i)
 			{
 				nErrorcode=pthread_join(m_vecHandle[i], NULL); 
 				if (nErrorcode!=0)
@@ -224,7 +224,7 @@ namespace simpleThread
 		//	vector<void*> m_vecPvoid;  //保存线程参数使用；
 	private:
 		threadManager(const threadManager&){;}//禁止拷贝
-		threadManager & operator=(const threadManager &){;}//禁止赋值			
+		void operator=(const threadManager &){}//禁止赋值			
 	};
 
 
