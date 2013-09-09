@@ -7,7 +7,7 @@
 
 using namespace std;
 
-typedef hash_map<string,string> CHARACTER_TABLE;
+typedef unordered_map<string,string> CHARACTER_TABLE;
 
 static const char wordlist[][3]=
 {

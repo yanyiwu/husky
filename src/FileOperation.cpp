@@ -3,7 +3,7 @@
 
 
 //载入 STRING->INT 结构文件 放入哈希表
-bool LoadKeysCnts(const char* pchFileName,hash_map<string,int> &hmStrCnt)
+bool LoadKeysCnts(const char* pchFileName,unordered_map<string,int> &hmStrCnt)
 {
 
 	FILE *pFile = fopen(pchFileName, "rb");

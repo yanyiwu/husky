@@ -54,7 +54,7 @@ $(CMLIB):
 all:  ${LIBA}
 
 clean:
-	rm -f *.o *.d $(LIBA) 
+	rm -f *.o *.d *.d.* $(LIBA) 
 	rm -rf $(TMPDIR)
 	cd $(CMDIR) && make clean
 

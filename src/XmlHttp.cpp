@@ -25,7 +25,7 @@ CXmlHttp::~CXmlHttp()
 }
 
 //将URL_DECODE 后参数值原封不动的存入HASH_MAP中
-int CXmlHttp::ParseRequest(string strRecvPara,hash_map<string,string>& hmStrStr)
+int CXmlHttp::ParseRequest(string strRecvPara,unordered_map<string,string>& hmStrStr)
 {
 	if(strRecvPara.length()==0)
 		return 0;

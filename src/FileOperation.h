@@ -115,7 +115,7 @@ inline string PrepareK<string>(char*buf)
 }
 
 template<class K,class V>
-bool Load2PairFileR(const char* pchFileName,hash_map<K,V> &hm)
+bool Load2PairFileR(const char* pchFileName,unordered_map<K,V> &hm)
 {
 	FILE *fpIn=fopen(pchFileName,"rb");
 
@@ -147,7 +147,7 @@ bool Load2PairFileR(const char* pchFileName,hash_map<K,V> &hm)
 
 
 template<class K,class V>
-bool Load2PairFile(const char* pchFileName,hash_map<K,V> &hm)
+bool Load2PairFile(const char* pchFileName,unordered_map<K,V> &hm)
 {
 	FILE *fpIn=fopen(pchFileName,"rb");
 
@@ -237,7 +237,7 @@ inline void ToStringR<string>(char *pBuf,const string& t)
 
 
 template<class K,class V>
-bool Write2PairFile(const char* pchFileName,hash_map<K,V> &hm)
+bool Write2PairFile(const char* pchFileName,unordered_map<K,V> &hm)
 {
 	FILE *fpOut=fopen(pchFileName,"wb");
 
@@ -249,7 +249,7 @@ bool Write2PairFile(const char* pchFileName,hash_map<K,V> &hm)
 	}
 	char chKey[1024];
 	char chVal[1024];
-	for (typename hash_map<K,V>::iterator it=hm.begin();it!=hm.end();++it)
+	for (typename unordered_map<K,V>::iterator it=hm.begin();it!=hm.end();++it)
 	{
 		ToString(chKey,it->first);
 		ToString(chVal,it->second);
@@ -260,7 +260,7 @@ bool Write2PairFile(const char* pchFileName,hash_map<K,V> &hm)
 }
 
 template<class K,class V>
-bool Write2PairFileR(const char* pchFileName,hash_map<K,V> &hm)
+bool Write2PairFileR(const char* pchFileName,unordered_map<K,V> &hm)
 {
 	FILE *fpOut=fopen(pchFileName,"wb");
 
@@ -272,7 +272,7 @@ bool Write2PairFileR(const char* pchFileName,hash_map<K,V> &hm)
 	}
 	char chKey[1024];
 	char chVal[1024];
-	for (typename hash_map<K,V>::iterator it=hm.begin();it!=hm.end();++it)
+	for (typename unordered_map<K,V>::iterator it=hm.begin();it!=hm.end();++it)
 	{
 		ToStringR(chKey,it->first);
 		ToStringR(chVal,it->second);
@@ -316,7 +316,7 @@ bool LoadKeysFile(const char* pchFileName,vector<T> &vec)
 }
 
 template<class T>
-bool LoadKeysFile(const char* pchFileName,hash_set<T> &hs)
+bool LoadKeysFile(const char* pchFileName,unordered_set<T> &hs)
 {
 	FILE *fpIn=fopen(pchFileName,"rb");
 	if(!fpIn)
@@ -342,7 +342,7 @@ bool LoadKeysFile(const char* pchFileName,hash_set<T> &hs)
 
 
 //载入 STRING->INT 结构文件 放入哈希表
-bool LoadKeysCnts(const char* pchFileName,hash_map<string,int> &hmStrCnt);
+bool LoadKeysCnts(const char* pchFileName,unordered_map<string,int> &hmStrCnt);
 
 //载入结构 bHead 表示是否有第一个整数标识结构大小 。
 template<class T>
@@ -353,15 +353,15 @@ bool WriteStruct(const char*pchFileName,vector<T>& vecTemplate,bool bHead=true);
 
 //将HASH_MAP string_T写入文件。
 template<class T,size_t size>
-bool WriteHash_StringT(hash_map<string,T>& hmStringT,const char*pchFileName);
+bool WriteHash_StringT(unordered_map<string,T>& hmStringT,const char*pchFileName);
 
 //将HASH_MAP string_T读出文件。
 template<class T,size_t size>
-bool LoadHash_StringT(hash_map<string,T>& hmStringT,const char*pchFileName);
+bool LoadHash_StringT(unordered_map<string,T>& hmStringT,const char*pchFileName);
 
 
 template<class T,size_t size>
-bool WriteHash_StringT(hash_map<string,T>& hmStringT,const char*pchFileName)
+bool WriteHash_StringT(unordered_map<string,T>& hmStringT,const char*pchFileName)
 {
 
 	//放入数组
@@ -369,7 +369,7 @@ bool WriteHash_StringT(hash_map<string,T>& hmStringT,const char*pchFileName)
 	vector<STRING_T<T,size> > vecStringT;
 	vecStringT.reserve(hmStringT.size());
 	STRING_T<T,size> stringT;
-	typename hash_map<string,T>::iterator i;
+	typename unordered_map<string,T>::iterator i;
 	for (i=hmStringT.begin();i!=hmStringT.end();++i)
 	{
 		strcpy(stringT.chBuf,i->first.c_str());
@@ -386,7 +386,7 @@ bool WriteHash_StringT(hash_map<string,T>& hmStringT,const char*pchFileName)
 }
 //将HASH_MAP string_T读出文件。
 template<class T,size_t size>
-bool LoadHash_StringT(hash_map<string,T>& hmStringT,const char*pchFileName)
+bool LoadHash_StringT(unordered_map<string,T>& hmStringT,const char*pchFileName)
 {
 
 	vector<STRING_T<T,size> > vecStringT;
