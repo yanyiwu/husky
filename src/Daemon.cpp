@@ -1,5 +1,7 @@
 #include "Daemon.h"
 
+namespace Husky
+{
 CWorker *CDaemon::m_pWorker=NULL;
 int CDaemon::m_nChildPid=0;
 
@@ -357,6 +359,7 @@ bool CDaemon::Run(int argc,char** argv)
 	}
 	return true;
 
+}
 }
 
 

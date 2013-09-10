@@ -1,6 +1,7 @@
 #include "FileOperation.h"
 
-
+namespace Husky
+{
 
 //载入 STRING->INT 结构文件 放入哈希表
 bool LoadKeysCnts(const char* pchFileName,unordered_map<string,int> &hmStrCnt)
@@ -22,4 +23,5 @@ bool LoadKeysCnts(const char* pchFileName,unordered_map<string,int> &hmStrCnt)
 	}
 	fclose(pFile);	
 	return true;
+}
 }

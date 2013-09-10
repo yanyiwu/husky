@@ -12,6 +12,9 @@
 #include "XmlHttp.h"
 #define MASTER_PID_FILE 	"masterDaemon.pid."//daemon 主进程PID文件
 
+namespace Husky
+
+{
 class CWorker
 {
 	public:
@@ -78,4 +81,5 @@ class CDaemon
 
 
 };
+}
 #endif

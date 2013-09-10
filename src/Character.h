@@ -5,6 +5,8 @@
 #include <string.h>
 #include "UtilDef.h"
 
+namespace Husky
+{
 using namespace std;
 
 typedef unordered_map<string,string> CHARACTER_TABLE;
@@ -3111,6 +3113,7 @@ class CharacterConverter
     public:
         CHARACTER_TABLE m_hashChinese;
 };
+}
 
 #endif 
 

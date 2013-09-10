@@ -10,6 +10,8 @@
 #include <errno.h>
 #include <string.h>
 #include "UtilDef.h"
+namespace Husky
+{
 using namespace std;
 
 #define REPLACE_CHAR ','
@@ -512,7 +514,7 @@ inline void SplitToVec<string>(char* pSrc, vector<string> &vec)
 	}
 }
 
-
+}
 
 
 #endif

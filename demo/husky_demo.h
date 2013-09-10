@@ -7,6 +7,7 @@
 #include <string.h>
 #include "../src/headers.h"
 using namespace CPPCOMMON;
+using namespace Husky;
 
 class ServerDemo: public SRequestHandler
 {
