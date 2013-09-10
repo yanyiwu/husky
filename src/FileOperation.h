@@ -11,10 +11,6 @@
 #include <string.h>
 #include "UtilDef.h"
 using namespace std;
-#ifdef _WIN32
-using namespace stdext;
-#endif
-
 
 #define REPLACE_CHAR ','
 
@@ -474,11 +470,7 @@ inline void SplitToVecEx(char* pSrc, vector<T> &vec, const char* pchSplit)
 	char* pchCurWord=strtok(pSrc,pchSplit);
 	while(pchCurWord)
 	{
-#ifdef _WIN32
-		vec.push_back((T)_atoi64(pchCurWord));
-#else
 		vec.push_back((T)atoll(pchCurWord));
-#endif
 		pchCurWord = strtok(NULL, pchSplit);
 	}
 
@@ -503,11 +495,7 @@ inline void SplitToVec(char* pSrc, vector<T> &vec)
 	char* pchCurWord=strtok(pSrc,pchSplit);
 	while(pchCurWord)
 	{
-#ifdef _WIN32
-		vec.push_back((T)_atoi64(pchCurWord));
-#else
 		vec.push_back((T)atoll(pchCurWord));
-#endif
 		pchCurWord = strtok(NULL, pchSplit);
 	}
 

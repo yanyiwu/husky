@@ -15,9 +15,6 @@
 
 
 using namespace std;
-#ifdef _WIN32
-using namespace stdext;
-#endif
 
 class CXmlHttp  
 {

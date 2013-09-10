@@ -20,7 +20,6 @@ const char* const RESPONSE_CHARSET_UTF8 = "UTF-8";
 const char* const RESPONSE_CHARSET_GB2312 = "GB2312";
 
 //-----------------------TYPE_DEFINE--------------------------------//
-typedef string   S;
 typedef vector<string>         VS;
 typedef vector<int>            VI;
 typedef set<int>               SI;
@@ -28,9 +27,9 @@ typedef set<string>            SETS;
 typedef VS::iterator           VSI;
 typedef VI::iterator           VII;
 typedef unordered_map<int,int>      HII;
-typedef unordered_map<S,int>        HSI;
-typedef unordered_map<int,S>        HIS;
-typedef unordered_map<S,S>          HSS;
+typedef unordered_map<string,int>        HSI;
+typedef unordered_map<int,string>        HIS;
+typedef unordered_map<string,string>          HSS;
 typedef pair<int,int>          PII;
 typedef pair<int,string>       PIS;
 typedef pair<string,string>    PSS;
@@ -39,20 +38,5 @@ typedef HII::iterator          HIII;
 typedef HSI::iterator          HSII;
 typedef HIS::iterator          HISI;
 typedef HSS::iterator          HSSI;
-
-//--------------------MACRO_DEFINE----------------------------------//
-#define FOR_EACH(iter,container)          for(iter=container.begin();iter!=container.end();++iter)
-#define FOR_EACH_POS(iter,container)      for(iter=0;iter!=container.size();++iter)
-#define FOR_EACH_CLASSIC(iter,start,end)  for(iter=start;iter<end;++iter)
-
-
-//#define FALSE_RETURN(clause)              if(clause) return false;
-#define TRUE_RETURN(clause)               if(clause) return true;
-#define FALSE_RETURN_STRERROR(clause)     if(clause) {fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));return false;}
-#define FALSE_RETURN(clause)     if(clause) {fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));return false;}
-
-#define MINUS1_RETURN(clause)     if(clause) {fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));return -1;}
-
-
 
 #endif

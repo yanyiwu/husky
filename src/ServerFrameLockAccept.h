@@ -1,9 +1,5 @@
 #ifndef SERVERFRAME_H 
 #define SERVERFRAME_H 
-#ifdef _WIN32
-	#include <WinSock2.h>	
-	typedef  CRITICAL_SECTION CS;
-#else
 	#include <pthread.h>
 	#include <string.h>
 	#include <errno.h>
@@ -16,7 +12,6 @@
 	#define INVALID_SOCKET  -1 
 	#define SOCKET_ERROR    -1 
 	#define closesocket     close
-#endif
 
 #include <string>
 #include <vector>
@@ -52,17 +47,9 @@ public:
 
 protected:
 
-#ifdef _WIN32
-	bool InitSocketLib(void);
-#endif
-
 	bool BindToLocalHost(SOCKET &sock,u_short nPort);
 
-#ifdef _WIN32
-	static unsigned __stdcall ServerThread(void *lpParameter );
-#else
 	static void* ServerThread(void *lpParameter );
-#endif
 
 	
 private:
@@ -73,11 +60,7 @@ private:
 
 	SRequestHandler *m_pHandler;
 	static bool m_bShutdown ;                 // Signals client/server threads to die
-#ifdef _WIN32
-	static CS m_csAccept;              // Ω” ’À¯
-#else		
 	static PM m_pmAccept;
-#endif
 			
 }; 
 

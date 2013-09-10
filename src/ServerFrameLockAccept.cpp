@@ -4,27 +4,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifndef _WIN32
-	#include <sys/socket.h>
-	#include <sys/types.h>
-	#include <arpa/inet.h>
-#endif
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
 #include <stdlib.h>
 //#include "ErroLog.h"
 using namespace simpleThread;
 
 bool CServerFrame::m_bShutdown = false;
 
-
-
-#ifdef _WIN32
-	CS CServerFrame::m_csAccept; 
-#else
-	PM CServerFrame::m_pmAccept; 
-#endif
-
-
-	
+PM CServerFrame::m_pmAccept; 
 
 CServerFrame::CServerFrame(void)
 {
@@ -33,28 +22,12 @@ CServerFrame::CServerFrame(void)
 
 CServerFrame::~CServerFrame(void)
 {
-#ifdef _WIN32
-	WSACleanup();
-	DeleteCriticalSection(&m_csAccept);
-#else
 	pthread_mutex_destroy(&m_pmAccept);
-#endif
-
 }
 
 bool CServerFrame::CloseServer()
 {
 	m_bShutdown=true;
-#ifdef _WIN32
-	if (SOCKET_ERROR==closesocket(m_lsnSock))
-	{
-		fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
-		return false;
-	}
-	char buf[128];
-	sprintf(buf,"telnet 127.0.0.1 %d",m_nLsnPort);
-	system(buf);
-#else
 	if (SOCKET_ERROR==closesocket(m_lsnSock))
 	{
 		fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
@@ -85,7 +58,6 @@ bool CServerFrame::CloseServer()
 		fprintf(stdout,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
 	}
 	close(sockfd);
-#endif
 	return true;
 
 }
@@ -104,11 +76,7 @@ bool CServerFrame::RunServer()
 	para.pHandler=m_pHandler;
 	for (i=0;i<m_nThreadCount;i++)
 	{		
-#ifdef _WIN32
-		if (!thrMngr.CreateThread(ServerThread, &para))
-#else
 		if (0!=thrMngr.CreateThread(ServerThread, &para))
-#endif
 		{
 			break;	
 		}		
@@ -122,11 +90,7 @@ bool CServerFrame::RunServer()
 
 	printf("server start to run.........\n");
 
-#ifdef _WIN32
-	if (thrMngr.WaitMultipleThread()!=WAIT_OBJECT_0)
-#else
 	if (thrMngr.WaitMultipleThread()!=0)
-#endif
 	{
 		return false;//等待所有线程退出
 	}
@@ -135,11 +99,7 @@ bool CServerFrame::RunServer()
 
 }
 
-#ifdef _WIN32
-unsigned __stdcall CServerFrame::ServerThread(void *lpParameter )
-#else
 void* CServerFrame::ServerThread(void *lpParameter )
-#endif
 {
 	SPara *pPara=(SPara*)lpParameter;
 	SOCKET hSockLsn=pPara->hSock;
@@ -152,15 +112,9 @@ void* CServerFrame::ServerThread(void *lpParameter )
 	string strHttpXml;
 	while(!m_bShutdown)
 	{		
-#ifdef _WIN32
-		EnterCriticalSection(&m_csAccept);
-		hClientSock=accept(hSockLsn,NULL,NULL);
-		LeaveCriticalSection(&m_csAccept);
-#else
 		pthread_mutex_lock(&m_pmAccept);
 		hClientSock=accept(hSockLsn,NULL,NULL);
 		pthread_mutex_unlock(&m_pmAccept);
-#endif
 		if(hClientSock==SOCKET_ERROR)
 		{
 			if(!m_bShutdown)
@@ -170,14 +124,6 @@ void* CServerFrame::ServerThread(void *lpParameter )
 		//printf("start to serve:id = %d\n",nSockNum);
 
 		//printf("server thread id = %d,socket id = %d",nSockNum,hClientSock);
-
-#ifdef _WIN32
-		bool noDelay=1;
-		if(SOCKET_ERROR==setsockopt(hClientSock,IPPROTO_TCP,TCP_NODELAY,(char*)&noDelay,sizeof(noDelay)))
-		{
-			fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
-		}
-#endif
 
 		lng.l_linger=1;
 		lng.l_onoff=1;				
@@ -261,50 +207,15 @@ bool CServerFrame::CreateServer(u_short nPort,u_short nThreadCount,SRequestHandl
 	m_nThreadCount=nThreadCount;
 	m_pHandler=pHandler;
 
-#ifdef _WIN32
-	if(!InitSocketLib())
-		return false;
-#endif
 
 	if (!BindToLocalHost(m_lsnSock,m_nLsnPort))
 	{
 		return false;
 	}
-#ifdef _WIN32
-	InitializeCriticalSection(&m_csAccept);
-#else
 	pthread_mutex_init(&m_pmAccept,NULL);
-#endif
 
 	return true;
 }
-
-
-
-#ifdef _WIN32
-bool  CServerFrame::InitSocketLib(void)
-{
-	WORD wVersionRequested;
-	WSADATA wsaData;
-	int err;
-
-	wVersionRequested = MAKEWORD( 2, 2 );
-
-	err = WSAStartup( wVersionRequested, &wsaData );
-	if ( err != 0 ) {	
-		printf("Failed to load WinSock!\n");
-		return false;
-	}	
-	if ( LOBYTE( wsaData.wVersion ) != 2 ||
-		HIBYTE( wsaData.wVersion ) != 2 ) {	
-			printf("Socket version is not 2.2\n");
-			WSACleanup( );
-			return false; 
-	}
-	return true;
-
-}
-#endif
 
 bool  CServerFrame::BindToLocalHost(SOCKET &sock,u_short nPort)
 {
@@ -325,11 +236,7 @@ bool  CServerFrame::BindToLocalHost(SOCKET &sock,u_short nPort)
 	struct sockaddr_in addrSock;
 	addrSock.sin_family=AF_INET;
 	addrSock.sin_port=htons(nPort);
-#ifdef _WIN32
-	addrSock.sin_addr.S_un.S_addr=htonl(INADDR_ANY);
-#else
 	addrSock.sin_addr.s_addr=htonl(INADDR_ANY);
-#endif
 	int retval;
 	retval=bind(sock,(sockaddr*)&addrSock,sizeof(sockaddr));
 	if(SOCKET_ERROR==retval)
