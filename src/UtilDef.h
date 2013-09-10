@@ -3,7 +3,12 @@
 #include <string>
 #include <vector>
 #include <set>
-#include "hash_wrap.h"
+#include <string>
+#include <stdlib.h>
+#include <tr1/unordered_map>
+#include <tr1/unordered_set>
+using std::tr1::unordered_map;
+using std::tr1::unordered_set;
 
 using std::string;
 using std::vector;

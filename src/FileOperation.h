@@ -9,7 +9,7 @@
 #include <typeinfo>
 #include <errno.h>
 #include <string.h>
-#include "hash_wrap.h"
+#include "UtilDef.h"
 using namespace std;
 #ifdef _WIN32
 using namespace stdext;

@@ -8,7 +8,7 @@
 #define XMLHTTP_H
 
 #include <string>
-#include "hash_wrap.h"
+#include "UtilDef.h"
 
 #define ADD_INT_XMLNODE(xml,chBuf,nodeName,value) {sprintf(chBuf, "<%s>%d</%s>\n", nodeName,value,nodeName);xml += chBuf;}
 

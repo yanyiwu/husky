@@ -15,8 +15,12 @@ void ServerDemo::operator()(string &strQuery, string &strOut)
 	CXmlHttp xh;
 	const char* end;
 	const char* mid;
+    strOut = strQuery;
+    return;
+    
 	end = strstr(strQuery.c_str(), " HTTP");
 	mid = strstr(strQuery.c_str(), "/?");
+    strOut = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><result><keyword><![CDATA[";
 	if (end&&mid)
 	{
 		strQuery = string(mid+2, end);
@@ -32,8 +36,6 @@ void ServerDemo::operator()(string &strQuery, string &strOut)
 	hssi = hssParse.find("title"); 
 	if(hssi != hssParse.end() && hssi->second.length() > 0)
 	{
-		strOut = "<?xml version=\"1.0\" encoding=\"gbk\" ?><result><keyword><![CDATA[";
-		//strOut += keywordStr;
 		strOut += "]]></keyword></result>";
 		return;
 	}
