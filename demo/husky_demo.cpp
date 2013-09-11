@@ -12,7 +12,7 @@ bool ServerDemo::dispose()
 
 void ServerDemo::operator()(string &strQuery, string &strOut) 
 {
-	CXmlHttp xh;
+	//CXmlHttp xh;
 	const char* end;
 	const char* mid;
     strOut = strQuery;

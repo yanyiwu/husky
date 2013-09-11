@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include "ServerFrameLockAccept.h"
-#include "XmlHttp.h"
+//#include "XmlHttp.h"
 #define MASTER_PID_FILE 	"masterDaemon.pid."//daemon 主进程PID文件
 
 namespace Husky

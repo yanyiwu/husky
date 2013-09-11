@@ -3,7 +3,7 @@
 
 #include "Daemon.h"
 //#include "FileOperation.h"
-#include "XmlHttp.h"
+//#include "XmlHttp.h"
 #include "ServerFrameLockAccept.h"
 #include "../cppcommon/headers.h"
 
