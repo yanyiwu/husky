@@ -32,7 +32,7 @@ namespace Husky
         m_bShutdown=true;
         if (SOCKET_ERROR==closesocket(m_lsnSock))
         {
-            fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+            LogError("file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
             return false;
         }
 
@@ -42,7 +42,7 @@ namespace Husky
 
         if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
         {
-            fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+            LogError("file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
             return false;
         }
 
@@ -51,7 +51,7 @@ namespace Husky
         dest.sin_port = htons(m_nLsnPort);
         if (inet_aton("127.0.0.1", (struct in_addr *) &dest.sin_addr.s_addr) == 0)
         {
-            fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+            LogError("file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
             return false;
         }
 
@@ -68,7 +68,7 @@ namespace Husky
     {
         if(SOCKET_ERROR==listen(m_lsnSock,LISEN_QUEUR_LEN))
         {
-            fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+            LogError("file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
             return false;
         }	
         threadManager thrMngr;	
@@ -86,7 +86,7 @@ namespace Husky
         printf("expect thread count %d, real count %d\n",m_nThreadCount,i);
         if(i==0)	
         {
-            fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+            LogError("file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
             return false;
         }
 
@@ -120,7 +120,7 @@ namespace Husky
             if(hClientSock==SOCKET_ERROR)
             {
                 if(!m_bShutdown)
-                  fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+                  LogError("file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
                 continue;
             }
             //printf("start to serve:id = %d\n",nSockNum);
@@ -131,7 +131,7 @@ namespace Husky
             lng.l_onoff=1;				
             if(SOCKET_ERROR==setsockopt(hClientSock,SOL_SOCKET,SO_LINGER,(char*)&lng,sizeof(lng)))			
             {
-                fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+                LogError("file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
             }
 
             struct timeval to;
@@ -143,9 +143,9 @@ namespace Husky
             in.tv_usec=0;
 
             if(SOCKET_ERROR==setsockopt(hClientSock,SOL_SOCKET,SO_RCVTIMEO,(char*)&in,sizeof(in)))
-              fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+              LogError("file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
             if(SOCKET_ERROR==setsockopt(hClientSock,SOL_SOCKET,SO_SNDTIMEO,(char*)&to,sizeof(to)))
-              fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+              LogError("file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
 
 
             string strRec;  //接收数据缓冲区
@@ -167,7 +167,7 @@ namespace Husky
 
             if(SOCKET_ERROR==nRetCode)
             {
-                fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+                LogError("file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
                 closesocket(hClientSock);
                 continue;
             }
@@ -192,7 +192,7 @@ namespace Husky
 
             if (SOCKET_ERROR==send(hClientSock,strHttpXml.c_str(),strHttpXml.length(),0))
             {
-                fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+                LogError("file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
             }
             closesocket(hClientSock);
         }
@@ -224,7 +224,7 @@ namespace Husky
         sock=socket(AF_INET,SOCK_STREAM,0);
         if(INVALID_SOCKET==sock)
         {
-            fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+            LogError("file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
             return false;
         }
 
@@ -232,7 +232,7 @@ namespace Husky
         int nRet = 1;
         if(SOCKET_ERROR==setsockopt(m_lsnSock, SOL_SOCKET, SO_REUSEADDR, (char*)&nRet, sizeof(nRet)))
         {	
-            fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+            LogError("file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
         }
 
         struct sockaddr_in addrSock;
@@ -243,7 +243,7 @@ namespace Husky
         retval=bind(sock,(sockaddr*)&addrSock,sizeof(sockaddr));
         if(SOCKET_ERROR==retval)
         {
-            fprintf(stderr,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+            LogError("file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
             closesocket(sock);
             return false;
         }

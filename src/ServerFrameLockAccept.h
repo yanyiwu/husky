@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
+#include "../cppcommon/headers.h"
 #define INVALID_SOCKET  -1 
 #define SOCKET_ERROR    -1 
 #define closesocket     close
@@ -13,6 +14,7 @@
 #define  LISEN_QUEUR_LEN 1024
 namespace Husky
 {
+    using namespace CPPCOMMON;
     typedef unsigned short  u_short;
     typedef unsigned int    u_int;
     typedef	int             SOCKET;

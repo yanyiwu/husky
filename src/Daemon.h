@@ -9,12 +9,11 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include "ServerFrameLockAccept.h"
-//#include "XmlHttp.h"
-#define MASTER_PID_FILE 	"masterDaemon.pid."//daemon 主进程PID文件
+#include "../cppcommon/headers.h"
 
 namespace Husky
-
 {
+    using namespace CPPCOMMON;
     class CWorker
     {
         public:
@@ -25,14 +24,7 @@ namespace Husky
 
 
     };
-    //struct SDerivedHandler:public SRequestHandler 
-    //{ 
-    //
-    //	bool Init();
-    //	bool Dispose();
-    //	virtual void operator()(string &strRec, string &strSnd);
-    //	Server m;
-    //};
+
     class CWorkerEx:public CWorker
     {
         public:
@@ -48,11 +40,8 @@ namespace Husky
 
     };
 
-
-
     class CDaemon
     {
-
         public:
             CDaemon(CWorker *pWorker){m_pWorker=pWorker;}
 

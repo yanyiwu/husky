@@ -13,22 +13,6 @@ namespace Husky
     {
     }
 
-
-    //bool SDerivedHandler::Init()
-    //{
-    //	return m.init();
-    //}
-    //
-    //bool SDerivedHandler::Dispose()
-    //{
-    //	return m.dispose();
-    //}
-    //
-    //void SDerivedHandler::operator()(string &strRec, string &strSnd)
-    //{
-    //	m(strRec, strSnd);
-    //}
-
     CWorkerEx::CWorkerEx(SRequestHandler* pHandler):m_pHandler(pHandler)
     {
     }
@@ -133,14 +117,14 @@ namespace Husky
         struct stat st;	
         if(stat(pchDir,&st)<0)
         {
-            fprintf(stderr,"stat dir %s fail,file %s,line %d -- info:%s\n", pchDir,__FILE__,__LINE__,strerror(errno));
+            LogError("stat dir %s fail, -- info:%s", pchDir,strerror(errno));
             exit(0);
         }
 
         if(0>chdir(pchDir))
         {
 
-            fprintf(stderr, "work dir %s does not exist\n",pchDir);
+            LogError("work dir %s does not exist",pchDir);
             exit(0);
         }
 
@@ -161,34 +145,30 @@ namespace Husky
         bool bRestart = true;
         if (WIFEXITED(status)) //exit()or return 方式退出
         {
-            fprintf(stderr, "child normal termination, exit pid = %d, status = %d", pid, WEXITSTATUS(status));
+            LogError("child normal termination, exit pid = %d, status = %d", pid, WEXITSTATUS(status));
             bRestart = false;
         }
         else if (WIFSIGNALED(status)) //signal方式退出
         {
-            fprintf(stderr, "abnormal termination, pid = %d, signal number = %d%s\n", pid, WTERMSIG(status),
+            LogError("abnormal termination, pid = %d, signal number = %d%s", pid, WTERMSIG(status,
 #ifdef	WCOREDUMP
-                        WCOREDUMP(status) ? " (core file generated)" : "");
-#else
-            "");
+                        WCOREDUMP(status) ? " (core file generated)" : 
 #endif
+            "")); 
 
             if (WTERMSIG(status) == SIGKILL)
             {
                 bRestart = false;
-                fprintf(stderr, "has been killed by user ??, exit pid = %d, status = %d", pid, WEXITSTATUS(status));
+                LogError("has been killed by user ??, exit pid = %d, status = %d", pid, WEXITSTATUS(status));
             }
         }
         else if (WIFSTOPPED(status)) //暂停的子进程退出
-          fprintf(stderr, "child stopped, pid = %d, signal number = %d\n", pid, WSTOPSIG(status));
+          LogError("child stopped, pid = %d, signal number = %d", pid, WSTOPSIG(status));
         else
-          fprintf(stderr, "child other reason quit, pid = %d, signal number = %d\n", pid, WSTOPSIG(status));
+          LogError("child other reason quit, pid = %d, signal number = %d", pid, WSTOPSIG(status));
 
         return bRestart;
     }
-
-
-
 
     bool CDaemon::Start()
     {
@@ -200,10 +180,10 @@ namespace Husky
         strName+=m_pName;
         if ( 0<Read1LineFromFile(strName.c_str(), buf, 64, "r") &&(masterPid = atoi(buf)) != 0)
         {
-            printf("readlast %d:masterPid\n",masterPid);
+            LogInfo("readlast %d:masterPid",masterPid);
             if (kill(masterPid, 0) == 0)
             {
-                printf("Another instance exist, ready to quit!\n");
+                LogInfo("Another instance exist, ready to quit!");
                 return true;
             }
 
@@ -215,7 +195,7 @@ namespace Husky
         if (!WriteBuff2File(strName.c_str(), buf, "w"))
         {
             //log_warn(g_logger, "Write master pid fail!");
-            fprintf(stderr, "Write master pid fail!\n");
+            LogError("Write master pid fail!");
         }
 
         while(true)
@@ -235,26 +215,26 @@ namespace Husky
 
                 if (!m_pWorker->Init(m_hisOptVal))
                 {	
-                    fprintf(stderr, "Worker init  fail!\n");
+                    LogError("Worker init  fail!");
                     return false;
                 }
-                fprintf(stderr, "Worker init  ok pid = %d\n",(int)getpid());
+                LogError("Worker init  ok pid = %d",(int)getpid());
 
                 if (!m_pWorker->Run())
                 {
-                    fprintf(stderr, "run finish -fail!\n");
+                    LogError("run finish -fail!");
                     return false;
                 }
 
-                fprintf(stderr, "run finish -ok!\n");
+                LogError("run finish -ok!");
 
                 if(!m_pWorker->Dispose())
                 {
-                    fprintf(stderr, "Worker dispose -fail!\n");
+                    LogError("Worker dispose -fail!");
                     return false;
                 }
 
-                fprintf(stderr, "Worker dispose -ok!\n");
+                LogError("Worker dispose -ok!");
                 exit(0);
             }
             m_nChildPid=pid;
@@ -262,7 +242,7 @@ namespace Husky
             pid = wait(&status);
             if (!isAbnormalExit(pid, status))
             {
-                fprintf(stderr, "child exit normally!\n");
+                LogError("child exit normally!");
                 break;
             }
         }
@@ -282,7 +262,7 @@ namespace Husky
         {
             if (kill(masterPid, 0) == 0)
             {
-                fprintf(stderr, "find previous daemon pid= %d, current pid= %d\n", masterPid, getpid());
+                LogInfo("find previous daemon pid= %d, current pid= %d", masterPid, getpid());
                 int tryTime = 200;		
                 kill(masterPid, SIGTERM);
                 while (kill(masterPid, 0) == 0 && --tryTime)
@@ -290,7 +270,7 @@ namespace Husky
 
                 if (!tryTime && kill(masterPid, 0) == 0)
                 {
-                    fprintf(stderr, "Time out shutdown fail!\n");		
+                    LogError("Time out shutdown fail!");		
                     return false	;
                 }
 
@@ -321,7 +301,7 @@ namespace Husky
     void CDaemon::sigMasterHandler(int sig)
     {		
         kill(m_nChildPid,SIGUSR1);
-        fprintf(stderr, "master = %d sig child =%d!\n",getpid(),m_nChildPid);
+        LogError("master = %d sig child =%d!",getpid(),m_nChildPid);
 
     }
 
@@ -330,7 +310,7 @@ namespace Husky
         if (sig == SIGUSR1)
         {
             m_pWorker->close();
-            fprintf(stderr, "master = %d signal accept current pid =%d!\n",getppid(),getpid());
+            LogError("master = %d signal accept current pid =%d!",getppid(),getpid());
         }
 
     }
