@@ -1,5 +1,5 @@
-#ifndef HUSKY_HEADERS_H
-#define HUSKY_HEADERS_H
+#ifndef HUSKY_HUSKY_HEADERS_H
+#define HUSKY_HUSKY_HEADERS_H
 
 #include "Daemon.h"
 //#include "FileOperation.h"

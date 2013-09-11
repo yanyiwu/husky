@@ -1,5 +1,5 @@
-#ifndef DAEMON_H_
-#define DAEMON_H_
+#ifndef HUSKY_DAEMON_H_
+#define HUSKY_DAEMON_H_
 #include "UtilDef.h"
 #include <stdio.h>
 #include <string.h>

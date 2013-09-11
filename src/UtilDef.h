@@ -1,5 +1,5 @@
-#ifndef UTIL_DEF_H
-#define UTIL_DEF_H
+#ifndef HUSKY_UTIL_DEF_H
+#define HUSKY_UTIL_DEF_H
 #include <string>
 #include <vector>
 #include <set>

@@ -1,5 +1,5 @@
-#ifndef SERVERFRAME_H 
-#define SERVERFRAME_H 
+#ifndef HUSKY_SERVERFRAME_H 
+#define HUSKY_SERVERFRAME_H 
 #include <pthread.h>
 #include <string.h>
 #include <errno.h>
