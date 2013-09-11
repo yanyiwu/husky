@@ -24,7 +24,7 @@ namespace Husky
 
             string& XmlEncode(const char *str, string& s);
             string& XmlPackText(const char *str, string& s)	;
-            int ParseRequest(string strRecvPara,unordered_map<string,string>& hmStrStr);
+            //int ParseRequest(string strRecvPara,unordered_map<string,string>& hmStrStr);
             // 15=>F 9=>9
 
 

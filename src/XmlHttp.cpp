@@ -1,11 +1,11 @@
 
 #include "XmlHttp.h"
-#include "Character.h"
+//#include "Character.h"
 
 namespace Husky
 {
 
-    static CharacterConverter gs_cc;
+    //static CharacterConverter gs_cc;
 
     CXmlHttp::CXmlHttp()
     {
@@ -18,71 +18,71 @@ namespace Husky
     }
 
     //将URL_DECODE 后参数值原封不动的存入HASH_MAP中
-    int CXmlHttp::ParseRequest(string strRecvPara,unordered_map<string,string>& hmStrStr)
-    {
-        if(strRecvPara.length()==0)
-          return 0;
-        //strRecvPara=URLDecode(strRecvPara.c_str());
+    //int CXmlHttp::ParseRequest(string strRecvPara,unordered_map<string,string>& hmStrStr)
+    //{
+    //    if(strRecvPara.length()==0)
+    //      return 0;
+    //    //strRecvPara=URLDecode(strRecvPara.c_str());
 
-        string::iterator itStr;
-        string::iterator itStrT;
-        string m_strEncodedKeyWord;
-        string strName,strValue;
-        // Parses & decodes the string in pairs name-value.
-        // ONLY standard requests are handled properly.
-
-
-        for (itStr=strRecvPara.begin();itStr!=strRecvPara.end();++itStr)
-        {
-            itStrT=itStr;
-            while(itStr!=strRecvPara.end()&&*itStr!='=')
-            {
-                ++itStr;
-            }
+    //    string::iterator itStr;
+    //    string::iterator itStrT;
+    //    string m_strEncodedKeyWord;
+    //    string strName,strValue;
+    //    // Parses & decodes the string in pairs name-value.
+    //    // ONLY standard requests are handled properly.
 
 
-            if (itStr==strRecvPara.end())
-            {
-                break;			
-            }
-            else			
-            {
-                strName.assign(itStrT,itStr);
-                if (strValue.empty())
-                {
-                    strValue="";
-                }
-                //cout<<endl<<"strName"<<strName.c_str()<<endl;
-                itStrT=itStr;
-            }
+    //    for (itStr=strRecvPara.begin();itStr!=strRecvPara.end();++itStr)
+    //    {
+    //        itStrT=itStr;
+    //        while(itStr!=strRecvPara.end()&&*itStr!='=')
+    //        {
+    //            ++itStr;
+    //        }
 
-            while (itStr!=strRecvPara.end()&&*itStr!='&')
-            {
-                ++itStr;
-            }
 
-            strValue.assign(++itStrT,itStr);
-            if (strValue.empty())
-            {
-                strValue="";
-            }
-            //cout<<endl<<"strValue"<<strValue.c_str()<<endl;
+    //        if (itStr==strRecvPara.end())
+    //        {
+    //            break;			
+    //        }
+    //        else			
+    //        {
+    //            strName.assign(itStrT,itStr);
+    //            if (strValue.empty())
+    //            {
+    //                strValue="";
+    //            }
+    //            //cout<<endl<<"strName"<<strName.c_str()<<endl;
+    //            itStrT=itStr;
+    //        }
 
-            string ret;
-            URLDecode(strValue,ret);
-            gs_cc.Convert_t2s((char*)ret.c_str());
-            gs_cc.ConvertDigitAlpha((char*)ret.c_str());
-            ret=ret.c_str();
+    //        while (itStr!=strRecvPara.end()&&*itStr!='&')
+    //        {
+    //            ++itStr;
+    //        }
 
-            hmStrStr[strName]=ret;	
-            if (itStr==strRecvPara.end())
-            {
-                break;
-            }
-        }
-        return 0;
+    //        strValue.assign(++itStrT,itStr);
+    //        if (strValue.empty())
+    //        {
+    //            strValue="";
+    //        }
+    //        //cout<<endl<<"strValue"<<strValue.c_str()<<endl;
 
-    }
+    //        string ret;
+    //        URLDecode(strValue,ret);
+    //        gs_cc.Convert_t2s((char*)ret.c_str());
+    //        gs_cc.ConvertDigitAlpha((char*)ret.c_str());
+    //        ret=ret.c_str();
+
+    //        hmStrStr[strName]=ret;	
+    //        if (itStr==strRecvPara.end())
+    //        {
+    //            break;
+    //        }
+    //    }
+    //    return 0;
+
+    //}
     string& CXmlHttp::XmlEncode(const char *str, string& s)
     {
         if(!str) return s;
