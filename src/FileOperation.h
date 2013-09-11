@@ -339,9 +339,6 @@ namespace Husky
         }
 
 
-    //载入 STRING->INT 结构文件 放入哈希表
-    bool LoadKeysCnts(const char* pchFileName,unordered_map<string,int> &hmStrCnt);
-
     //载入结构 bHead 表示是否有第一个整数标识结构大小 。
     template<class T>
         bool LoadStruct(const char*pchFileName,vector<T>& vecTemplate,bool bHead=true);

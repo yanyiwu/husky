@@ -18,7 +18,6 @@ endif
 DOLINK := $(LD) $(LDFLAGS) -o $@ $^
 DOPACK := $(AR)  
 SOURCES = Daemon.cpp\
-	FileOperation.cpp\
 	XmlHttp.cpp\
 	ServerFrameLockAccept.cpp
 OBJS := $(patsubst %.cpp,%.o,$(SOURCES))
