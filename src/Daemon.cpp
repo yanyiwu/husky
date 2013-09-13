@@ -183,8 +183,8 @@ namespace Husky
             LogInfo("readlast %d:masterPid",masterPid);
             if (kill(masterPid, 0) == 0)
             {
-                LogInfo("Another instance exist, ready to quit!");
-                return true;
+                LogError("Another instance exist, ready to quit!");
+                return false;
             }
 
         }
@@ -194,14 +194,13 @@ namespace Husky
         sprintf(buf, "%d", getpid());
         if (!WriteBuff2File(strName.c_str(), buf, "w"))
         {
-            //log_warn(g_logger, "Write master pid fail!");
-            LogError("Write master pid fail!");
+            LogWarn("Write master pid fail!");
         }
 
         while(true)
         {
             pid_t pid = fork();
-            if (pid == 0)
+            if (0 == pid)
             {
                 //子进程做的事情
 
@@ -218,7 +217,7 @@ namespace Husky
                     LogError("Worker init  fail!");
                     return false;
                 }
-                LogError("Worker init  ok pid = %d",(int)getpid());
+                LogInfo("Worker init  ok pid = %d",(int)getpid());
 
                 if (!m_pWorker->Run())
                 {
@@ -226,7 +225,7 @@ namespace Husky
                     return false;
                 }
 
-                LogError("run finish -ok!");
+                LogInfo("run finish -ok!");
 
                 if(!m_pWorker->Dispose())
                 {
@@ -234,7 +233,7 @@ namespace Husky
                     return false;
                 }
 
-                LogError("Worker dispose -ok!");
+                LogInfo("Worker dispose -ok!");
                 exit(0);
             }
             m_nChildPid=pid;
@@ -242,7 +241,7 @@ namespace Husky
             pid = wait(&status);
             if (!isAbnormalExit(pid, status))
             {
-                LogError("child exit normally!");
+                LogInfo("child exit normally!");
                 break;
             }
         }
@@ -255,8 +254,7 @@ namespace Husky
         char buf[640];
         int masterPid;
 
-        string strName = m_runPath + MASTER_PID_FILE ;
-        strName+=m_pName;
+        string strName = m_runPath + MASTER_PID_FILE +m_pName ;
 
         if ( 0<Read1LineFromFile(strName.c_str(), buf, 64, "r") &&(masterPid = atoi(buf)) != 0)
         {
@@ -301,7 +299,7 @@ namespace Husky
     void CDaemon::sigMasterHandler(int sig)
     {		
         kill(m_nChildPid,SIGUSR1);
-        LogError("master = %d sig child =%d!",getpid(),m_nChildPid);
+        LogInfo("master = %d sig child =%d!",getpid(),m_nChildPid);
 
     }
 
@@ -310,7 +308,7 @@ namespace Husky
         if (sig == SIGUSR1)
         {
             m_pWorker->close();
-            LogError("master = %d signal accept current pid =%d!",getppid(),getpid());
+            LogInfo("master = %d signal accept current pid =%d!",getppid(),getpid());
         }
 
     }
