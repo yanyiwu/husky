@@ -1,4 +1,11 @@
-*.a
+*tmp*
+tags
+*swp
+*.out
 *.o
 *.d
-masterDaemon.pid.*
+*.ut
+log
+*.log
+*.pyc
+*.a
