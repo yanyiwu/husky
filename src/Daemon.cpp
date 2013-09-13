@@ -150,11 +150,11 @@ namespace Husky
         }
         else if (WIFSIGNALED(status)) //signal·½Ê½ÍË³ö
         {
-            LogError("abnormal termination, pid = %d, signal number = %d%s", pid, WTERMSIG(status,
+            LogError("abnormal termination, pid = %d, signal number = %d%s", pid, WTERMSIG(status),
 #ifdef	WCOREDUMP
                         WCOREDUMP(status) ? " (core file generated)" : 
 #endif
-            "")); 
+            ""); 
 
             if (WTERMSIG(status) == SIGKILL)
             {
