@@ -22,6 +22,7 @@ namespace Husky
     const char* const RESPONSE_CHARSET_UTF8 = "UTF-8";
     const char* const RESPONSE_CHARSET_GB2312 = "GB2312";
 
+    const char* const RESPONSE_FORMAT = "HTTP/1.1 200 OK\nConnection: close\nServer: FrameServer/1.0.0\nContent-Type: text/xml; charset=%s\nContent-Length: %d\n\n";
     //-----------------------TYPE_DEFINE--------------------------------//
     typedef vector<string>         VS;
     typedef vector<int>            VI;

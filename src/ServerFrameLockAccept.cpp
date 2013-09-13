@@ -167,13 +167,13 @@ namespace Husky
 
             if(SOCKET_ERROR==nRetCode)
             {
-                LogError("file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+                LogError("error info: %s",strerror(errno));
                 closesocket(hClientSock);
                 continue;
             }
             if(0==nRetCode)
             {
-                printf("****connection has been gracefully closed \n");/*comment by msdn*/
+                LogInfo("****connection has been gracefully closed");/*comment by msdn*/
                 closesocket(hClientSock);
                 continue;
             }
@@ -182,11 +182,13 @@ namespace Husky
             char chHttpHeader[1024];
 
 
-            sprintf(chHttpHeader,   "HTTP/1.1 200 OK\r\n"
-                        "Connection: close\r\n"
-                        "Server: FrameServer/1.0.0\r\n"  //**¸Ä³ÉSELF
-                        "Content-Type: text/xml; charset=%s\r\n"
-                        "Content-Length: %d\r\n\r\n",RESPONSE_CHARSET_UTF8,strSnd.length());
+            //sprintf(chHttpHeader,   "HTTP/1.1 200 OK\r\n"
+            //            "Connection: close\r\n"
+            //            "Server: FrameServer/1.0.0\r\n"  
+            //            "Content-Type: text/xml; charset=%s\r\n"
+            //            "Content-Length: %d\r\n\r\n",RESPONSE_CHARSET_UTF8,strSnd.length());
+            sprintf(chHttpHeader, RESPONSE_FORMAT, RESPONSE_CHARSET_UTF8, strSnd.length());
+            LogDebug(chHttpHeader);
             strHttpXml=chHttpHeader;
             strHttpXml+=strSnd;
 
