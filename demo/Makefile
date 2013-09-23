@@ -20,7 +20,7 @@ DOPACK := $(AR)
 SOURCES := $(wildcard *.cpp)
 OBJS := $(patsubst %.cpp,%.o,$(SOURCES))
 
-SRCDIR = ../src
+SRCDIR = ../husky
 SRCLIB = $(SRCDIR)/libhusky.a
 
 # remove the objs after compilation

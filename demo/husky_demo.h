@@ -5,7 +5,7 @@
 #include <string>
 #include <ctype.h>
 #include <string.h>
-#include "../src/headers.h"
+#include "../husky/headers.h"
 using namespace CPPCOMMON;
 using namespace Husky;
 
