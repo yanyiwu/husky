@@ -17,29 +17,6 @@ void ServerDemo::operator()(string &strQuery, string &strOut)
 	const char* mid;
     strOut = strQuery;
     return;
-    
-	//end = strstr(strQuery.c_str(), " HTTP");
-	//mid = strstr(strQuery.c_str(), "/?");
-    //strOut = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><result><keyword><![CDATA[";
-	//if (end&&mid)
-	//{
-	//	strQuery = string(mid+2, end);
-	//}
-	//string dstrQuery(strQuery);
-	//strQuery = "";
-	//string str = "";
-	//strQuery = xh.URLDecode(dstrQuery, str);
-	//HSS   hssParse;
-	//HSSI  hssi;
-	////xh.ParseRequest(strQuery,hssParse);
-
-	//hssi = hssParse.find("title"); 
-	//if(hssi != hssParse.end() && hssi->second.length() > 0)
-	//{
-	//	strOut += "]]></keyword></result>";
-	//	return;
-	//}
-	//strOut = "<result>Hello Husky</result>";
 } 
 
 int main(int argc,char* argv[])

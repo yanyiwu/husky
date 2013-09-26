@@ -51,30 +51,6 @@ namespace Husky
         return m_server.CloseServer();
     }
 
-
-    //读文件第一行：buf ，读入缓冲区，maxCount最大字节数量，mode 文件打开方式，失败返回 0。
-    int CDaemon::Read1LineFromFile(const char* fileName, char* buf, int maxCount, const char* mode)
-    {
-        FILE* fp = fopen(fileName, mode);
-        if (!fp)
-          return 0;
-        int ret;
-        fgets(buf, maxCount, fp) ? ret = 1 : ret = 0;
-        fclose(fp);
-        return ret;
-    }
-
-    //将缓冲区写入文件：buf 缓冲区 ，mode 文件打开方式，失败返回 0。
-    int CDaemon::WriteBuff2File(const char* fileName, const char* buf, const char* mode)
-    {
-        FILE* fp = fopen(fileName, mode);
-        if (!fp)
-          return 0;
-        int n = fprintf(fp, "%s", buf);
-        fclose(fp);
-        return n;
-    }
-
     //************************************
     // Method:    ParseCmdLine 解析命令行参数，格式为 -x xxx .... 形式
     // FullName:  CDaemon::ParseCmdLine
@@ -172,15 +148,12 @@ namespace Husky
 
     bool CDaemon::Start()
     {
-        //从文件获取正在运行的daemon的pid
-        char buf[640];
-        int masterPid;
-
-        string strName = m_runPath + MASTER_PID_FILE ;
-        strName+=m_pName;
-        if ( 0<Read1LineFromFile(strName.c_str(), buf, 64, "r") &&(masterPid = atoi(buf)) != 0)
+        string strName = m_runPath + MASTER_PID_FILE + m_pName;
+        string masterPidStr = loadFile2Str(strName.c_str());
+        int masterPid = atoi(masterPidStr.c_str());
+        if(masterPid)
         {
-            LogInfo("readlast %d:masterPid",masterPid);
+            LogInfo("readlast masterPid[%d]",masterPid);
             if (kill(masterPid, 0) == 0)
             {
                 LogError("Another instance exist, ready to quit!");
@@ -191,10 +164,11 @@ namespace Husky
 
         initAsDaemon();
 
+        char buf[64];
         sprintf(buf, "%d", getpid());
-        if (!WriteBuff2File(strName.c_str(), buf, "w"))
+        if (!WriteStr2File(strName.c_str(),buf ,"w"))
         {
-            LogWarn("Write master pid fail!");
+            LogFatal("Write master pid fail!");
         }
 
         while(true)
@@ -251,36 +225,35 @@ namespace Husky
 
     bool CDaemon::Stop()
     {
-        char buf[640];
-        int masterPid;
-
-        string strName = m_runPath + MASTER_PID_FILE +m_pName ;
-
-        if ( 0<Read1LineFromFile(strName.c_str(), buf, 64, "r") &&(masterPid = atoi(buf)) != 0)
+        string strName = m_runPath + MASTER_PID_FILE + m_pName;
+        string masterPidStr = loadFile2Str(strName.c_str());
+        int masterPid = atoi(masterPidStr.c_str());
+        if(masterPid)
         {
+            LogInfo("readlast masterPid[%d]",masterPid);
             if (kill(masterPid, 0) == 0)
             {
                 LogInfo("find previous daemon pid= %d, current pid= %d", masterPid, getpid());
-                int tryTime = 200;		
                 kill(masterPid, SIGTERM);
+
+                int tryTime = 200;		
                 while (kill(masterPid, 0) == 0 && --tryTime)
                   sleep(1);			
 
                 if (!tryTime && kill(masterPid, 0) == 0)
                 {
                     LogError("Time out shutdown fail!");		
-                    return false	;
+                    return false;
                 }
 
                 return true;
             }
 
         }
-
-        printf("Another instance doesn't exist, ready to quit!\n");
+        LogInfo("Another instance doesn't exist, ready to quit!");
         return true;
     }
-    //初始化DAEMON
+
     void CDaemon::initAsDaemon()
     {
         if (fork() > 0)
