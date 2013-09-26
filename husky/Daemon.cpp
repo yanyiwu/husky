@@ -4,18 +4,8 @@ namespace Husky
 {
     CWorker *CDaemon::m_pWorker=NULL;
     int CDaemon::m_nChildPid=0;
-
-    CDaemon::CDaemon(void)
-    {
-    }
-
-    CDaemon::~CDaemon(void)
-    {
-    }
-
-    CWorkerEx::CWorkerEx(SRequestHandler* pHandler):m_pHandler(pHandler)
-    {
-    }
+    CDaemon::CDaemon(CWorker *pWorker){m_pWorker = pWorker;};
+    CWorkerEx::CWorkerEx(SRequestHandler* pHandler):m_pHandler(pHandler){};
 
     bool CWorkerEx::Init(HIS&his)
     {
@@ -119,7 +109,7 @@ namespace Husky
     bool isAbnormalExit(int pid, int status)
     {
         bool bRestart = true;
-        if (WIFEXITED(status)) //exit()or return 方式退出
+        if (WIFEXITED(status)) //exit()or return 
         {
             LogError("child normal termination, exit pid = %d, status = %d", pid, WEXITSTATUS(status));
             bRestart = false;
@@ -130,7 +120,7 @@ namespace Husky
 #ifdef	WCOREDUMP
                         WCOREDUMP(status) ? " (core file generated)" : 
 #endif
-            ""); 
+                        ""); 
 
             if (WTERMSIG(status) == SIGKILL)
             {
@@ -139,17 +129,20 @@ namespace Husky
             }
         }
         else if (WIFSTOPPED(status)) //暂停的子进程退出
-          LogError("child stopped, pid = %d, signal number = %d", pid, WSTOPSIG(status));
+        {
+            LogError("child stopped, pid = %d, signal number = %d", pid, WSTOPSIG(status));
+        }
         else
-          LogError("child other reason quit, pid = %d, signal number = %d", pid, WSTOPSIG(status));
-
+        {
+            LogError("child other reason quit, pid = %d, signal number = %d", pid, WSTOPSIG(status));
+        }
         return bRestart;
     }
 
     bool CDaemon::Start()
     {
-        string strName = m_runPath + MASTER_PID_FILE + m_pName;
-        string masterPidStr = loadFile2Str(strName.c_str());
+        string pidFileName = m_runPath + MASTER_PID_FILE + m_pName;
+        string masterPidStr = loadFile2Str(pidFileName.c_str());
         int masterPid = atoi(masterPidStr.c_str());
         if(masterPid)
         {
@@ -166,7 +159,7 @@ namespace Husky
 
         char buf[64];
         sprintf(buf, "%d", getpid());
-        if (!WriteStr2File(strName.c_str(),buf ,"w"))
+        if (!WriteStr2File(pidFileName.c_str(),buf ,"w"))
         {
             LogFatal("Write master pid fail!");
         }
@@ -174,10 +167,8 @@ namespace Husky
         while(true)
         {
             pid_t pid = fork();
-            if (0 == pid)
+            if (0 == pid)// child process do
             {
-                //子进程做的事情
-
                 signal(SIGUSR1, sigChildHandler);
                 signal(SIGPIPE, SIG_IGN);
                 signal(SIGTTOU, SIG_IGN);
@@ -198,7 +189,6 @@ namespace Husky
                     LogError("run finish -fail!");
                     return false;
                 }
-
                 LogInfo("run finish -ok!");
 
                 if(!m_pWorker->Dispose())
@@ -210,6 +200,7 @@ namespace Husky
                 LogInfo("Worker dispose -ok!");
                 exit(0);
             }
+
             m_nChildPid=pid;
             int status;
             pid = wait(&status);
@@ -225,8 +216,8 @@ namespace Husky
 
     bool CDaemon::Stop()
     {
-        string strName = m_runPath + MASTER_PID_FILE + m_pName;
-        string masterPidStr = loadFile2Str(strName.c_str());
+        string pidFileName = m_runPath + MASTER_PID_FILE + m_pName;
+        string masterPidStr = loadFile2Str(pidFileName.c_str());
         int masterPid = atoi(masterPidStr.c_str());
         if(masterPid)
         {
@@ -238,7 +229,9 @@ namespace Husky
 
                 int tryTime = 200;		
                 while (kill(masterPid, 0) == 0 && --tryTime)
+                {
                   sleep(1);			
+                }
 
                 if (!tryTime && kill(masterPid, 0) == 0)
                 {
@@ -285,7 +278,6 @@ namespace Husky
         }
 
     }
-
 
     bool CDaemon::Run(int argc,char** argv)
     {

@@ -22,7 +22,6 @@ namespace Husky
             virtual bool Dispose(){return true;};
             virtual bool close(){return true;};
 
-
     };
 
     class CWorkerEx:public CWorker
@@ -43,7 +42,9 @@ namespace Husky
     class CDaemon
     {
         public:
-            CDaemon(CWorker *pWorker){m_pWorker=pWorker;}
+            CDaemon(){};
+            virtual ~CDaemon(){};
+            CDaemon(CWorker *pWorker);
 
             int ParseCmdLine(int argc,char** argv);
             bool Start();
@@ -51,18 +52,13 @@ namespace Husky
             static void initAsDaemon();
             static void sigMasterHandler(int sig);
             static void sigChildHandler(int sig);
-
             bool Run(int argc,char** argv);
-            CDaemon(void);
-            virtual ~CDaemon(void);
         private:
             HIS      m_hisOptVal;
             string   m_runPath;
             char*    m_pName;
             static	CWorker *m_pWorker;
             static	int m_nChildPid;
-
-
     };
 }
 #endif
