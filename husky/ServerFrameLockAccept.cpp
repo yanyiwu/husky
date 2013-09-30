@@ -112,11 +112,16 @@ namespace Husky
 
         SOCKET hClientSock;
         string strHttpXml;
+
+        sockaddr_in clientaddr;
+        socklen_t nSize = sizeof(clientaddr);
         while(!m_bShutdown)
         {		
             pthread_mutex_lock(&m_pmAccept);
-            hClientSock=accept(hSockLsn,NULL,NULL);
+            hClientSock=accept(hSockLsn,(sockaddr *)&clientaddr, &nSize);
+            //LogInfo(inet_ntoa(clientaddr.sin_addr));
             pthread_mutex_unlock(&m_pmAccept);
+
             if(hClientSock==SOCKET_ERROR)
             {
                 if(!m_bShutdown)
@@ -173,7 +178,7 @@ namespace Husky
             }
             if(0==nRetCode)
             {
-                LogInfo("****connection has been gracefully closed");/*comment by msdn*/
+                LogInfo("****connection has been gracefully closed");
                 closesocket(hClientSock);
                 continue;
             }
@@ -181,14 +186,11 @@ namespace Husky
             (*pHandler)(strRec,strSnd);     
             char chHttpHeader[1024];
 
-
-            //sprintf(chHttpHeader,   "HTTP/1.1 200 OK\r\n"
-            //            "Connection: close\r\n"
-            //            "Server: FrameServer/1.0.0\r\n"  
-            //            "Content-Type: text/xml; charset=%s\r\n"
-            //            "Content-Length: %d\r\n\r\n",RESPONSE_CHARSET_UTF8,strSnd.length());
             sprintf(chHttpHeader, RESPONSE_FORMAT, RESPONSE_CHARSET_UTF8, strSnd.length());
-            LogDebug(chHttpHeader);
+
+#ifdef DEBUG
+            //LogDebug(chHttpHeader);
+#endif
             strHttpXml=chHttpHeader;
             strHttpXml+=strSnd;
 
@@ -199,18 +201,15 @@ namespace Husky
             closesocket(hClientSock);
         }
 
-        //			g_threadStatusArray[threadNum]=CLIENT_SOCKET_CLOSED;//πÿ±’¡¨Ω”
         return 0;
 
-    }//while(!g_fShutdown)
+    }
 
     bool CServerFrame::CreateServer(u_short nPort,u_short nThreadCount,SRequestHandler *pHandler)
     {
-
         m_nLsnPort=nPort;
         m_nThreadCount=nThreadCount;
         m_pHandler=pHandler;
-
 
         if (!BindToLocalHost(m_lsnSock,m_nLsnPort))
         {

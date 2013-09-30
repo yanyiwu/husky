@@ -26,7 +26,6 @@ namespace Husky
 
     };
 
-
     class CServerFrame
     {
         public:
