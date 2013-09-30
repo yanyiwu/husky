@@ -48,11 +48,9 @@ namespace Husky
 
 
         private:
-            u_short  m_nLsnPort;                            // 侦听端口
-            u_short  m_nThreadCount;                     // 服务进程数量
-            SOCKET   m_lsnSock;                           //侦听SOCKT
-
-
+            u_short  m_nLsnPort;
+            u_short  m_nThreadCount;
+            SOCKET   m_lsnSock;
             SRequestHandler *m_pHandler;
             static bool m_bShutdown ;                 // Signals client/server threads to die
             static PM m_pmAccept;

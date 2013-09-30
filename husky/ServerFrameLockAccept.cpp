@@ -57,7 +57,7 @@ namespace Husky
 
         if (connect(sockfd, (struct sockaddr *) &dest, sizeof(dest)) < 0)
         {
-            fprintf(stdout,"file:%s , line: %d, error info: %s\n",__FILE__,__LINE__,strerror(errno));
+            LogError(strerror(errno));
         }
         close(sockfd);
         return true;
@@ -83,20 +83,20 @@ namespace Husky
                 break;	
             }		
         }	
-        printf("expect thread count %d, real count %d\n",m_nThreadCount,i);
+        LogInfo("expect thread count %d, real count %d",m_nThreadCount,i);
         if(i==0)	
         {
             LogError(strerror(errno));
             return false;
         }
 
-        printf("server start to run.........\n");
+        LogInfo("server start to run.........");
 
         if (thrMngr.WaitMultipleThread()!=0)
         {
-            return false;//等待所有线程退出
+            return false;//waiting for all the thread exited
         }
-        printf("server shutdown ok............\n");
+        LogInfo("server shutdown ok............");
         return true;
 
     }
@@ -148,11 +148,11 @@ namespace Husky
               LogError(strerror(errno));
 
 
-            string strRec;  //接收数据缓冲区
-            string strSnd;            //发送数据缓冲区
+            string strRec;  //buffer for receiving
+            string strSnd;            //buffer for sending
             while(true)
             {
-                memset(chRecvBuf,0,sizeof(chRecvBuf));//每次初始化字串		
+                memset(chRecvBuf,0,sizeof(chRecvBuf));
                 nRetCode=recv(hClientSock,chRecvBuf,RECV_BUFFER-1,0);	
                 if(nRetCode>0)
                 {
