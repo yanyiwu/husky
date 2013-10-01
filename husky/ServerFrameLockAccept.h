@@ -24,6 +24,8 @@ namespace Husky
         {
         }
 
+        //virtual bool 
+
     };
 
     class CServerFrame
