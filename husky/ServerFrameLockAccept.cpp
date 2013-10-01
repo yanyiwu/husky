@@ -148,13 +148,17 @@ namespace Husky
             in.tv_usec=0;
 
             if(SOCKET_ERROR==setsockopt(hClientSock,SOL_SOCKET,SO_RCVTIMEO,(char*)&in,sizeof(in)))
+            {
               LogError(strerror(errno));
+            }
             if(SOCKET_ERROR==setsockopt(hClientSock,SOL_SOCKET,SO_SNDTIMEO,(char*)&to,sizeof(to)))
+            {
               LogError(strerror(errno));
+            }
 
 
-            string strRec;  //buffer for receiving
-            string strSnd;            //buffer for sending
+            string strRec;
+            string strSnd;
             while(true)
             {
                 memset(chRecvBuf,0,sizeof(chRecvBuf));
