@@ -20,13 +20,17 @@ namespace Husky
     {
         virtual bool init(){return true;}
         virtual bool dispose(){return true;}
-        virtual void operator()(string &strRec, string &strSnd)
+        virtual void operator()(string& strRec, string &strSnd)
         {
         }
 
-        //virtual bool 
+        virtual bool do_GET(const HttpReqInfo& httpReq, string& res)
+        {
+            return false;
+        }
 
     };
+    
 
     class CServerFrame
     {

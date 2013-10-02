@@ -103,6 +103,7 @@ namespace Husky
 
     void* CServerFrame::ServerThread(void *lpParameter )
     {
+        HttpReqInfo httpReq;
         SPara *pPara=(SPara*)lpParameter;
         SOCKET hSockLsn=pPara->hSock;
         SRequestHandler *pHandler=pPara->pHandler;
@@ -119,7 +120,9 @@ namespace Husky
         {		
             pthread_mutex_lock(&m_pmAccept);
             hClientSock=accept(hSockLsn,(sockaddr *)&clientaddr, &nSize);
-            //LogInfo(inet_ntoa(clientaddr.sin_addr));
+            //LogDebug(inet_ntoa(clientaddr.sin_addr));
+            httpReq[CLIENT_IP_K] = inet_ntoa(clientaddr.sin_addr);// inet_ntoa is not thread safety at some version 
+            
             pthread_mutex_unlock(&m_pmAccept);
 
             if(hClientSock==SOCKET_ERROR)
@@ -166,9 +169,7 @@ namespace Husky
                 if(nRetCode>0)
                 {
                     strRec+=chRecvBuf;
-#ifdef DEBUG
-                    LogDebug(strRec);
-#endif
+                    //LogDebug(strRec);
                     if(strstr(chRecvBuf," HTTP")!=NULL)
                       break;
                 }
@@ -189,8 +190,11 @@ namespace Husky
                 closesocket(hClientSock);
                 continue;
             }
-
-            (*pHandler)(strRec,strSnd);     
+            httpReq.load(strRec);
+            
+            //(*pHandler)(strRec,strSnd);     
+            pHandler->do_GET(httpReq, strSnd);
+            
             char chHttpHeader[1024];
 
             sprintf(chHttpHeader, RESPONSE_FORMAT, RESPONSE_CHARSET_UTF8, strSnd.length());

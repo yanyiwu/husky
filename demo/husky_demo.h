@@ -17,6 +17,8 @@ class ServerDemo: public SRequestHandler
 	public:
 		//int HandleRequest(string& strQuery,string& strOut);
 		virtual void operator()(string &strRec, string &strSnd);
+
+        virtual bool do_GET(const HttpReqInfo& httpReq, string& strSnd);
 };
 
 #endif

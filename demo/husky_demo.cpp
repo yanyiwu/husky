@@ -20,6 +20,13 @@ void ServerDemo::operator()(string &strQuery, string &strOut)
     return;
 } 
 
+bool ServerDemo::do_GET(const HttpReqInfo& httpReq, string& strSnd)
+{
+    HttpReqInfo info = httpReq;
+    strSnd = info.toString();
+    return true;
+}
+
 int main(int argc,char* argv[])
 {
 	if(argc<3)
