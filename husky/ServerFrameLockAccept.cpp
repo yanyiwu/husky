@@ -166,6 +166,9 @@ namespace Husky
                 if(nRetCode>0)
                 {
                     strRec+=chRecvBuf;
+#ifdef DEBUG
+                    LogDebug(strRec);
+#endif
                     if(strstr(chRecvBuf," HTTP")!=NULL)
                       break;
                 }
@@ -193,7 +196,7 @@ namespace Husky
             sprintf(chHttpHeader, RESPONSE_FORMAT, RESPONSE_CHARSET_UTF8, strSnd.length());
 
 #ifdef DEBUG
-            //LogDebug(chHttpHeader);
+            LogDebug(chHttpHeader);
 #endif
             strHttpXml=chHttpHeader;
             strHttpXml+=strSnd;
