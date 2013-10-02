@@ -1,17 +1,9 @@
 #include "ServerFrameLockAccept.h"
-#include "SimpleThread.h"
-#include "UtilDef.h"
-#include <stdio.h>
-#include <string.h>
-
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-//#include "ErroLog.h"
 namespace Husky
 {
-    using namespace simpleThread;
+    IRequestHandler::~IRequestHandler()
+    {
+    }
 
     bool CServerFrame::m_bShutdown = false;
 
@@ -106,7 +98,7 @@ namespace Husky
         HttpReqInfo httpReq;
         SPara *pPara=(SPara*)lpParameter;
         SOCKET hSockLsn=pPara->hSock;
-        SRequestHandler *pHandler=pPara->pHandler;
+        IRequestHandler *pHandler=pPara->pHandler;
         int nRetCode;
         linger lng;
         char chRecvBuf[RECV_BUFFER];
@@ -216,7 +208,7 @@ namespace Husky
 
     }
 
-    bool CServerFrame::CreateServer(u_short nPort,u_short nThreadCount,SRequestHandler *pHandler)
+    bool CServerFrame::CreateServer(u_short nPort,u_short nThreadCount,IRequestHandler *pHandler)
     {
         m_nLsnPort=nPort;
         m_nThreadCount=nThreadCount;

@@ -5,7 +5,7 @@ namespace Husky
     CWorker *CDaemon::m_pWorker=NULL;
     int CDaemon::m_nChildPid=0;
     CDaemon::CDaemon(CWorker *pWorker){m_pWorker = pWorker;};
-    CWorkerEx::CWorkerEx(SRequestHandler* pHandler):m_pHandler(pHandler){};
+    CWorkerEx::CWorkerEx(IRequestHandler* pHandler):m_pHandler(pHandler){};
 
     bool CWorkerEx::Init(HIS&his)
     {

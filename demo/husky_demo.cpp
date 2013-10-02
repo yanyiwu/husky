@@ -1,31 +1,37 @@
-#include "husky_demo.h"
 #include <unistd.h>
+#include <algorithm>
+#include <string>
+#include <ctype.h>
+#include <string.h>
+#include "../husky/headers.h"
+using namespace CPPCOMMON;
+using namespace Husky;
 
-bool ServerDemo::init()
+class ServerDemo: public IRequestHandler
 {
-	return true;
-}
+	public:
+        ServerDemo(){};
+        virtual ~ServerDemo(){};
+		virtual bool init(){return true;};
+		virtual bool dispose(){return true;};
+	public:
+		//int HandleRequest(string& strQuery,string& strOut);
+		virtual void operator()(string &strRec, string &strSnd)
+        {
+            //CXmlHttp xh;
+            const char* end;
+            const char* mid;
+            strSnd = strRec;
+            return;
+        }
 
-bool ServerDemo::dispose()
-{
-	return false;
-}
-
-void ServerDemo::operator()(string &strQuery, string &strOut) 
-{
-	//CXmlHttp xh;
-	const char* end;
-	const char* mid;
-    strOut = strQuery;
-    return;
-} 
-
-bool ServerDemo::do_GET(const HttpReqInfo& httpReq, string& strSnd)
-{
-    HttpReqInfo info = httpReq;
-    strSnd = info.toString();
-    return true;
-}
+        virtual bool do_GET(const HttpReqInfo& httpReq, string& strSnd)
+        {
+            HttpReqInfo info = httpReq;
+            strSnd = info.toString();
+            return true;
+        }
+};
 
 int main(int argc,char* argv[])
 {

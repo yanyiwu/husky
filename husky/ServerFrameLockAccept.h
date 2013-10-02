@@ -1,33 +1,40 @@
 #ifndef HUSKY_SERVERFRAME_H 
 #define HUSKY_SERVERFRAME_H 
 
+#include <stdio.h>
+#include <string.h>
+
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
-#include <string>
 #include <vector>
 #include "UtilDef.h"
 #include "../cppcommon/headers.h"
+#include "SimpleThread.h"
+#include "UtilDef.h"
 
 
 namespace Husky
 {
 
     using namespace CPPCOMMON;
+    using namespace simpleThread;
 
-    struct SRequestHandler 
+    class IRequestHandler 
     {
-        virtual bool init(){return true;}
-        virtual bool dispose(){return true;}
-        virtual void operator()(string& strRec, string &strSnd)
-        {
-        }
+        public:
+            virtual ~IRequestHandler() =0;
+        public:
+            virtual bool init() = 0;
+            virtual bool dispose() = 0;
+            virtual void operator()(string& strRec, string &strSnd) = 0;
 
-        virtual bool do_GET(const HttpReqInfo& httpReq, string& res)
-        {
-            return false;
-        }
+            virtual bool do_GET(const HttpReqInfo& httpReq, string& res) = 0;
 
     };
     
@@ -37,7 +44,7 @@ namespace Husky
         public:
 
             CServerFrame(void);
-            bool CreateServer(u_short nPort,u_short nThreadCount,SRequestHandler *pHandler);
+            bool CreateServer(u_short nPort,u_short nThreadCount,IRequestHandler *pHandler);
             bool CloseServer();
             bool RunServer();
             // virtual  void HandleRequest(const string &strReceive,string& strSend){;}
@@ -56,7 +63,7 @@ namespace Husky
             u_short  m_nLsnPort;
             u_short  m_nThreadCount;
             SOCKET   m_lsnSock;
-            SRequestHandler *m_pHandler;
+            IRequestHandler *m_pHandler;
             static bool m_bShutdown ;                 // Signals client/server threads to die
             static PM m_pmAccept;
 
@@ -66,7 +73,7 @@ namespace Husky
     struct SPara
     {
         SOCKET hSock;
-        SRequestHandler * pHandler;
+        IRequestHandler * pHandler;
     };
 }
 #endif

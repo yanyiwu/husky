@@ -27,7 +27,7 @@ namespace Husky
     class CWorkerEx:public CWorker
     {
         public:
-            CWorkerEx(SRequestHandler* pHandler);
+            CWorkerEx(IRequestHandler* pHandler);
             virtual bool Init(HIS&his);
             virtual bool Run();
             virtual bool Dispose();
@@ -35,7 +35,7 @@ namespace Husky
 
         private:
             CServerFrame     m_server;
-            SRequestHandler* m_pHandler;
+            IRequestHandler* m_pHandler;
 
     };
 
