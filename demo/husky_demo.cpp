@@ -41,7 +41,7 @@ int main(int argc,char* argv[])
 		return -1;
 	}
 	ServerDemo s;
-	CWorkerEx worker(&s);
+	CWorker worker(&s);
 	CDaemon daemon(&worker);
 	return daemon.Run(argc,argv)!=true;
 }

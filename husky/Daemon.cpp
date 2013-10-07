@@ -5,9 +5,9 @@ namespace Husky
     CWorker *CDaemon::m_pWorker=NULL;
     int CDaemon::m_nChildPid=0;
     CDaemon::CDaemon(CWorker *pWorker){m_pWorker = pWorker;};
-    CWorkerEx::CWorkerEx(IRequestHandler* pHandler):m_pHandler(pHandler){};
+    CWorker::CWorker(IRequestHandler* pHandler):m_pHandler(pHandler){};
 
-    bool CWorkerEx::Init(HIS&his)
+    bool CWorker::Init(HIS&his)
     {
         int nPort,nThreadNum;
         HISI i=his.find('n');   
@@ -26,17 +26,17 @@ namespace Husky
         return m_server.CreateServer(nPort, nThreadNum, m_pHandler);
     }
 
-    bool CWorkerEx::Run()
+    bool CWorker::Run()
     {
         return m_server.RunServer();
     }
 
-    bool CWorkerEx::Dispose()
+    bool CWorker::Dispose()
     {
         return m_pHandler->dispose();
     } 
 
-    bool CWorkerEx::close()
+    bool CWorker::close()
     {
         return m_server.CloseServer();
     }

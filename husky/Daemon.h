@@ -14,20 +14,20 @@
 namespace Husky
 {
     using namespace CPPCOMMON;
-    class CWorker
+    //class CWorker
+    //{
+    //    public:
+    //        virtual bool Init(HIS&his){return true;};
+    //        virtual bool Run(){return true;};
+    //        virtual bool Dispose(){return true;};
+    //        virtual bool close(){return true;};
+
+    //};
+
+    class CWorker//:public CWorker
     {
         public:
-            virtual bool Init(HIS&his){return true;};
-            virtual bool Run(){return true;};
-            virtual bool Dispose(){return true;};
-            virtual bool close(){return true;};
-
-    };
-
-    class CWorkerEx:public CWorker
-    {
-        public:
-            CWorkerEx(IRequestHandler* pHandler);
+            CWorker(IRequestHandler* pHandler);
             virtual bool Init(HIS&his);
             virtual bool Run();
             virtual bool Dispose();
