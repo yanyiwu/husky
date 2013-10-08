@@ -17,43 +17,27 @@ endif
 
 DOLINK := $(LD) $(LDFLAGS) -o $@ $^
 DOPACK := $(AR)  
-SOURCES = Daemon.cpp\
-	ServerFrameLockAccept.cpp
+SOURCES = Daemon.cpp ServerFrameLockAccept.cpp
 OBJS := $(patsubst %.cpp,%.o,$(SOURCES))
-
-CMDIR := ../cppcommon
-CMLIB := $(CMDIR)/libcm.a
-
-TMPDIR := ./huskytmp
 
 LIBA := libhusky.a
 
 # remove the objs after compilation
 .INTERMEDIATE: 
-.PHONY: clean $(CMLIB) 
+.PHONY: clean 
 
 all: $(LIBA)
 
 %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) $<
 
-${LIBA}: $(TMPDIR) $(OBJS) $(CMLIB) 
-	cp $(CMLIB) $(TMPDIR) && cd $(TMPDIR) && ar x `basename $(CMLIB)`
-	$(DOPACK) $@ $(OBJS) $(TMPDIR)/*.o 
-	rm -rf $(TMPDIR)
-
-$(TMPDIR):
-	mkdir $@
-
-$(CMLIB):
-	cd $(CMDIR) && $(MAKE)
+${LIBA}: $(OBJS) 
+	$(DOPACK) -o $@ $(OBJS) 
 
 all:  ${LIBA}
 
 clean:
 	rm -f *.o *.d *.d.* $(LIBA) 
-	rm -rf $(TMPDIR)
-	cd $(CMDIR) && make clean
 
 sinclude $(SOURCES:.cpp=.d)
 %.d:%.cpp

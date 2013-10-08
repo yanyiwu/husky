@@ -9,7 +9,7 @@ namespace Husky
 
     bool CWorker::Init(HIS&his)
     {
-        int nPort,nThreadNum;
+        int nPort = -1,nThreadNum = -1;
         HISI i=his.find('n');   
         if(i!=his.end())
           nThreadNum=atoi(i->second.c_str());
@@ -95,9 +95,15 @@ namespace Husky
         }
 
         char buf[128];
-        getcwd(buf,128);	
-        m_runPath = buf;
-        m_runPath+='/';
+        if(NULL != getcwd(buf,128))
+        {
+            m_runPath = buf;
+            m_runPath+='/';
+        }
+        else
+        {
+            m_runPath = "./";
+        }
 
         return m_hisOptVal.size();
     }
