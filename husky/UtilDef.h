@@ -30,7 +30,7 @@ namespace Husky
     const char* const RESPONSE_CHARSET_GB2312 = "GB2312";
     const char* const CLIENT_IP_K = "CLIENT_IP"; 
 
-    const char* const RESPONSE_FORMAT = "HTTP/1.1 200 OK\r\nConnection: close\r\nServer: FrameServer/1.0.0\r\nContent-Type: text/xml; charset=%s\r\nContent-Length: %d\r\n\r\n";
+    const char* const RESPONSE_FORMAT = "HTTP/1.1 200 OK\r\nConnection: close\r\nServer: FrameServer/1.0.0\r\nContent-Type: text/json; charset=%s\r\nContent-Length: %d\r\n\r\n";
     //-----------------------TYPE_DEFINE--------------------------------//
     typedef vector<string>         VS;
     typedef vector<int>            VI;
