@@ -104,7 +104,7 @@ namespace Husky
         char chRecvBuf[RECV_BUFFER];
 
         SOCKET hClientSock;
-        string strHttpXml;
+        string strHttpResp;
 
         sockaddr_in clientaddr;
         socklen_t nSize = sizeof(clientaddr);
@@ -187,20 +187,22 @@ namespace Husky
             //(*pHandler)(strRec,strSnd);     
             pHandler->do_GET(httpReq, strSnd);
             
-            char chHttpHeader[1024];
+            char chHttpHeader[2048];
 
             sprintf(chHttpHeader, RESPONSE_FORMAT, RESPONSE_CHARSET_UTF8, strSnd.length());
 
-#ifdef DEBUG
-            LogDebug(chHttpHeader);
-#endif
-            strHttpXml=chHttpHeader;
-            strHttpXml+=strSnd;
+            strHttpResp=chHttpHeader;
+            strHttpResp+=strSnd;
 
-            if (SOCKET_ERROR==send(hClientSock,strHttpXml.c_str(),strHttpXml.length(),0))
+            if (SOCKET_ERROR==send(hClientSock,strHttpResp.c_str(),strHttpResp.length(),0))
             {
                 LogError(strerror(errno));
             }
+
+#ifdef DEBUG
+            LogDebug("send response [%s] ", strHttpResp.c_str());
+#endif
+            
             closesocket(hClientSock);
         }
 
