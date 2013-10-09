@@ -32,7 +32,7 @@ all: $(LIBA)
 	$(CXX) -c $(CXXFLAGS) $<
 
 ${LIBA}: $(OBJS) 
-	$(DOPACK) -o $@ $(OBJS) 
+	$(DOPACK) $@ $(OBJS) 
 
 all:  ${LIBA}
 
