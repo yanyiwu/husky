@@ -117,7 +117,7 @@ namespace Husky
         bool bRestart = true;
         if (WIFEXITED(status)) //exit()or return 
         {
-            LogError("child normal termination, exit pid = %d, status = %d", pid, WEXITSTATUS(status));
+            LogInfo("child normal termination, exit pid = %d, status = %d", pid, WEXITSTATUS(status));
             bRestart = false;
         }
         else if (WIFSIGNALED(status)) //signal方式退出
@@ -131,7 +131,7 @@ namespace Husky
             if (WTERMSIG(status) == SIGKILL)
             {
                 bRestart = false;
-                LogError("has been killed by user ??, exit pid = %d, status = %d", pid, WEXITSTATUS(status));
+                LogError("has been killed by user , exit pid = %d, status = %d", pid, WEXITSTATUS(status));
             }
         }
         else if (WIFSTOPPED(status)) //暂停的子进程退出
