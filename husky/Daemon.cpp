@@ -52,8 +52,6 @@ namespace Husky
     //************************************
     int CDaemon::ParseCmdLine(int argc,char** argv)
     {
-        m_pName=argv[0];
-
         if(argc<2)return 0;
         for (int i=1;i<argc;++i)
         {
@@ -147,7 +145,7 @@ namespace Husky
 
     bool CDaemon::Start()
     {
-        string pidFileName = m_runPath + MASTER_PID_FILE + m_pName;
+        string pidFileName = m_runPath + MASTER_PID_FILE;
         string masterPidStr = loadFile2Str(pidFileName.c_str());
         int masterPid = atoi(masterPidStr.c_str());
         if(masterPid)
@@ -222,7 +220,7 @@ namespace Husky
 
     bool CDaemon::Stop()
     {
-        string pidFileName = m_runPath + MASTER_PID_FILE + m_pName;
+        string pidFileName = m_runPath + MASTER_PID_FILE;
         string masterPidStr = loadFile2Str(pidFileName.c_str());
         int masterPid = atoi(masterPidStr.c_str());
         if(masterPid)
@@ -288,11 +286,6 @@ namespace Husky
     bool CDaemon::Run(int argc,char** argv)
     {
         ParseCmdLine(argc,argv);
-        char*p=strrchr(argv[0],'/');
-        p!=NULL?p=p+1:
-            p=argv[0];
-        m_pName=p;
-
 
         HISI i=m_hisOptVal.find('k');
         if (i!=m_hisOptVal.end())
