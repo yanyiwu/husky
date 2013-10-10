@@ -7,23 +7,13 @@ namespace Husky
     CDaemon::CDaemon(CWorker *pWorker){m_pWorker = pWorker;};
     CWorker::CWorker(IRequestHandler* pHandler):m_pHandler(pHandler){};
 
-    bool CWorker::Init(HIS&his)
+    bool CWorker::Init(unsigned int port, unsigned int threadNum)
     {
-        int nPort = -1,nThreadNum = -1;
-        HISI i=his.find('n');   
-        if(i!=his.end())
-          nThreadNum=atoi(i->second.c_str());
-        i=his.find('p');   
-        if(i!=his.end())
-          nPort=atoi(i->second.c_str());
-        if(nThreadNum<=0||nPort<=0)
-          return false;
         if(!m_pHandler->init())
         {
             return false;
         }
-
-        return m_server.CreateServer(nPort, nThreadNum, m_pHandler);
+        return m_server.CreateServer(port, threadNum, m_pHandler);
     }
 
     bool CWorker::Run()
@@ -50,50 +40,50 @@ namespace Husky
     // Parameter: int argc
     // Parameter: char * * argv
     //************************************
-    int CDaemon::ParseCmdLine(int argc,char** argv)
-    {
-        if(argc<2)return 0;
-        for (int i=1;i<argc;++i)
-        {
-            if (argv[i][0]!='-')
-              continue;
+    //int CDaemon::ParseCmdLine(int argc,char** argv)
+    //{
+    //    if(argc<2)return 0;
+    //    for (int i=1;i<argc;++i)
+    //    {
+    //        if (argv[i][0]!='-')
+    //          continue;
 
-            if (i==argc-1)//后面还有
-              break;
+    //        if (i==argc-1)//后面还有
+    //          break;
 
-            if (argv[i+1][0]=='-')
-            {
-                m_hisOptVal[argv[i][1]]="";
-                continue;
-            }
+    //        if (argv[i+1][0]=='-')
+    //        {
+    //            m_hisOptVal[argv[i][1]]="";
+    //            continue;
+    //        }
 
-            m_hisOptVal[argv[i][1]]=argv[i+1];
-            ++i;
-        }	
+    //        m_hisOptVal[argv[i][1]]=argv[i+1];
+    //        ++i;
+    //    }	
 
-        const char* pchDir;
-        HISI it=m_hisOptVal.find('d');
-        if(it!=m_hisOptVal.end())
-          pchDir=it->second.c_str();
-        else
-          pchDir=".";
+    //    const char* pchDir;
+    //    HISI it=m_hisOptVal.find('d');
+    //    if(it!=m_hisOptVal.end())
+    //      pchDir=it->second.c_str();
+    //    else
+    //      pchDir=".";
 
-        struct stat st;	
-        if(stat(pchDir,&st)<0)
-        {
-            LogError("stat dir %s fail, -- info:%s", pchDir,strerror(errno));
-            exit(0);
-        }
+    //    struct stat st;	
+    //    if(stat(pchDir,&st)<0)
+    //    {
+    //        LogError("stat dir %s fail, -- info:%s", pchDir,strerror(errno));
+    //        exit(0);
+    //    }
 
-        if(0>chdir(pchDir))
-        {
+    //    if(0>chdir(pchDir))
+    //    {
 
-            LogError("work dir %s does not exist",pchDir);
-            exit(0);
-        }
+    //        LogError("work dir %s does not exist",pchDir);
+    //        exit(0);
+    //    }
 
-        return m_hisOptVal.size();
-    }
+    //    return m_hisOptVal.size();
+    //}
 
     /* modify from book apue
      * 为防止子进程意外死亡, 主进程会重新生成子进程.
@@ -132,7 +122,7 @@ namespace Husky
         return bRestart;
     }
 
-    bool CDaemon::Start()
+    bool CDaemon::Start(unsigned int port, unsigned int threadNum)
     {
         string masterPidStr = loadFile2Str(MASTER_PID_FILE);
         int masterPid = atoi(masterPidStr.c_str());
@@ -169,7 +159,7 @@ namespace Husky
                 signal(SIGINT,  SIG_IGN);
                 signal(SIGQUIT, SIG_IGN);
 
-                if (!m_pWorker->Init(m_hisOptVal))
+                if (!m_pWorker->Init(port, threadNum))
                 {	
                     LogError("Worker init  fail!");
                     return false;
@@ -270,25 +260,6 @@ namespace Husky
 
     }
 
-    bool CDaemon::Run(int argc,char** argv)
-    {
-        ParseCmdLine(argc,argv);
-
-        HISI i=m_hisOptVal.find('k');
-        if (i!=m_hisOptVal.end())
-        {
-            if (i->second=="start")
-            {
-                return Start();
-            }
-            else
-            {
-                return Stop();
-            }
-        }
-        return true;
-
-    }
 }
 
 

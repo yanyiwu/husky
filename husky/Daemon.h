@@ -19,7 +19,7 @@ namespace Husky
     {
         public:
             CWorker(IRequestHandler* pHandler);
-            virtual bool Init(HIS&his);
+            virtual bool Init(unsigned int port, unsigned int threadNum);
             virtual bool Run();
             virtual bool Dispose();
             virtual bool close();
@@ -36,14 +36,11 @@ namespace Husky
             CDaemon(){};
             virtual ~CDaemon(){};
             CDaemon(CWorker *pWorker);
-
-            int ParseCmdLine(int argc,char** argv);
-            bool Start();
+            bool Start(unsigned int port, unsigned int threadNum);
             bool Stop();
             static void initAsDaemon();
             static void sigMasterHandler(int sig);
             static void sigChildHandler(int sig);
-            bool Run(int argc,char** argv);
         private:
             HIS      m_hisOptVal;
             static	CWorker *m_pWorker;

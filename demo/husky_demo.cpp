@@ -35,14 +35,26 @@ class ServerDemo: public IRequestHandler
 
 int main(int argc,char* argv[])
 {
-	if(argc<3)
+	if(argc != 7)
 	{
-		printf("usage: %s -n THREAD_NUMBER -p  PLISTEN_PORT -k start|STOP\n",argv[0]);
+		printf("usage: %s -n THREAD_NUMBER -p LISTEN_PORT -k start|stop\n",argv[0]);
 		return -1;
 	}
-	ServerDemo s;
-	CWorker worker(&s);
-	CDaemon daemon(&worker);
-	return daemon.Run(argc,argv)!=true;
+    ArgvContext arg(argc, argv);
+    unsigned int port = 0, threadNum = 0;
+    port = atoi(arg["-p"].c_str());
+    threadNum = atoi(arg["-n"].c_str());
+
+    ServerDemo s;
+    CWorker worker(&s);
+    CDaemon daemon(&worker);
+    if(arg["-k"] == "start")
+    {
+        return !daemon.Start(port, threadNum);
+    }
+    else
+    {
+        return !daemon.Stop();
+    }
 }
 
