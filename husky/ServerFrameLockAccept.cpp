@@ -24,7 +24,7 @@ namespace Husky
         m_bShutdown=true;
         if (SOCKET_ERROR==closesocket(m_lsnSock))
         {
-            LogError(strerror(errno));
+            LogError("error [%s]", strerror(errno));
             return false;
         }
 
@@ -34,7 +34,7 @@ namespace Husky
 
         if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
         {
-            LogError(strerror(errno));
+            LogError("error [%s]", strerror(errno));
             return false;
         }
 
@@ -43,13 +43,13 @@ namespace Husky
         dest.sin_port = htons(m_nLsnPort);
         if (inet_aton("127.0.0.1", (struct in_addr *) &dest.sin_addr.s_addr) == 0)
         {
-            LogError(strerror(errno));
+            LogError("error [%s]", strerror(errno));
             return false;
         }
 
         if (connect(sockfd, (struct sockaddr *) &dest, sizeof(dest)) < 0)
         {
-            LogError(strerror(errno));
+            LogError("error [%s]", strerror(errno));
         }
         close(sockfd);
         return true;
@@ -60,7 +60,7 @@ namespace Husky
     {
         if(SOCKET_ERROR==listen(m_lsnSock,LISEN_QUEUR_LEN))
         {
-            LogError(strerror(errno));
+            LogError("error [%s]", strerror(errno));
             return false;
         }	
         threadManager thrMngr;	
@@ -78,7 +78,7 @@ namespace Husky
         LogInfo("expect thread count %d, real count %d",m_nThreadCount,i);
         if(i==0)	
         {
-            LogError(strerror(errno));
+            LogError("error [%s]", strerror(errno));
             return false;
         }
 
@@ -120,7 +120,7 @@ namespace Husky
             if(hClientSock==SOCKET_ERROR)
             {
                 if(!m_bShutdown)
-                  LogError(strerror(errno));
+                  LogError("error [%s]", strerror(errno));
                 continue;
             }
             //printf("start to serve:id = %d\n",nSockNum);
@@ -131,7 +131,7 @@ namespace Husky
             lng.l_onoff=1;				
             if(SOCKET_ERROR==setsockopt(hClientSock,SOL_SOCKET,SO_LINGER,(char*)&lng,sizeof(lng)))			
             {
-                LogError(strerror(errno));
+                LogError("error [%s]", strerror(errno));
             }
 
             struct timeval to;
@@ -144,11 +144,11 @@ namespace Husky
 
             if(SOCKET_ERROR==setsockopt(hClientSock,SOL_SOCKET,SO_RCVTIMEO,(char*)&in,sizeof(in)))
             {
-              LogError(strerror(errno));
+              LogError("error [%s]", strerror(errno));
             }
             if(SOCKET_ERROR==setsockopt(hClientSock,SOL_SOCKET,SO_SNDTIMEO,(char*)&to,sizeof(to)))
             {
-              LogError(strerror(errno));
+              LogError("error [%s]", strerror(errno));
             }
 
 
@@ -172,7 +172,7 @@ namespace Husky
 
             if(SOCKET_ERROR==nRetCode)
             {
-                LogError(strerror(errno));
+                LogError("error [%s]", strerror(errno));
                 closesocket(hClientSock);
                 continue;
             }
@@ -196,7 +196,7 @@ namespace Husky
 
             if (SOCKET_ERROR==send(hClientSock,strHttpResp.c_str(),strHttpResp.length(),0))
             {
-                LogError(strerror(errno));
+                LogError("error [%s]", strerror(errno));
             }
 
 #ifdef DEBUG
@@ -230,7 +230,7 @@ namespace Husky
         sock=socket(AF_INET,SOCK_STREAM,0);
         if(INVALID_SOCKET==sock)
         {
-            LogError(strerror(errno));
+            LogError("error [%s]", strerror(errno));
             return false;
         }
 
@@ -238,7 +238,7 @@ namespace Husky
         int nRet = 1;
         if(SOCKET_ERROR==setsockopt(m_lsnSock, SOL_SOCKET, SO_REUSEADDR, (char*)&nRet, sizeof(nRet)))
         {	
-            LogError(strerror(errno));
+            LogError("error [%s]", strerror(errno));
         }
 
         struct sockaddr_in addrSock;
@@ -249,7 +249,7 @@ namespace Husky
         retval=bind(sock,(sockaddr*)&addrSock,sizeof(sockaddr));
         if(SOCKET_ERROR==retval)
         {
-            LogError(strerror(errno));
+            LogError("error [%s]", strerror(errno));
             closesocket(sock);
             return false;
         }
