@@ -1,6 +1,6 @@
 #ifndef HUSKY_DAEMON_H_
 #define HUSKY_DAEMON_H_
-#include "UtilDef.h"
+#include "globals.h"
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -14,17 +14,8 @@
 namespace Husky
 {
     using namespace CPPCOMMON;
-    //class CWorker
-    //{
-    //    public:
-    //        virtual bool Init(HIS&his){return true;};
-    //        virtual bool Run(){return true;};
-    //        virtual bool Dispose(){return true;};
-    //        virtual bool close(){return true;};
 
-    //};
-
-    class CWorker//:public CWorker
+    class CWorker
     {
         public:
             CWorker(IRequestHandler* pHandler);
@@ -56,7 +47,7 @@ namespace Husky
         private:
             HIS      m_hisOptVal;
             string   m_runPath;
-            char*    m_pName;
+            char*    m_pName;// process name
             static	CWorker *m_pWorker;
             static	int m_nChildPid;
     };

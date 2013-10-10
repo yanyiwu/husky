@@ -1,5 +1,5 @@
-#ifndef HUSKY_UTIL_DEF_H
-#define HUSKY_UTIL_DEF_H
+#ifndef HUSKY_GLOBALS_H
+#define HUSKY_GLOBALS_H
 #include <string>
 #include <vector>
 #include <set>

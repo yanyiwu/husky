@@ -13,10 +13,9 @@
 #include <errno.h>
 #include <unistd.h>
 #include <vector>
-#include "UtilDef.h"
+#include "globals.h"
 #include "../cppcommon/headers.h"
 #include "SimpleThread.h"
-#include "UtilDef.h"
 
 
 namespace Husky
