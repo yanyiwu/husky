@@ -23,8 +23,14 @@ OBJS := $(patsubst %.cpp,%.o,$(SOURCES))
 SRCDIR = ../husky
 SRCLIB = $(SRCDIR)/libhusky.a
 
+CMDIR = ../cppcommon
+LIBCMA = $(CMDIR)/libcm.a
+
+
+LIBA =  $(SRCLIB) $(LIBCMA)
+
 # remove the objs after compilation
-.PHONY: clean $(SRCLIB)
+.PHONY: clean $(LIBA)
 
 TARGET = husky_demo
 
@@ -36,15 +42,19 @@ all: $(TARGET)
 %.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) $<
 
-$(TARGET): husky_demo.cpp $(SRCLIB)
-	$(CXX) -o $@ $< $(SRCLIB) -lpthread
+$(TARGET): husky_demo.cpp $(LIBA)
+	$(CXX) -o $@ $< $(LIBA) -lpthread
 
 $(SRCLIB): 
 	cd $(SRCDIR) && $(MAKE)
 
+$(LIBCMA): 
+	cd $(CMDIR) && $(MAKE)
+
 clean:
 	rm -f *.o *.ut *.d *.d.* $(TARGET)
 	cd $(SRCDIR) && make clean
+	cd $(CMDIR) && make clean
 
 sinclude $(SOURCES:.cpp=.d)
 %.d:%.cpp
