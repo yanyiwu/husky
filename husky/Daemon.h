@@ -46,8 +46,6 @@ namespace Husky
             bool Run(int argc,char** argv);
         private:
             HIS      m_hisOptVal;
-            string   m_runPath;
-            char*    m_pName;// process name
             static	CWorker *m_pWorker;
             static	int m_nChildPid;
     };

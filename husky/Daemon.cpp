@@ -92,17 +92,6 @@ namespace Husky
             exit(0);
         }
 
-        char buf[128];
-        if(NULL != getcwd(buf,128))
-        {
-            m_runPath = buf;
-            m_runPath+='/';
-        }
-        else
-        {
-            m_runPath = "./";
-        }
-
         return m_hisOptVal.size();
     }
 
@@ -145,8 +134,7 @@ namespace Husky
 
     bool CDaemon::Start()
     {
-        string pidFileName = m_runPath + MASTER_PID_FILE;
-        string masterPidStr = loadFile2Str(pidFileName.c_str());
+        string masterPidStr = loadFile2Str(MASTER_PID_FILE);
         int masterPid = atoi(masterPidStr.c_str());
         if(masterPid)
         {
@@ -163,7 +151,7 @@ namespace Husky
 
         char buf[64];
         sprintf(buf, "%d", getpid());
-        if (!WriteStr2File(pidFileName.c_str(),buf ,"w"))
+        if (!WriteStr2File(MASTER_PID_FILE,buf ,"w"))
         {
             LogFatal("Write master pid fail!");
         }
@@ -220,8 +208,7 @@ namespace Husky
 
     bool CDaemon::Stop()
     {
-        string pidFileName = m_runPath + MASTER_PID_FILE;
-        string masterPidStr = loadFile2Str(pidFileName.c_str());
+        string masterPidStr = loadFile2Str(MASTER_PID_FILE);
         int masterPid = atoi(masterPidStr.c_str());
         if(masterPid)
         {
