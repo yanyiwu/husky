@@ -2,8 +2,6 @@ CXX    := g++
 LD     := g++
 AR     := ar rc
 
-INCS := -I. -I./cppcommon
-
 DEBUG_CXXFLAGS     := -g -Wall -DDEBUG 
 RELEASE_CXXFLAGS   := -Wall -O3
 
@@ -22,8 +20,6 @@ OBJS := $(patsubst %.cpp,%.o,$(SOURCES))
 
 LIBA := libhusky.a
 
-# remove the objs after compilation
-.INTERMEDIATE: 
 .PHONY: clean 
 
 all: $(LIBA)
@@ -33,8 +29,6 @@ all: $(LIBA)
 
 ${LIBA}: $(OBJS) 
 	$(DOPACK) $@ $(OBJS) 
-
-all:  ${LIBA}
 
 clean:
 	rm -f *.o *.d *.d.* $(LIBA) 
