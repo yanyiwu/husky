@@ -4,20 +4,12 @@ namespace Husky
     IRequestHandler::~IRequestHandler()
     {
     }
+    
+    struct timeval CServerFrame::m_timev;
 
     bool CServerFrame::m_bShutdown = false;
 
     PM CServerFrame::m_pmAccept; 
-
-    CServerFrame::CServerFrame(void)
-    {
-
-    }
-
-    CServerFrame::~CServerFrame(void)
-    {
-        pthread_mutex_destroy(&m_pmAccept);
-    }
 
     bool CServerFrame::CloseServer()
     {
@@ -114,7 +106,7 @@ namespace Husky
             hClientSock=accept(hSockLsn,(sockaddr *)&clientaddr, &nSize);
             //LogDebug(inet_ntoa(clientaddr.sin_addr));
             httpReq[CLIENT_IP_K] = inet_ntoa(clientaddr.sin_addr);// inet_ntoa is not thread safety at some version 
-            
+
             pthread_mutex_unlock(&m_pmAccept);
 
             if(hClientSock==SOCKET_ERROR)
@@ -123,9 +115,6 @@ namespace Husky
                   LogError("error [%s]", strerror(errno));
                 continue;
             }
-            //printf("start to serve:id = %d\n",nSockNum);
-
-            //printf("server thread id = %d,socket id = %d",nSockNum,hClientSock);
 
             lng.l_linger=1;
             lng.l_onoff=1;				
@@ -134,21 +123,13 @@ namespace Husky
                 LogError("error [%s]", strerror(errno));
             }
 
-            struct timeval to;
-            to.tv_sec=5;
-            to.tv_usec=0;
-
-            struct timeval in;
-            in.tv_sec=5;
-            in.tv_usec=0;
-
-            if(SOCKET_ERROR==setsockopt(hClientSock,SOL_SOCKET,SO_RCVTIMEO,(char*)&in,sizeof(in)))
+            if(SOCKET_ERROR==setsockopt(hClientSock,SOL_SOCKET,SO_RCVTIMEO,(char*)&m_timev,sizeof(m_timev)))
             {
-              LogError("error [%s]", strerror(errno));
+                LogError("error [%s]", strerror(errno));
             }
-            if(SOCKET_ERROR==setsockopt(hClientSock,SOL_SOCKET,SO_SNDTIMEO,(char*)&to,sizeof(to)))
+            if(SOCKET_ERROR==setsockopt(hClientSock,SOL_SOCKET,SO_SNDTIMEO,(char*)&m_timev,sizeof(m_timev)))
             {
-              LogError("error [%s]", strerror(errno));
+                LogError("error [%s]", strerror(errno));
             }
 
 
@@ -183,10 +164,10 @@ namespace Husky
                 continue;
             }
             httpReq.load(strRec);
-            
+
             //(*pHandler)(strRec,strSnd);     
             pHandler->do_GET(httpReq, strSnd);
-            
+
             char chHttpHeader[2048];
 
             sprintf(chHttpHeader, RESPONSE_FORMAT, RESPONSE_CHARSET_UTF8, strSnd.length());
@@ -202,7 +183,7 @@ namespace Husky
 #ifdef DEBUG
             LogDebug("send response [%s] ", strHttpResp.c_str());
 #endif
-            
+
             closesocket(hClientSock);
         }
 
