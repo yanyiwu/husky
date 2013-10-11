@@ -87,7 +87,6 @@ namespace Husky
 
     void* CServerFrame::ServerThread(void *lpParameter )
     {
-        HttpReqInfo httpReq;
         SPara *pPara=(SPara*)lpParameter;
         SOCKET hSockLsn=pPara->hSock;
         IRequestHandler *pHandler=pPara->pHandler;
@@ -102,12 +101,11 @@ namespace Husky
         socklen_t nSize = sizeof(clientaddr);
         while(!m_bShutdown)
         {		
+            HttpReqInfo httpReq;
             pthread_mutex_lock(&m_pmAccept);
             hClientSock=accept(hSockLsn,(sockaddr *)&clientaddr, &nSize);
-            //LogDebug(inet_ntoa(clientaddr.sin_addr));
-            httpReq[CLIENT_IP_K] = inet_ntoa(clientaddr.sin_addr);// inet_ntoa is not thread safety at some version 
-
             pthread_mutex_unlock(&m_pmAccept);
+            httpReq[CLIENT_IP_K] = inet_ntoa(clientaddr.sin_addr);// inet_ntoa is not thread safety at some version 
 
             if(hClientSock==SOCKET_ERROR)
             {
@@ -127,6 +125,7 @@ namespace Husky
             {
                 LogError("error [%s]", strerror(errno));
             }
+
             if(SOCKET_ERROR==setsockopt(hClientSock,SOL_SOCKET,SO_SNDTIMEO,(char*)&m_timev,sizeof(m_timev)))
             {
                 LogError("error [%s]", strerror(errno));
@@ -138,16 +137,15 @@ namespace Husky
             while(true)
             {
                 memset(chRecvBuf,0,sizeof(chRecvBuf));
-                nRetCode=recv(hClientSock,chRecvBuf,RECV_BUFFER-1,0);	
-                if(nRetCode>0)
+                nRetCode = recv(hClientSock, chRecvBuf, RECV_BUFFER, 0);	
+                strRec+=chRecvBuf;
+#ifdef DEBUG
+                LogDebug(strRec);
+#endif
+                if(nRetCode != RECV_BUFFER)
                 {
-                    strRec+=chRecvBuf;
-                    //LogDebug(strRec);
-                    if(strstr(chRecvBuf," HTTP")!=NULL)
-                      break;
+                    break;
                 }
-                else
-                  break;
             }
 
 
