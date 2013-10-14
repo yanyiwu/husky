@@ -15,7 +15,7 @@ endif
 
 DOLINK := $(LD) $(LDFLAGS) -o $@ $^
 DOPACK := $(AR)  
-SOURCES = Daemon.cpp ServerFrameLockAccept.cpp
+SOURCES = $(wildcard *.cpp)
 OBJS := $(patsubst %.cpp,%.o,$(SOURCES))
 
 LIBA := libhusky.a

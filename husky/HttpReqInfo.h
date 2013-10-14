@@ -1,16 +1,14 @@
-#ifndef CPPCOMMON_HTTP_FUNCTS_H
-#define CPPCOMMON_HTTP_FUNCTS_H
+#ifndef CPPCOMMON_HTTP_REQINFO_H
+#define CPPCOMMON_HTTP_REQINFO_H
 
 #include <iostream>
 #include <string>
-#include "typedefs.h"
-#include "map_functs.h"
-#include "str_functs.h"
-#include "logger.h"
+#include "globals.h"
+#include "../cppcommon/headers.h"
 
-namespace CPPCOMMON
+namespace Husky
 {
-    using namespace std;
+    using namespace CPPCOMMON;
 
     class HttpReqInfo
     {

@@ -1,6 +1,6 @@
-#include "http_functs.h"
+#include "HttpReqInfo.h"
 
-namespace CPPCOMMON
+namespace Husky
 {
     bool HttpReqInfo::_parseUrl(const string& url, HashMap<string, string>& mp)
     {
@@ -70,11 +70,7 @@ namespace CPPCOMMON
         //parse path to _methodGetMap
         if("GET" == _headerMap[KEY_METHOD])
         {
-            if(!_parseUrl(firstline, _methodGetMap))
-            {
-                LogFatal("headerStr firstline[%s] illegal.", firstline.c_str());
-                return false;
-            }
+            _parseUrl(firstline, _methodGetMap);
         }
         
         

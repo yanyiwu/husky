@@ -16,6 +16,7 @@
 #include "globals.h"
 #include "../cppcommon/headers.h"
 #include "SimpleThread.h"
+#include "HttpReqInfo.h"
 
 
 namespace Husky
