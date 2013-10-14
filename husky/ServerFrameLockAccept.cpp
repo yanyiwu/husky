@@ -2,8 +2,7 @@
 namespace Husky
 {
     IRequestHandler::~IRequestHandler()
-    {
-    }
+    {}
     
     struct timeval CServerFrame::m_timev;
 

@@ -15,15 +15,6 @@ class ServerDemo: public IRequestHandler
 		virtual bool init(){return true;};
 		virtual bool dispose(){return true;};
 	public:
-		//int HandleRequest(string& strQuery,string& strOut);
-		virtual void operator()(string &strRec, string &strSnd)
-        {
-            //CXmlHttp xh;
-            const char* end;
-            const char* mid;
-            strSnd = strRec;
-            return;
-        }
 
         virtual bool do_GET(const HttpReqInfo& httpReq, string& strSnd)
         {

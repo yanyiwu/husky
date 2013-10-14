@@ -32,7 +32,6 @@ namespace Husky
         public:
             virtual bool init() = 0;
             virtual bool dispose() = 0;
-            virtual void operator()(string& strRec, string &strSnd) = 0;
 
             virtual bool do_GET(const HttpReqInfo& httpReq, string& res) = 0;
 
