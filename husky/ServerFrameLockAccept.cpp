@@ -4,7 +4,7 @@ namespace Husky
     IRequestHandler::~IRequestHandler()
     {}
     
-    struct timeval CServerFrame::m_timev;
+    struct timeval CServerFrame::m_timev = {SOCKET_TIMEOUT, 0};
 
     bool CServerFrame::m_bShutdown = false;
 

@@ -44,8 +44,8 @@ namespace Husky
 
             CServerFrame()
             {
-                m_timev.tv_sec = SOCKET_TIMEOUT;
-                m_timev.tv_usec = 0;
+                //m_timev.tv_sec = SOCKET_TIMEOUT;
+                //m_timev.tv_usec = 0;
             };
             ~CServerFrame(){pthread_mutex_destroy(&m_pmAccept);};
             bool CreateServer(u_short nPort,u_short nThreadCount,IRequestHandler *pHandler);
