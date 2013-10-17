@@ -104,7 +104,6 @@ namespace Husky
             pthread_mutex_lock(&m_pmAccept);
             hClientSock=accept(hSockLsn,(sockaddr *)&clientaddr, &nSize);
             pthread_mutex_unlock(&m_pmAccept);
-            httpReq[CLIENT_IP_K] = inet_ntoa(clientaddr.sin_addr);// inet_ntoa is not thread safety at some version 
 
             if(hClientSock==SOCKET_ERROR)
             {
@@ -112,6 +111,8 @@ namespace Husky
                   LogError("error [%s]", strerror(errno));
                 continue;
             }
+
+            httpReq[CLIENT_IP_K] = inet_ntoa(clientaddr.sin_addr);// inet_ntoa is not thread safety at some version 
 
             lng.l_linger=1;
             lng.l_onoff=1;				
@@ -133,20 +134,13 @@ namespace Husky
 
             string strRec;
             string strSnd;
-            while(true)
-            {
-                memset(chRecvBuf,0,sizeof(chRecvBuf));
-                nRetCode = recv(hClientSock, chRecvBuf, RECV_BUFFER, 0);	
-                strRec+=chRecvBuf;
-#ifdef DEBUG
-                LogDebug(strRec);
-#endif
-                if(nRetCode != RECV_BUFFER)
-                {
-                    break;
-                }
-            }
+            memset(chRecvBuf,0,sizeof(chRecvBuf));
+            nRetCode = recv(hClientSock, chRecvBuf, RECV_BUFFER, 0);	
+            strRec = chRecvBuf;
 
+#ifdef DEBUG
+            LogDebug(strRec);
+#endif
 
             if(SOCKET_ERROR==nRetCode)
             {
@@ -156,13 +150,12 @@ namespace Husky
             }
             if(0==nRetCode)
             {
-                LogInfo("****connection has been gracefully closed");
+                LogDebug("connection has been gracefully closed");
                 closesocket(hClientSock);
                 continue;
             }
             httpReq.load(strRec);
 
-            //(*pHandler)(strRec,strSnd);     
             pHandler->do_GET(httpReq, strSnd);
 
             char chHttpHeader[2048];
