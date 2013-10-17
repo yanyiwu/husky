@@ -55,8 +55,8 @@ namespace Husky
     typedef unsigned short  u_short;
     typedef unsigned int    u_int;
     typedef	int             SOCKET;
-    typedef pthread_mutex_t PM;
-    typedef pthread_cond_t  PC;
+    //typedef pthread_mutex_t PM;
+    //typedef pthread_cond_t  PC;
 
     using std::vector;
     using std::string;

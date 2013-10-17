@@ -66,8 +66,8 @@ namespace Husky
             u_short  m_nThreadCount;
             SOCKET   m_lsnSock;
             IRequestHandler *m_pHandler;
-            static bool m_bShutdown ;                 // Signals client/server threads to die
-            static PM m_pmAccept;
+            static bool m_bShutdown ;
+            static pthread_mutex_t m_pmAccept;
             static struct timeval m_timev;
 
     }; 

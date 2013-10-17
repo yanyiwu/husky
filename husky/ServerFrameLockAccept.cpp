@@ -8,7 +8,7 @@ namespace Husky
 
     bool CServerFrame::m_bShutdown = false;
 
-    PM CServerFrame::m_pmAccept; 
+    pthread_mutex_t CServerFrame::m_pmAccept; 
 
     bool CServerFrame::CloseServer()
     {
