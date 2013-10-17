@@ -1,4 +1,4 @@
-//**½Ó¿Úº¯ÊıMT_transform**//
+//**æ¥å£å‡½æ•°MT_transform**//
 
 #ifndef MT_TRANSFORM
 #define MT_TRANSFORM
@@ -15,26 +15,26 @@ namespace Husky
     using namespace std;
 
     ///////////////**********************************************************************************//////////////
-    //ÀàThreadMananger ÎªÒ»¸ö¼òµ¥µÄÏß³Ì°ü×°¹ÜÀí×é¼ş Æä½Ó¿Ú½éÉÜÏê¼ûÃ¿¸ö½Ó¿Úº¯Êı¶¨Òå main.cppÓĞ²âÊÔÓÃÀı£»
-    //¶ÔÍâ½Ó¿ÚÎªÆäËùÓĞ¹«ÓĞ³ÉÔ±º¯Êı£»ÁíBindº¯ÊıÊÇÃû×Ö¿Õ¼äsimpleThreadµÄÒ»¸ö¹«ÓĞ½Ó¿Ú
+    //ç±»ThreadMananger ä¸ºä¸€ä¸ªç®€å•çš„çº¿ç¨‹åŒ…è£…ç®¡ç†ç»„ä»¶ å…¶æ¥å£ä»‹ç»è¯¦è§æ¯ä¸ªæ¥å£å‡½æ•°å®šä¹‰ main.cppæœ‰æµ‹è¯•ç”¨ä¾‹ï¼›
+    //å¯¹å¤–æ¥å£ä¸ºå…¶æ‰€æœ‰å…¬æœ‰æˆå‘˜å‡½æ•°ï¼›å¦Bindå‡½æ•°æ˜¯åå­—ç©ºé—´simpleThreadçš„ä¸€ä¸ªå…¬æœ‰æ¥å£
 
-    //Ê¹ÓÃ·½·¨£º      1´´½¨¶ÔÏó    ThreadMananger manager;
+    //ä½¿ç”¨æ–¹æ³•ï¼š      1åˆ›å»ºå¯¹è±¡    ThreadMananger manager;
 
-    //                2´´½¨Ïß³Ì     £¨1£© ±ê×¼Ïß³Ìº¯Êı·½·¨   
-    //                              £¨2£© º¯Êı¶ÔÏó·½·¨        A Ö±½Óº¯Êı¶ÔÏó·¨
-    //                                                        B ¼ä½Óº¯Êı¶ÔÏó£¨°ó¶¨Ïß³Ìº¯ÊıÖ¸Õë£¬ºÍÏß³Ì²ÎÊı£©
-    //                                                        C ÎŞ²Îº¯ÊıÖ¸Õë·½·¨£»
+    //                2åˆ›å»ºçº¿ç¨‹     ï¼ˆ1ï¼‰ æ ‡å‡†çº¿ç¨‹å‡½æ•°æ–¹æ³•   
+    //                              ï¼ˆ2ï¼‰ å‡½æ•°å¯¹è±¡æ–¹æ³•        A ç›´æ¥å‡½æ•°å¯¹è±¡æ³•
+    //                                                        B é—´æ¥å‡½æ•°å¯¹è±¡ï¼ˆç»‘å®šçº¿ç¨‹å‡½æ•°æŒ‡é’ˆï¼Œå’Œçº¿ç¨‹å‚æ•°ï¼‰
+    //                                                        C æ— å‚å‡½æ•°æŒ‡é’ˆæ–¹æ³•ï¼›
 
-    //                3µÈ´ıÏß³Ì     £¨1£© µÈ´ıµ¥¸öÏß³Ì        Wait  ·½·¨
-    //                               (2)  µÈ´ı¶à¸öÏß³Ì        WaitMultipleThread
+    //                3ç­‰å¾…çº¿ç¨‹     ï¼ˆ1ï¼‰ ç­‰å¾…å•ä¸ªçº¿ç¨‹        Wait  æ–¹æ³•
+    //                               (2)  ç­‰å¾…å¤šä¸ªçº¿ç¨‹        WaitMultipleThread
 
-    //                4ThreadMananger¶ÔÏóÏú»Ùºó×Ô¶¯¹Ø±ÕÏß³Ì¾ä±ú
+    //                4ThreadManangerå¯¹è±¡é”€æ¯åè‡ªåŠ¨å…³é—­çº¿ç¨‹å¥æŸ„
 
-    //                5¶ÔÓÚ´ËÀàÖĞÏß³Ìº¯Êı·µ»Ø¾ä±ú¿É×÷ÎªÊäÈë²ÎÊıµ÷ÓÃ¸ÃÀàÆäËûº¯Êı£¬µ«²»ÒªÓÃAPIº¯ÊıCloseHandle¹Ø±Õ£»
+    //                5å¯¹äºæ­¤ç±»ä¸­çº¿ç¨‹å‡½æ•°è¿”å›å¥æŸ„å¯ä½œä¸ºè¾“å…¥å‚æ•°è°ƒç”¨è¯¥ç±»å…¶ä»–å‡½æ•°ï¼Œä½†ä¸è¦ç”¨APIå‡½æ•°CloseHandleå…³é—­ï¼›
 
-    //                6¹ØÓÚ´«ÈëÏß³ÌµÄ²ÎÊı×îºÃÊÇ¼òµ¥Êı¾İÀàĞÍ £¨°üÀ¨Ö¸Õë£¬¼òµ¥µÄ½á¹¹ÌåµÈ£©·ñÔò¿ÉÄÜÓÉÓÚ¿½±´¶ÔÏóÓ°ÏìĞ§ÂÊ£»
+    //                6å…³äºä¼ å…¥çº¿ç¨‹çš„å‚æ•°æœ€å¥½æ˜¯ç®€å•æ•°æ®ç±»å‹ ï¼ˆåŒ…æ‹¬æŒ‡é’ˆï¼Œç®€å•çš„ç»“æ„ä½“ç­‰ï¼‰å¦åˆ™å¯èƒ½ç”±äºæ‹·è´å¯¹è±¡å½±å“æ•ˆç‡ï¼›
 
-    //                7¹ØÓÚ×ÊÔ´Ğ¹Â¶£¬ÈôÓÃ»§²»Í£µÄ´´½¨ĞÂµÄÏß³Ì£¬²¢ÇÒÏß³Ì·ÇÕı³£ÍË³ö»áÓĞÄÚ´æĞ¹Â¶--¶¯Ì¬·ÖÅäµÄÏß³Ì²ÎÊıĞ¹Â¶£»
+    //                7å…³äºèµ„æºæ³„éœ²ï¼Œè‹¥ç”¨æˆ·ä¸åœçš„åˆ›å»ºæ–°çš„çº¿ç¨‹ï¼Œå¹¶ä¸”çº¿ç¨‹éæ­£å¸¸é€€å‡ºä¼šæœ‰å†…å­˜æ³„éœ²--åŠ¨æ€åˆ†é…çš„çº¿ç¨‹å‚æ•°æ³„éœ²ï¼›
     ///////////////**********************************************************************************//////////////
 
 
@@ -44,38 +44,38 @@ namespace Husky
 
 
 
-        //ÒÔº¯Êı¶ÔÏó·½Ê½´´½¨Ïß³ÌÊ±£¬ÄÚ²¿µ÷ÓÃµÄÏß³Ìº¯Êı£¬ËüÓÃ½á¹¹Ìå°ü×°ÒÔ´«µİFuncObjÀàĞÍĞÅÏ¢
-        //ËüÊ¹ÓÃµÄº¯Êı¶ÔÏóĞèÊÇÒ»¸öGenerator ¼´²»ÓÃÈÎºÎ²ÎÊı¾Í¿ÉÒÔµ÷ÓÃµÄº¯Êı¶ÔÏó 
-        //Ïß³Ì²ÎÊıÓÉº¯Êı¶ÔÏóµÄ³ÉÔ±±äÁ¿Ğ¯´ø,ÓÃ¹¹Ôìº¯Êı³õÊ¼»¯¸Ã³ÉÔ±±äÁ¿£»
+        //ä»¥å‡½æ•°å¯¹è±¡æ–¹å¼åˆ›å»ºçº¿ç¨‹æ—¶ï¼Œå†…éƒ¨è°ƒç”¨çš„çº¿ç¨‹å‡½æ•°ï¼Œå®ƒç”¨ç»“æ„ä½“åŒ…è£…ä»¥ä¼ é€’FuncObjç±»å‹ä¿¡æ¯
+        //å®ƒä½¿ç”¨çš„å‡½æ•°å¯¹è±¡éœ€æ˜¯ä¸€ä¸ªGenerator å³ä¸ç”¨ä»»ä½•å‚æ•°å°±å¯ä»¥è°ƒç”¨çš„å‡½æ•°å¯¹è±¡ 
+        //çº¿ç¨‹å‚æ•°ç”±å‡½æ•°å¯¹è±¡çš„æˆå‘˜å˜é‡æºå¸¦,ç”¨æ„é€ å‡½æ•°åˆå§‹åŒ–è¯¥æˆå‘˜å˜é‡ï¼›
         template <class FuncObj>
-            struct InnerThreadFuncCls//**ÓÃ½á¹¹°ü×°ÒÔ´«µİÀàĞÍĞÅÏ¢
+            struct InnerThreadFuncCls//**ç”¨ç»“æ„åŒ…è£…ä»¥ä¼ é€’ç±»å‹ä¿¡æ¯
             {
                 static void *InnerThreadFunc(void *pPara)
                 {
                     FuncObj* pFuncObj=(FuncObj*)pPara;
                     (*pFuncObj)();	
-                    delete pFuncObj;//ÇåÀí¶¯Ì¬º¯Êı¶ÔÏó			
+                    delete pFuncObj;//æ¸…ç†åŠ¨æ€å‡½æ•°å¯¹è±¡			
                     return 0;
                 }
             };
 
 
 
-        class threadManager                       //Ïß³Ì¹ÜÀíÀà£»
+        class threadManager                       //çº¿ç¨‹ç®¡ç†ç±»ï¼›
         {
             public:
                 threadManager(){;}
                 ~threadManager()
                 {
-                    //¹Ø±ÕÆä¹ÜÀíµÄÃ¿Ò»¸öÏß³Ì¾ä±ú£¬£¨ÕâĞ©Ïß³Ì¿ÉÄÜÓĞ»¹ÔÚÔËĞĞµÄ£©£»
+                    //å…³é—­å…¶ç®¡ç†çš„æ¯ä¸€ä¸ªçº¿ç¨‹å¥æŸ„ï¼Œï¼ˆè¿™äº›çº¿ç¨‹å¯èƒ½æœ‰è¿˜åœ¨è¿è¡Œçš„ï¼‰ï¼›
                 }
 
 
-                //·µ»ØÆä¹ÜÀíµÄÏß³Ì×ÜÊı
+                //è¿”å›å…¶ç®¡ç†çš„çº¿ç¨‹æ€»æ•°
                 unsigned int HandleCount(){return m_vecHandle.size();}
 
 
-                //¹Ø±ÕÆä¹ÜÀíµÄÃ¿Ò»¸öÏß³Ì¾ä±ú£¬ÇåÀíÄÚ²¿×ÊÔ´£¬£¨ÕâĞ©Ïß³Ì¿ÉÄÜÓĞ»¹ÔÚÔËĞĞµÄ£©£»
+                //å…³é—­å…¶ç®¡ç†çš„æ¯ä¸€ä¸ªçº¿ç¨‹å¥æŸ„ï¼Œæ¸…ç†å†…éƒ¨èµ„æºï¼Œï¼ˆè¿™äº›çº¿ç¨‹å¯èƒ½æœ‰è¿˜åœ¨è¿è¡Œçš„ï¼‰ï¼›
                 void clear()
                 {
                     //WaitMultipleThread();
@@ -86,28 +86,28 @@ namespace Husky
 
 
 
-                //ÒÔ_beginthreadexÏß³Ìº¯ÊıĞÎÊ½´´½¨Ïß³Ì
-                //pFuncÖ¸Ïò±ê×¼Ïß³Ìº¯ÊıµÄÖ¸Õë  unsigned __stdcall ThreadFunc(void *param )
-                //pParaÏß³Ì²ÎÊıÖ¸Õë           : ´Ë²ÎÊıÖ¸ÏòµÄ¶ÔÏóÉú´æÆäĞè³¤ÓÚÏß³Ìº¯Êı£¬²¢ÇÒ×¢ÒâÎª¶à¸öÏß³ÌÉú³ÉÇ¡µ±µÄ²ÎÊı¶ÔÏó¡£
-                //return value                : ·µ»ØÖµÎªÁãËµÃ÷´´½¨Ïß³ÌÊ§°Ü£¬·ñÔò·µ»ØÏß³Ì¾ä±ú
+                //ä»¥_beginthreadexçº¿ç¨‹å‡½æ•°å½¢å¼åˆ›å»ºçº¿ç¨‹
+                //pFuncæŒ‡å‘æ ‡å‡†çº¿ç¨‹å‡½æ•°çš„æŒ‡é’ˆ  unsigned __stdcall ThreadFunc(void *param )
+                //pParaçº¿ç¨‹å‚æ•°æŒ‡é’ˆ           : æ­¤å‚æ•°æŒ‡å‘çš„å¯¹è±¡ç”Ÿå­˜å…¶éœ€é•¿äºçº¿ç¨‹å‡½æ•°ï¼Œå¹¶ä¸”æ³¨æ„ä¸ºå¤šä¸ªçº¿ç¨‹ç”Ÿæˆæ°å½“çš„å‚æ•°å¯¹è±¡ã€‚
+                //return value                : è¿”å›å€¼ä¸ºé›¶è¯´æ˜åˆ›å»ºçº¿ç¨‹å¤±è´¥ï¼Œå¦åˆ™è¿”å›çº¿ç¨‹å¥æŸ„
                 HANDLE CreateThread( PThreadFunc pFunc,void *pPara)
                 {	
                     pthread_t pt;
                     int nErrorCode=pthread_create(&pt,NULL,pFunc,pPara);
                     if(nErrorCode!=0)
                       return nErrorCode;
-                    m_vecHandle.push_back(pt);	//¼ÓÈëÏß³ÌÁĞ±í ÎªWaitForMultipleObjects×¼±¸	
+                    m_vecHandle.push_back(pt);	//åŠ å…¥çº¿ç¨‹åˆ—è¡¨ ä¸ºWaitForMultipleObjectså‡†å¤‡	
                     return nErrorCode;
 
                 }
 
-                //µÈ´ıÄ³¸öÏß³ÌÖ´ĞĞÍê±Ï£»
-                //hThreadÏß³Ì¾ä±ú         : Îª0Ê±ÎªÄ¬ÈÏ×îºóÒ»¸ö¼ÓÈë¹ÜÀíÆ÷µÄÏß³Ì¾ä±ú 
-                //dwMillisecondsµÈ´ıÊ±¼ä  : µ¥Î»ºÁÃë£¬Ä¬ÈÏÖµÎŞÇîÊ±¼ä
-                //return value            : -1¾ä±úÎŞĞ§£¬ÆäËûÖµ WaitForSingleObjectº¯ÊıµÄ·µ»ØÖµ
+                //ç­‰å¾…æŸä¸ªçº¿ç¨‹æ‰§è¡Œå®Œæ¯•ï¼›
+                //hThreadçº¿ç¨‹å¥æŸ„         : ä¸º0æ—¶ä¸ºé»˜è®¤æœ€åä¸€ä¸ªåŠ å…¥ç®¡ç†å™¨çš„çº¿ç¨‹å¥æŸ„ 
+                //dwMillisecondsç­‰å¾…æ—¶é—´  : å•ä½æ¯«ç§’ï¼Œé»˜è®¤å€¼æ— ç©·æ—¶é—´
+                //return value            : -1å¥æŸ„æ— æ•ˆï¼Œå…¶ä»–å€¼ WaitForSingleObjectå‡½æ•°çš„è¿”å›å€¼
                 DWORD Wait(HANDLE hThread=0,DWORD dwMilliseconds=INFINITE )
                 {
-                    if( hThread==0)//×îºóÒ»¸ö¼ÓÈëµÄÏß³Ì
+                    if( hThread==0)//æœ€åä¸€ä¸ªåŠ å…¥çš„çº¿ç¨‹
                     {   
                         if(!m_vecHandle.empty())
                         {
@@ -118,7 +118,7 @@ namespace Husky
                     }
                     else
                     {
-                        if (find(m_vecHandle.begin(),m_vecHandle.end(),hThread)==m_vecHandle.end())//²»´æÔÚ´Ë¾ä±ú
+                        if (find(m_vecHandle.begin(),m_vecHandle.end(),hThread)==m_vecHandle.end())//ä¸å­˜åœ¨æ­¤å¥æŸ„
                         {
                             return -1;
                         }
@@ -129,10 +129,10 @@ namespace Husky
                 }
 
 
-                //µÈ´ıËùÓĞÏß³ÌÖ´ĞĞÍê±Ï
-                //bWaitAllÊÇ·ñËùÓĞÏß³Ì  : Ä¬ÈÏÖµ1µÈ´ıËùÓĞÏß³Ì,0ÓĞÈÎºÎÏß³Ì½áÊø£¬´Ëº¯Êı·µ»Ø
-                //dwMilliseconds        : µ¥Î»ºÁÃë£¬Ä¬ÈÏÖµÎŞÇîÊ±¼ä
-                //return value          : -1Ã»ÓĞÈÎºÎ¾ä±ú£¬ÆäËûÖµ WaitForMultipleObjectsº¯ÊıµÄ·µ»ØÖµ
+                //ç­‰å¾…æ‰€æœ‰çº¿ç¨‹æ‰§è¡Œå®Œæ¯•
+                //bWaitAllæ˜¯å¦æ‰€æœ‰çº¿ç¨‹  : é»˜è®¤å€¼1ç­‰å¾…æ‰€æœ‰çº¿ç¨‹,0æœ‰ä»»ä½•çº¿ç¨‹ç»“æŸï¼Œæ­¤å‡½æ•°è¿”å›
+                //dwMilliseconds        : å•ä½æ¯«ç§’ï¼Œé»˜è®¤å€¼æ— ç©·æ—¶é—´
+                //return value          : -1æ²¡æœ‰ä»»ä½•å¥æŸ„ï¼Œå…¶ä»–å€¼ WaitForMultipleObjectså‡½æ•°çš„è¿”å›å€¼
                 DWORD  WaitMultipleThread( bool bWaitAll=1,DWORD dwMilliseconds=INFINITE)
                 {
                     if (m_vecHandle.empty())		
@@ -149,37 +149,37 @@ namespace Husky
 
 
 
-                //ÒÔº¯Êı¶ÔÏó·½Ê½´´½¨Ïß³Ì,»òÕßÎŞ²ÎµÄº¯ÊıÖ¸Õë£»void (*pfunc)(void)
-                //ËüÊ¹ÓÃµÄº¯Êı¶ÔÏóĞèÊÇÒ»¸öGenerator ¼´²»ÓÃÈÎºÎ²ÎÊı¾Í¿ÉÒÔµ÷ÓÃµÄº¯Êı¶ÔÏó 
-                //Ïß³Ì²ÎÊıÓÉº¯Êı¶ÔÏóµÄ³ÉÔ±±äÁ¿Ğ¯´ø,ÓÃ¹¹Ôìº¯Êı³õÊ¼»¯¸Ã³ÉÔ±±äÁ¿£»
+                //ä»¥å‡½æ•°å¯¹è±¡æ–¹å¼åˆ›å»ºçº¿ç¨‹,æˆ–è€…æ— å‚çš„å‡½æ•°æŒ‡é’ˆï¼›void (*pfunc)(void)
+                //å®ƒä½¿ç”¨çš„å‡½æ•°å¯¹è±¡éœ€æ˜¯ä¸€ä¸ªGenerator å³ä¸ç”¨ä»»ä½•å‚æ•°å°±å¯ä»¥è°ƒç”¨çš„å‡½æ•°å¯¹è±¡ 
+                //çº¿ç¨‹å‚æ•°ç”±å‡½æ•°å¯¹è±¡çš„æˆå‘˜å˜é‡æºå¸¦,ç”¨æ„é€ å‡½æ•°åˆå§‹åŒ–è¯¥æˆå‘˜å˜é‡ï¼›
                 template <class FuncObj>
-                    HANDLE CreateThread(FuncObj funcObj) //ÒıÓÃ´«µİÔÚÖ¸Ïòº¯ÊıÖ¸ÕëÊ± »áÓĞ±àÒëÎÊÌâÒò´ËÓÃÖµ´«µİ
+                    HANDLE CreateThread(FuncObj funcObj) //å¼•ç”¨ä¼ é€’åœ¨æŒ‡å‘å‡½æ•°æŒ‡é’ˆæ—¶ ä¼šæœ‰ç¼–è¯‘é—®é¢˜å› æ­¤ç”¨å€¼ä¼ é€’
                     {
-                        FuncObj* pFuncObj=new FuncObj(funcObj);//ĞèÒªºÏÊÊµÄÄ¬ÈÏ¿½±´¹¹Ôìº¯Êı
-                        //ÓÚÏß³Ìº¯ÊıÖĞDELETE
+                        FuncObj* pFuncObj=new FuncObj(funcObj);//éœ€è¦åˆé€‚çš„é»˜è®¤æ‹·è´æ„é€ å‡½æ•°
+                        //äºçº¿ç¨‹å‡½æ•°ä¸­DELETE
                         HANDLE handle;
                         pthread_t pt;
                         int nErrorCode=pthread_create(&pt,NULL,InnerThreadFuncCls<FuncObj>::InnerThreadFunc,pFuncObj);
                         if(nErrorCode!=0)
                           return nErrorCode;
-                        m_vecHandle.push_back(pt);	//¼ÓÈëÏß³ÌÁĞ±í ÎªWaitForMultipleObjects×¼±¸	
+                        m_vecHandle.push_back(pt);	//åŠ å…¥çº¿ç¨‹åˆ—è¡¨ ä¸ºWaitForMultipleObjectså‡†å¤‡	
                         return nErrorCode;
                     }
             private:
 
-                vector<pthread_t> m_vecHandle;   //Ïß³Ì¾ä±úºÍº¯Êı¶ÔÏóµÄÁĞ±í
+                vector<pthread_t> m_vecHandle;   //çº¿ç¨‹å¥æŸ„å’Œå‡½æ•°å¯¹è±¡çš„åˆ—è¡¨
 
-                //	vector<void*> m_vecPvoid;  //±£´æÏß³Ì²ÎÊıÊ¹ÓÃ£»
+                //	vector<void*> m_vecPvoid;  //ä¿å­˜çº¿ç¨‹å‚æ•°ä½¿ç”¨ï¼›
             private:
-                threadManager(const threadManager&){;}//½ûÖ¹¿½±´
-                void operator=(const threadManager &){}//½ûÖ¹¸³Öµ			
+                threadManager(const threadManager&){;}//ç¦æ­¢æ‹·è´
+                void operator=(const threadManager &){}//ç¦æ­¢èµ‹å€¼			
         };
 
 
 
 
 
-        //´úÀíº¯Êı¶ÔÏóÓÃÓÚ°ó¶¨Ïß³Ìº¯ÊıÖ¸ÕëºÍÏß³Ì²ÎÊı
+        //ä»£ç†å‡½æ•°å¯¹è±¡ç”¨äºç»‘å®šçº¿ç¨‹å‡½æ•°æŒ‡é’ˆå’Œçº¿ç¨‹å‚æ•°
         template<class PUserFunc,class ThreadPara>
             struct FuncObjProxy 
             {		
@@ -195,10 +195,10 @@ namespace Husky
 
             };
 
-        //°ó¶¨·½·¨£»·µ»Øº¯Êı¶ÔÏó
-        //pfun º¯ÊıÖ¸ÕëÖ¸ÏòÓÃ»§Ïß³Ìº¯Êı£¬ĞÎÊ½Îª typename RetCls (*ThreadFunc)(typename ThreadPara) 
-        //Êµ¼Ê·µ»ØÀàĞÍRetClsÓÃ»§»ñÈ¡²»µ½£¬×îºÃÎªvoid (*ThreadFunc)(ThreadPara para)ĞÎÊ½
-        //refParaÎªÓÃ»§Ïß³Ìº¯Êı²ÎÊıµÄÒıÓÃ
+        //ç»‘å®šæ–¹æ³•ï¼›è¿”å›å‡½æ•°å¯¹è±¡
+        //pfun å‡½æ•°æŒ‡é’ˆæŒ‡å‘ç”¨æˆ·çº¿ç¨‹å‡½æ•°ï¼Œå½¢å¼ä¸º typename RetCls (*ThreadFunc)(typename ThreadPara) 
+        //å®é™…è¿”å›ç±»å‹RetClsç”¨æˆ·è·å–ä¸åˆ°ï¼Œæœ€å¥½ä¸ºvoid (*ThreadFunc)(ThreadPara para)å½¢å¼
+        //refParaä¸ºç”¨æˆ·çº¿ç¨‹å‡½æ•°å‚æ•°çš„å¼•ç”¨
         template<class PUserFunc,class ThreadPara>
             FuncObjProxy<PUserFunc,ThreadPara> Bind(PUserFunc pfun,ThreadPara &refPara)
             {

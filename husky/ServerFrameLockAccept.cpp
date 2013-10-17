@@ -77,7 +77,7 @@ namespace Husky
 
         if (thrMngr.WaitMultipleThread()!=0)
         {
-            return false;//waiting for all the thread exited
+            return false;
         }
         LogInfo("server shutdown ok............");
         return true;
