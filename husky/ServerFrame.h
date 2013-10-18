@@ -15,7 +15,7 @@
 #include <vector>
 #include "globals.h"
 #include "../cppcommon/headers.h"
-#include "SimpleThread.h"
+#include "ThreadManager.h"
 #include "HttpReqInfo.h"
 
 
@@ -23,8 +23,6 @@ namespace Husky
 {
 
     using namespace CPPCOMMON;
-    using namespace simpleThread;
-
     class IRequestHandler 
     {
         public:

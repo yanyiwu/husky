@@ -53,7 +53,7 @@ namespace Husky
             LogError("error [%s]", strerror(errno));
             return false;
         }	
-        threadManager thrMngr;	
+        ThreadManager thrMngr;	
         int i;
         SPara para;
         para.hSock=m_lsnSock;
