@@ -8,7 +8,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <signal.h>
-#include "ServerFrameLockAccept.h"
+#include "ServerFrame.h"
 #include "../cppcommon/headers.h"
 
 namespace Husky

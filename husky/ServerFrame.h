@@ -52,7 +52,7 @@ namespace Husky
 
             bool BindToLocalHost(SOCKET &sock,u_short nPort);
 
-            static void* ServerThread(void *lpParameter );
+            static void * ServerThread(void * lpParameter );
 
         private:
             u_short  m_nLsnPort;
