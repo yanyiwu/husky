@@ -2,9 +2,6 @@
 
 namespace Husky
 {
-    CWorker *CDaemon::m_pWorker=NULL;
-    int CDaemon::m_nChildPid=0;
-    CDaemon::CDaemon(CWorker *pWorker){m_pWorker = pWorker;};
     CWorker::CWorker(IRequestHandler* pHandler):m_pHandler(pHandler){};
 
     bool CWorker::Init(unsigned int port, unsigned int threadNum)
@@ -26,70 +23,20 @@ namespace Husky
         return m_pHandler->dispose();
     } 
 
-    bool CWorker::close()
+    bool CWorker::CloseServer()
     {
         return m_server.CloseServer();
     }
 
-    //************************************
-    // Method:    ParseCmdLine 解析命令行参数，格式为 -x xxx .... 形式
-    // FullName:  CDaemon::ParseCmdLine
-    // Access:    public 
-    // Returns:   int	
-    // Qualifier:
-    // Parameter: int argc
-    // Parameter: char * * argv
-    //************************************
-    //int CDaemon::ParseCmdLine(int argc,char** argv)
-    //{
-    //    if(argc<2)return 0;
-    //    for (int i=1;i<argc;++i)
-    //    {
-    //        if (argv[i][0]!='-')
-    //          continue;
-
-    //        if (i==argc-1)//后面还有
-    //          break;
-
-    //        if (argv[i+1][0]=='-')
-    //        {
-    //            m_hisOptVal[argv[i][1]]="";
-    //            continue;
-    //        }
-
-    //        m_hisOptVal[argv[i][1]]=argv[i+1];
-    //        ++i;
-    //    }	
-
-    //    const char* pchDir;
-    //    HISI it=m_hisOptVal.find('d');
-    //    if(it!=m_hisOptVal.end())
-    //      pchDir=it->second.c_str();
-    //    else
-    //      pchDir=".";
-
-    //    struct stat st;	
-    //    if(stat(pchDir,&st)<0)
-    //    {
-    //        LogError("stat dir %s fail, -- info:%s", pchDir,strerror(errno));
-    //        exit(0);
-    //    }
-
-    //    if(0>chdir(pchDir))
-    //    {
-
-    //        LogError("work dir %s does not exist",pchDir);
-    //        exit(0);
-    //    }
-
-    //    return m_hisOptVal.size();
-    //}
+    CWorker *CDaemon::m_pWorker = NULL;
+    int CDaemon::m_nChildPid = 0;
+    CDaemon::CDaemon(CWorker *pWorker){m_pWorker = pWorker;};
 
     /* modify from book apue
      * 为防止子进程意外死亡, 主进程会重新生成子进程.
      * 除非:1.子进程以EXIT方式退出. 2. kill -9 杀死该进程
      */
-    bool isAbnormalExit(int pid, int status)
+    bool CDaemon::isAbnormalExit(int pid, int status)
     {
         bool bRestart = true;
         if (WIFEXITED(status)) //exit()or return 
@@ -121,6 +68,7 @@ namespace Husky
         }
         return bRestart;
     }
+
 
     bool CDaemon::Start(unsigned int port, unsigned int threadNum)
     {
@@ -171,15 +119,14 @@ namespace Husky
                     LogError("run finish -fail!");
                     return false;
                 }
-                LogInfo("run finish -ok!");
+                LogDebug("run finish -ok!");
 
                 if(!m_pWorker->Dispose())
                 {
                     LogError("Worker dispose -fail!");
                     return false;
                 }
-
-                LogInfo("Worker dispose -ok!");
+                LogDebug("Worker dispose -ok!");
                 exit(0);
             }
 
@@ -188,7 +135,7 @@ namespace Husky
             pid = wait(&status);
             if (!isAbnormalExit(pid, status))
             {
-                LogInfo("child exit normally!");
+                LogInfo("child exit normally! and CDaemon exit");
                 break;
             }
         }
@@ -242,11 +189,12 @@ namespace Husky
         signal(SIGQUIT, sigMasterHandler);
         signal(SIGKILL, sigMasterHandler);
     }
+
     //主进程接收USR1信号处理函数
     void CDaemon::sigMasterHandler(int sig)
     {		
         kill(m_nChildPid,SIGUSR1);
-        LogInfo("master = %d sig child =%d!",getpid(),m_nChildPid);
+        LogDebug("master = %d sig child =%d!",getpid(),m_nChildPid);
 
     }
 
@@ -254,8 +202,8 @@ namespace Husky
     {		
         if (sig == SIGUSR1)
         {
-            m_pWorker->close();
-            LogInfo("master = %d signal accept current pid =%d!",getppid(),getpid());
+            m_pWorker->CloseServer();
+            LogDebug("master = %d signal accept current pid =%d!",getppid(),getpid());
         }
 
     }

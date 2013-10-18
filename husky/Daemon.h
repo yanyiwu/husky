@@ -22,7 +22,7 @@ namespace Husky
             virtual bool Init(unsigned int port, unsigned int threadNum);
             virtual bool Run();
             virtual bool Dispose();
-            virtual bool close();
+            virtual bool CloseServer();
 
         private:
             CServerFrame     m_server;
@@ -33,16 +33,17 @@ namespace Husky
     class CDaemon
     {
         public:
-            CDaemon(){};
-            virtual ~CDaemon(){};
             CDaemon(CWorker *pWorker);
+            ~CDaemon(){};
+        public:
             bool Start(unsigned int port, unsigned int threadNum);
             bool Stop();
+        public:
             static void initAsDaemon();
             static void sigMasterHandler(int sig);
             static void sigChildHandler(int sig);
+            static bool isAbnormalExit(int pid, int status);
         private:
-            HIS      m_hisOptVal;
             static	CWorker *m_pWorker;
             static	int m_nChildPid;
     };

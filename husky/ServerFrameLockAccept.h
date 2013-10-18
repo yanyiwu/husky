@@ -42,24 +42,17 @@ namespace Husky
     {
         public:
 
-            CServerFrame()
-            {
-                //m_timev.tv_sec = SOCKET_TIMEOUT;
-                //m_timev.tv_usec = 0;
-            };
+            CServerFrame(){};
             ~CServerFrame(){pthread_mutex_destroy(&m_pmAccept);};
             bool CreateServer(u_short nPort,u_short nThreadCount,IRequestHandler *pHandler);
             bool CloseServer();
             bool RunServer();
-
-        public:
 
         protected:
 
             bool BindToLocalHost(SOCKET &sock,u_short nPort);
 
             static void* ServerThread(void *lpParameter );
-
 
         private:
             u_short  m_nLsnPort;
@@ -68,7 +61,7 @@ namespace Husky
             IRequestHandler *m_pHandler;
             static bool m_bShutdown ;
             static pthread_mutex_t m_pmAccept;
-            static struct timeval m_timev;
+            static const struct timeval m_timev;
 
     }; 
 

@@ -1,10 +1,9 @@
 #include "ServerFrameLockAccept.h"
 namespace Husky
 {
-    IRequestHandler::~IRequestHandler()
-    {}
+    IRequestHandler::~IRequestHandler(){}
     
-    struct timeval CServerFrame::m_timev = {SOCKET_TIMEOUT, 0};
+    const struct timeval CServerFrame::m_timev = {SOCKET_TIMEOUT, 0};
 
     bool CServerFrame::m_bShutdown = false;
 
