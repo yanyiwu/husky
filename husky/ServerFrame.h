@@ -14,8 +14,8 @@
 #include <unistd.h>
 #include <vector>
 #include "globals.h"
-#include "ThreadManager.h"
-#include "HttpReqInfo.h"
+#include "ThreadManager.hpp"
+#include "HttpReqInfo.hpp"
 
 #define INVALID_SOCKET  -1 
 #define SOCKET_ERROR    -1 

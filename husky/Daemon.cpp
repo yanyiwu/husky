@@ -2,40 +2,11 @@
 
 namespace Husky
 {
-    Worker::Worker(IRequestHandler* pHandler):m_pHandler(pHandler){};
-
-    bool Worker::Init(unsigned int port, unsigned int threadNum)
-    {
-        if(!m_pHandler->init())
-        {
-            return false;
-        }
-        return m_server.CreateServer(port, threadNum, m_pHandler);
-    }
-
-    bool Worker::Run()
-    {
-        return m_server.RunServer();
-    }
-
-    bool Worker::Dispose()
-    {
-        return m_pHandler->dispose();
-    } 
-
-    bool Worker::CloseServer()
-    {
-        return m_server.CloseServer();
-    }
 
     Worker *Daemon::m_pWorker = NULL;
     int Daemon::m_nChildPid = 0;
     Daemon::Daemon(Worker *pWorker){m_pWorker = pWorker;};
 
-    /* modify from book apue
-     * 为防止子进程意外死亡, 主进程会重新生成子进程.
-     * 除非:1.子进程以EXIT方式退出. 2. kill -9 杀死该进程
-     */
     bool Daemon::isAbnormalExit(int pid, int status)
     {
         bool bRestart = true;

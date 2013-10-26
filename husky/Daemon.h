@@ -10,26 +10,13 @@
 #include <signal.h>
 #include <logger.hpp>
 #include "ServerFrame.h"
+#include "Worker.h"
 
 
 namespace Husky
 {
     using namespace Limonp;
 
-    class Worker
-    {
-        public:
-            Worker(IRequestHandler* pHandler);
-            virtual bool Init(unsigned int port, unsigned int threadNum);
-            virtual bool Run();
-            virtual bool Dispose();
-            virtual bool CloseServer();
-
-        private:
-            ServerFrame     m_server;
-            IRequestHandler* m_pHandler;
-
-    };
 
     class Daemon
     {
