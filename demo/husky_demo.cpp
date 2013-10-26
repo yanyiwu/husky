@@ -4,7 +4,8 @@
 #include <ctype.h>
 #include <string.h>
 #include "../husky/headers.h"
-using namespace CPPCOMMON;
+#include <ArgvContext.hpp>
+
 using namespace Husky;
 
 class ServerDemo: public IRequestHandler

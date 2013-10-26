@@ -8,11 +8,6 @@
 #include <tr1/unordered_map>
 #include <tr1/unordered_set>
 
-#define INVALID_SOCKET  -1 
-#define SOCKET_ERROR    -1 
-#define closesocket     close
-#define  RECV_BUFFER     10240
-#define  LISEN_QUEUR_LEN 1024
 
 namespace Husky
 {
@@ -55,11 +50,6 @@ namespace Husky
     typedef unsigned short  u_short;
     typedef unsigned int    u_int;
     typedef	int             SOCKET;
-    //typedef pthread_mutex_t PM;
-    //typedef pthread_cond_t  PC;
-
-    using std::vector;
-    using std::string;
 }
 
 #endif

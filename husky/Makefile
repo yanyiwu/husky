@@ -18,6 +18,7 @@ DOPACK := $(AR)
 SOURCES = $(wildcard *.cpp)
 OBJS := $(patsubst %.cpp,%.o,$(SOURCES))
 
+INC := -I../limonp
 LIBA := libhusky.a
 
 .PHONY: clean 
@@ -25,7 +26,7 @@ LIBA := libhusky.a
 all: $(LIBA)
 
 %.o: %.cpp
-	$(CXX) -c $(CXXFLAGS) $<
+	$(CXX) -c $(CXXFLAGS) $< $(INC)
 
 ${LIBA}: $(OBJS) 
 	$(DOPACK) $@ $(OBJS) 

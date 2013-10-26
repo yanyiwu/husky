@@ -19,12 +19,10 @@ DOLINK := $(LD) $(LDFLAGS)
 DOPACK := $(AR)  
 SOURCES := $(wildcard *.cpp)
 OBJS := $(patsubst %.cpp,%.o,$(SOURCES))
+INC := -I../limonp
 
 SRCDIR = ../husky
 SRCLIB = $(SRCDIR)/libhusky.a
-
-CMDIR = ../cppcommon
-LIBCMA = $(CMDIR)/libcm.a
 
 
 LIBA =  $(SRCLIB) $(LIBCMA)
@@ -40,10 +38,10 @@ all: $(TARGET)
 # This is a suffix rule 
 #.c.o: 
 %.o: %.cpp
-	$(CXX) -c $(CXXFLAGS) $<
+	$(CXX) -c $(CXXFLAGS) $< $(INC)
 
 $(TARGET): husky_demo.cpp $(LIBA)
-	$(CXX) -o $@ $< $(LIBA) -lpthread
+	$(CXX) -o $@ $< $(LIBA) $(INC) -lpthread
 
 $(SRCLIB): 
 	cd $(SRCDIR) && $(MAKE)
@@ -54,7 +52,6 @@ $(LIBCMA):
 clean:
 	rm -f *.o *.ut *.d *.d.* $(TARGET)
 	cd $(SRCDIR) && make clean
-	cd $(CMDIR) && make clean
 
 sinclude $(SOURCES:.cpp=.d)
 %.d:%.cpp

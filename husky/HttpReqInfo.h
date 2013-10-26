@@ -1,14 +1,16 @@
-#ifndef CPPCOMMON_HTTP_REQINFO_H
-#define CPPCOMMON_HTTP_REQINFO_H
+#ifndef HUSKY_HTTP_REQINFO_H
+#define HUSKY_HTTP_REQINFO_H
 
 #include <iostream>
 #include <string>
 #include "globals.h"
-#include "../cppcommon/headers.h"
+#include <str_functs.hpp>
+#include <logger.hpp>
+#include <map_functs.hpp>
 
 namespace Husky
 {
-    using namespace CPPCOMMON;
+    using namespace Limonp;
 
     class HttpReqInfo
     {
@@ -18,8 +20,6 @@ namespace Husky
             static const char* const KEY_PROTOCOL;
         public:
             bool load(const string& headerStr);
-        private:
-            //bool _parse(const string& headerStr, size_t lpos, size_t rpos, const char * const key);
         public:
             string& operator[] (const string& key)
             {
