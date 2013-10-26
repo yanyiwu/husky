@@ -26,12 +26,11 @@
 
 namespace Husky
 {
-
     using namespace Limonp;
     class IRequestHandler 
     {
         public:
-            virtual ~IRequestHandler() =0;
+            virtual ~IRequestHandler(){};
         public:
             virtual bool init() = 0;
             virtual bool dispose() = 0;
@@ -39,12 +38,10 @@ namespace Husky
             virtual bool do_GET(const HttpReqInfo& httpReq, string& res) = 0;
 
     };
-    
 
     class ServerFrame
     {
         public:
-
             ServerFrame(){};
             ~ServerFrame(){pthread_mutex_destroy(&m_pmAccept);};
             bool CreateServer(u_short nPort,u_short nThreadCount,IRequestHandler *pHandler);
@@ -62,7 +59,7 @@ namespace Husky
             u_short  m_nThreadCount;
             SOCKET   m_lsnSock;
             IRequestHandler *m_pHandler;
-            static bool m_bShutdown ;
+            static bool m_bShutdown;
             static pthread_mutex_t m_pmAccept;
             static const struct timeval m_timev;
 

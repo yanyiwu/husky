@@ -1,13 +1,10 @@
 #include "ServerFrame.h"
 namespace Husky
 {
-    IRequestHandler::~IRequestHandler(){}
-    
     const struct timeval ServerFrame::m_timev = {SOCKET_TIMEOUT, 0};
 
-    bool ServerFrame::m_bShutdown = false;
-
     pthread_mutex_t ServerFrame::m_pmAccept; 
+    bool ServerFrame::m_bShutdown = false;
 
     bool ServerFrame::CloseServer()
     {
