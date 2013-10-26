@@ -41,12 +41,12 @@ namespace Husky
     };
     
 
-    class CServerFrame
+    class ServerFrame
     {
         public:
 
-            CServerFrame(){};
-            ~CServerFrame(){pthread_mutex_destroy(&m_pmAccept);};
+            ServerFrame(){};
+            ~ServerFrame(){pthread_mutex_destroy(&m_pmAccept);};
             bool CreateServer(u_short nPort,u_short nThreadCount,IRequestHandler *pHandler);
             bool CloseServer();
             bool RunServer();

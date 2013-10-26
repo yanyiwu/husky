@@ -2,9 +2,9 @@
 
 namespace Husky
 {
-    CWorker::CWorker(IRequestHandler* pHandler):m_pHandler(pHandler){};
+    Worker::Worker(IRequestHandler* pHandler):m_pHandler(pHandler){};
 
-    bool CWorker::Init(unsigned int port, unsigned int threadNum)
+    bool Worker::Init(unsigned int port, unsigned int threadNum)
     {
         if(!m_pHandler->init())
         {
@@ -13,30 +13,30 @@ namespace Husky
         return m_server.CreateServer(port, threadNum, m_pHandler);
     }
 
-    bool CWorker::Run()
+    bool Worker::Run()
     {
         return m_server.RunServer();
     }
 
-    bool CWorker::Dispose()
+    bool Worker::Dispose()
     {
         return m_pHandler->dispose();
     } 
 
-    bool CWorker::CloseServer()
+    bool Worker::CloseServer()
     {
         return m_server.CloseServer();
     }
 
-    CWorker *CDaemon::m_pWorker = NULL;
-    int CDaemon::m_nChildPid = 0;
-    CDaemon::CDaemon(CWorker *pWorker){m_pWorker = pWorker;};
+    Worker *Daemon::m_pWorker = NULL;
+    int Daemon::m_nChildPid = 0;
+    Daemon::Daemon(Worker *pWorker){m_pWorker = pWorker;};
 
     /* modify from book apue
      * 为防止子进程意外死亡, 主进程会重新生成子进程.
      * 除非:1.子进程以EXIT方式退出. 2. kill -9 杀死该进程
      */
-    bool CDaemon::isAbnormalExit(int pid, int status)
+    bool Daemon::isAbnormalExit(int pid, int status)
     {
         bool bRestart = true;
         if (WIFEXITED(status)) //exit()or return 
@@ -70,7 +70,7 @@ namespace Husky
     }
 
 
-    bool CDaemon::Start(unsigned int port, unsigned int threadNum)
+    bool Daemon::Start(unsigned int port, unsigned int threadNum)
     {
         string masterPidStr = loadFile2Str(MASTER_PID_FILE);
         int masterPid = atoi(masterPidStr.c_str());
@@ -135,7 +135,7 @@ namespace Husky
             pid = wait(&status);
             if (!isAbnormalExit(pid, status))
             {
-                LogInfo("child exit normally! and CDaemon exit");
+                LogInfo("child exit normally! and Daemon exit");
                 break;
             }
         }
@@ -143,7 +143,7 @@ namespace Husky
     }
 
 
-    bool CDaemon::Stop()
+    bool Daemon::Stop()
     {
         string masterPidStr = loadFile2Str(MASTER_PID_FILE);
         int masterPid = atoi(masterPidStr.c_str());
@@ -175,7 +175,7 @@ namespace Husky
         return true;
     }
 
-    void CDaemon::initAsDaemon()
+    void Daemon::initAsDaemon()
     {
         if (fork() > 0)
           exit(0);
@@ -191,14 +191,14 @@ namespace Husky
     }
 
     //主进程接收USR1信号处理函数
-    void CDaemon::sigMasterHandler(int sig)
+    void Daemon::sigMasterHandler(int sig)
     {		
         kill(m_nChildPid,SIGUSR1);
         LogDebug("master = %d sig child =%d!",getpid(),m_nChildPid);
 
     }
 
-    void CDaemon::sigChildHandler(int sig)
+    void Daemon::sigChildHandler(int sig)
     {		
         if (sig == SIGUSR1)
         {

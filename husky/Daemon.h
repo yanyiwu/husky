@@ -16,26 +16,26 @@ namespace Husky
 {
     using namespace Limonp;
 
-    class CWorker
+    class Worker
     {
         public:
-            CWorker(IRequestHandler* pHandler);
+            Worker(IRequestHandler* pHandler);
             virtual bool Init(unsigned int port, unsigned int threadNum);
             virtual bool Run();
             virtual bool Dispose();
             virtual bool CloseServer();
 
         private:
-            CServerFrame     m_server;
+            ServerFrame     m_server;
             IRequestHandler* m_pHandler;
 
     };
 
-    class CDaemon
+    class Daemon
     {
         public:
-            CDaemon(CWorker *pWorker);
-            ~CDaemon(){};
+            Daemon(Worker *pWorker);
+            ~Daemon(){};
         public:
             bool Start(unsigned int port, unsigned int threadNum);
             bool Stop();
@@ -45,7 +45,7 @@ namespace Husky
             static void sigChildHandler(int sig);
             static bool isAbnormalExit(int pid, int status);
         private:
-            static	CWorker *m_pWorker;
+            static	Worker *m_pWorker;
             static	int m_nChildPid;
     };
 }

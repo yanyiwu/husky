@@ -3,13 +3,13 @@ namespace Husky
 {
     IRequestHandler::~IRequestHandler(){}
     
-    const struct timeval CServerFrame::m_timev = {SOCKET_TIMEOUT, 0};
+    const struct timeval ServerFrame::m_timev = {SOCKET_TIMEOUT, 0};
 
-    bool CServerFrame::m_bShutdown = false;
+    bool ServerFrame::m_bShutdown = false;
 
-    pthread_mutex_t CServerFrame::m_pmAccept; 
+    pthread_mutex_t ServerFrame::m_pmAccept; 
 
-    bool CServerFrame::CloseServer()
+    bool ServerFrame::CloseServer()
     {
         m_bShutdown=true;
         if (SOCKET_ERROR==closesocket(m_lsnSock))
@@ -46,7 +46,7 @@ namespace Husky
 
     }
 
-    bool CServerFrame::RunServer()
+    bool ServerFrame::RunServer()
     {
         if(SOCKET_ERROR==listen(m_lsnSock,LISEN_QUEUR_LEN))
         {
@@ -83,7 +83,7 @@ namespace Husky
 
     }
 
-    void* CServerFrame::ServerThread(void *lpParameter )
+    void* ServerFrame::ServerThread(void *lpParameter )
     {
         SPara *pPara=(SPara*)lpParameter;
         SOCKET hSockLsn=pPara->hSock;
@@ -180,7 +180,7 @@ namespace Husky
 
     }
 
-    bool CServerFrame::CreateServer(u_short nPort,u_short nThreadCount,IRequestHandler *pHandler)
+    bool ServerFrame::CreateServer(u_short nPort,u_short nThreadCount,IRequestHandler *pHandler)
     {
         m_nLsnPort=nPort;
         m_nThreadCount=nThreadCount;
@@ -195,7 +195,7 @@ namespace Husky
         return true;
     }
 
-    bool  CServerFrame::BindToLocalHost(SOCKET &sock,u_short nPort)
+    bool  ServerFrame::BindToLocalHost(SOCKET &sock,u_short nPort)
     {
         sock=socket(AF_INET,SOCK_STREAM,0);
         if(INVALID_SOCKET==sock)
