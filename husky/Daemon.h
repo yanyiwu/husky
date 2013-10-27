@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include <logger.hpp>
-#include "ServerFrame.h"
+//#include "ServerFrame.h"
 #include "Worker.h"
 
 
@@ -20,7 +20,10 @@ namespace Husky
     class Daemon
     {
         public:
-            Daemon(Worker *pWorker);
+            Daemon(IRequestHandler * pHandler)
+            {
+                m_pHandler = pHandler;
+            }
             ~Daemon(){};
         public:
             bool Start(unsigned int port, unsigned int threadNum);
@@ -31,8 +34,9 @@ namespace Husky
             static void sigChildHandler(int sig);
             static bool isAbnormalExit(int pid, int status);
         private:
-            static	Worker *m_pWorker;
-            static	int m_nChildPid;
+            static    IRequestHandler* m_pHandler;
+            static    ServerFrame m_ServerFrame;
+            static    int m_nChildPid;
     };
 }
 #endif

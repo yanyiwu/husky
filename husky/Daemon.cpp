@@ -3,9 +3,9 @@
 namespace Husky
 {
 
-    Worker *Daemon::m_pWorker = NULL;
+    IRequestHandler * Daemon::m_pHandler;
+    ServerFrame Daemon::m_ServerFrame;
     int Daemon::m_nChildPid = 0;
-    Daemon::Daemon(Worker *pWorker){m_pWorker = pWorker;};
 
     bool Daemon::isAbnormalExit(int pid, int status)
     {
@@ -18,7 +18,7 @@ namespace Husky
         else if (WIFSIGNALED(status)) //signal·½Ê½ÍË³ö
         {
             LogError("abnormal termination, pid = %d, signal number = %d%s", pid, WTERMSIG(status),
-#ifdef	WCOREDUMP
+#ifdef    WCOREDUMP
                         WCOREDUMP(status) ? " (core file generated)" : 
 #endif
                         ""); 
@@ -39,7 +39,6 @@ namespace Husky
         }
         return bRestart;
     }
-
 
     bool Daemon::Start(unsigned int port, unsigned int threadNum)
     {
@@ -78,27 +77,32 @@ namespace Husky
                 signal(SIGINT,  SIG_IGN);
                 signal(SIGQUIT, SIG_IGN);
 
-                if (!m_pWorker->Init(port, threadNum))
-                {	
-                    LogError("Worker init  fail!");
+                if(!m_pHandler->init())
+                {
+                    LogFatal("m_pHandler init failed!");
+                    return false;
+                }
+                if (!m_ServerFrame.CreateServer(port, threadNum, m_pHandler))
+                {    
+                    LogFatal("m_ServerFrame CreateServer(%d, %d, m_pHandler) fail!", port, threadNum);
                     return false;
                 }
 #ifdef DEBUG
                 LogDebug("Worker init  ok pid = %d",(int)getpid());
 #endif
 
-                if (!m_pWorker->Run())
+                if (!m_ServerFrame.RunServer())
                 {
-                    LogError("run finish -fail!");
+                    LogError("m_ServerFrame.RunServer finish -fail!");
                     return false;
                 }
 #ifdef DEBUG
                 LogDebug("run finish -ok!");
 #endif
 
-                if(!m_pWorker->Dispose())
+                if(!m_pHandler->dispose())
                 {
-                    LogError("Worker dispose -fail!");
+                    LogError("m_pHandler.dispose -fail!");
                     return false;
                 }
 #ifdef DEBUG
@@ -136,15 +140,15 @@ namespace Husky
 #endif
                 kill(masterPid, SIGTERM);
 
-                int tryTime = 200;		
+                int tryTime = 200;        
                 while (kill(masterPid, 0) == 0 && --tryTime)
                 {
-                    sleep(1);			
+                    sleep(1);            
                 }
 
                 if (!tryTime && kill(masterPid, 0) == 0)
                 {
-                    LogError("Time out shutdown fail!");		
+                    LogError("Time out shutdown fail!");        
                     return false;
                 }
 
@@ -172,17 +176,17 @@ namespace Husky
     }
 
     void Daemon::sigMasterHandler(int sig)
-    {		
+    {        
         kill(m_nChildPid,SIGUSR1);
         LogDebug("master = %d sig child =%d!",getpid(),m_nChildPid);
 
     }
 
     void Daemon::sigChildHandler(int sig)
-    {		
+    {        
         if (sig == SIGUSR1)
         {
-            m_pWorker->CloseServer();
+            m_ServerFrame.CloseServer();
             LogDebug("master = %d signal accept current pid =%d!",getppid(),getpid());
         }
 

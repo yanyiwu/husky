@@ -27,6 +27,8 @@
 namespace Husky
 {
     using namespace Limonp;
+    typedef	int SOCKET;
+
     class IRequestHandler 
     {
         public:
@@ -39,10 +41,14 @@ namespace Husky
 
     };
 
-    typedef	int SOCKET;
+    struct SPara
+    {
+        SOCKET hSock;
+        IRequestHandler * pHandler;
+    };
+
     class ServerFrame
     {
-        private:
         public:
             ServerFrame(){};
             ~ServerFrame(){pthread_mutex_destroy(&m_pmAccept);};
@@ -68,10 +74,5 @@ namespace Husky
     }; 
 
 
-    struct SPara
-    {
-        SOCKET hSock;
-        IRequestHandler * pHandler;
-    };
 }
 #endif

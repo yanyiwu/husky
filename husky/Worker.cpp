@@ -2,7 +2,6 @@
 
 namespace Husky
 {
-
     Worker::Worker(IRequestHandler* pHandler):m_pHandler(pHandler){};
 
     bool Worker::Init(unsigned int port, unsigned int threadNum)

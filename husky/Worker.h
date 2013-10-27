@@ -19,10 +19,10 @@ namespace Husky
     {
         public:
             Worker(IRequestHandler* pHandler);
-            virtual bool Init(unsigned int port, unsigned int threadNum);
-            virtual bool Run();
-            virtual bool Dispose();
-            virtual bool CloseServer();
+            bool Init(unsigned int port, unsigned int threadNum);
+            bool Run();
+            bool Dispose();
+            bool CloseServer();
 
         private:
             ServerFrame     m_server;

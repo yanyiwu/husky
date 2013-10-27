@@ -17,7 +17,6 @@ class ServerDemo: public IRequestHandler
 		virtual bool init(){return true;};
 		virtual bool dispose(){return true;};
 	public:
-
         virtual bool do_GET(const HttpReqInfo& httpReq, string& strSnd)
         {
             HttpReqInfo info = httpReq;
