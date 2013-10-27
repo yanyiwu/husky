@@ -2,8 +2,6 @@ CXX    := g++
 LD     := g++
 AR     := ar rc
 
-INCS := 
-
 DEBUG_CXXFLAGS     := -g -Wall -DDEBUG 
 RELEASE_CXXFLAGS   := -Wall -O3
 
@@ -15,39 +13,27 @@ else
    LDFLAGS      := ${RELEASE_LDFLAGS}
 endif
 
-DOLINK := $(LD) $(LDFLAGS) 
-DOPACK := $(AR)  
 SOURCES := $(wildcard *.cpp)
 OBJS := $(patsubst %.cpp,%.o,$(SOURCES))
+DEMOS := $(patsubst %.cpp,%.demo,$(SOURCES))
 INC := -I../limonp
 
 SRCDIR = ../husky
 SRCLIB = $(SRCDIR)/libhusky.a
 
+LIBA =  $(SRCLIB) 
 
-LIBA =  $(SRCLIB) $(LIBCMA)
-
-# remove the objs after compilation
 .PHONY: clean $(LIBA)
 
-TARGET = husky_demo
+TARGET = $(DEMOS)
 
-# Main Targets
 all: $(TARGET)
 
-# This is a suffix rule 
-#.c.o: 
-%.o: %.cpp
-	$(CXX) -c $(CXXFLAGS) $< $(INC)
-
-$(TARGET): husky_demo.cpp $(LIBA)
+%.demo: %.cpp $(LIBA)
 	$(CXX) -o $@ $< $(LIBA) $(INC) -lpthread
 
 $(SRCLIB): 
 	cd $(SRCDIR) && $(MAKE)
-
-$(LIBCMA): 
-	cd $(CMDIR) && $(MAKE)
 
 clean:
 	rm -f *.o *.ut *.d *.d.* $(TARGET)
