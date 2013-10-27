@@ -3,7 +3,8 @@
 #include <string>
 #include <ctype.h>
 #include <string.h>
-#include "../husky/headers.h"
+#include "../husky/Daemon.h"
+#include "../husky/ServerFrame.h"
 #include <ArgvContext.hpp>
 
 using namespace Husky;
