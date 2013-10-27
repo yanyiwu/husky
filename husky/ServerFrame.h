@@ -39,8 +39,10 @@ namespace Husky
 
     };
 
+    typedef	int SOCKET;
     class ServerFrame
     {
+        private:
         public:
             ServerFrame(){};
             ~ServerFrame(){pthread_mutex_destroy(&m_pmAccept);};
