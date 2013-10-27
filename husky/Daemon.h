@@ -17,7 +17,6 @@ namespace Husky
 {
     using namespace Limonp;
 
-
     class Daemon
     {
         public:
