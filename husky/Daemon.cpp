@@ -12,7 +12,7 @@ namespace Husky
         bool bRestart = true;
         if (WIFEXITED(status)) //exit()or return 
         {
-            LogInfo("child normal termination, exit pid = %d, status = %d", pid, WEXITSTATUS(status));
+            LogDebug("child normal termination, exit pid = %d, status = %d", pid, WEXITSTATUS(status));
             bRestart = false;
         }
         else if (WIFSIGNALED(status)) //signal·½Ê½ÍË³ö
@@ -46,13 +46,11 @@ namespace Husky
         int masterPid = atoi(masterPidStr.c_str());
         if(masterPid)
         {
-            LogInfo("readlast masterPid[%d]",masterPid);
             if (kill(masterPid, 0) == 0)
             {
                 LogError("Another instance exist, ready to quit!");
                 return false;
             }
-
         }
 
         initAsDaemon();
@@ -116,7 +114,7 @@ namespace Husky
             pid = wait(&status);
             if (!isAbnormalExit(pid, status))
             {
-                LogInfo("child exit normally! and Daemon exit");
+                LogDebug("child exit normally! and Daemon exit");
                 break;
             }
         }
@@ -152,12 +150,13 @@ namespace Husky
                     return false;
                 }
 
+                LogInfo("previous daemon pid[%d] shutdown ok.", masterPid);
                 return true;
             }
 
         }
-        LogInfo("Another instance doesn't exist, ready to quit!");
-        return true;
+        LogError("Another instance doesn't exist, ready to quit!");
+        return false;
     }
 
     void Daemon::initAsDaemon()

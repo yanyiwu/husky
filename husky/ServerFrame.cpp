@@ -62,7 +62,7 @@ namespace Husky
                 break;	
             }		
         }	
-        LogInfo("expect thread count %d, real count %d",m_nThreadCount,i);
+        LogDebug("expect thread count %d, real count %d",m_nThreadCount,i);
         if(i==0)	
         {
             LogError("error [%s]", strerror(errno));
@@ -135,7 +135,7 @@ namespace Husky
             strRec = chRecvBuf;
 
 #ifdef DEBUG
-            LogDebug(strRec);
+            LogDebug("response[%s]", strRec.c_str());
 #endif
 
             if(SOCKET_ERROR==nRetCode)
