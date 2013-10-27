@@ -39,6 +39,7 @@ namespace Husky
             LogError("error [%s]", strerror(errno));
         }
         close(sockfd);
+        LogInfo("CloseServer ok.");
         return true;
 
     }
@@ -75,7 +76,6 @@ namespace Husky
         {
             return false;
         }
-        LogInfo("server shutdown ok............");
         return true;
 
     }
@@ -188,7 +188,7 @@ namespace Husky
             return false;
         }
         pthread_mutex_init(&m_pmAccept,NULL);
-
+        LogInfo("CreatServer ok {port:%d, threadNum:%d}", nPort, nThreadCount);
         return true;
     }
 
