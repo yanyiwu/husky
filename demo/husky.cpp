@@ -38,8 +38,7 @@ int main(int argc,char* argv[])
     threadNum = atoi(arg["-n"].c_str());
 
     ServerDemo s;
-    Worker worker(&s);
-    Daemon daemon(&worker);
+    Daemon daemon(&s);
     if(arg["-k"] == "start")
     {
         return !daemon.Start(port, threadNum);
