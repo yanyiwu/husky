@@ -83,21 +83,27 @@ namespace Husky
                     LogError("Worker init  fail!");
                     return false;
                 }
-                LogInfo("Worker init  ok pid = %d",(int)getpid());
+#ifdef DEBUG
+                LogDebug("Worker init  ok pid = %d",(int)getpid());
+#endif
 
                 if (!m_pWorker->Run())
                 {
                     LogError("run finish -fail!");
                     return false;
                 }
+#ifdef DEBUG
                 LogDebug("run finish -ok!");
+#endif
 
                 if(!m_pWorker->Dispose())
                 {
                     LogError("Worker dispose -fail!");
                     return false;
                 }
+#ifdef DEBUG
                 LogDebug("Worker dispose -ok!");
+#endif
                 exit(0);
             }
 
@@ -120,16 +126,20 @@ namespace Husky
         int masterPid = atoi(masterPidStr.c_str());
         if(masterPid)
         {
-            LogInfo("readlast masterPid[%d]",masterPid);
+#ifdef DEBUG
+            LogDebug("read last masterPid[%d]",masterPid);
+#endif
             if (kill(masterPid, 0) == 0)
             {
-                LogInfo("find previous daemon pid= %d, current pid= %d", masterPid, getpid());
+#ifdef DEBUG
+                LogDebug("find previous daemon pid= %d, current pid= %d", masterPid, getpid());
+#endif
                 kill(masterPid, SIGTERM);
 
                 int tryTime = 200;		
                 while (kill(masterPid, 0) == 0 && --tryTime)
                 {
-                  sleep(1);			
+                    sleep(1);			
                 }
 
                 if (!tryTime && kill(masterPid, 0) == 0)
@@ -161,7 +171,6 @@ namespace Husky
         signal(SIGKILL, sigMasterHandler);
     }
 
-    //主进程接收USR1信号处理函数
     void Daemon::sigMasterHandler(int sig)
     {		
         kill(m_nChildPid,SIGUSR1);
