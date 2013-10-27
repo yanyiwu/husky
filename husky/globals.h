@@ -28,25 +28,6 @@ namespace Husky
     const unsigned int SOCKET_TIMEOUT = 2;
 
     const char* const RESPONSE_FORMAT = "HTTP/1.1 200 OK\r\nConnection: close\r\nServer: FrameServer/1.0.0\r\nContent-Type: text/json; charset=%s\r\nContent-Length: %d\r\n\r\n";
-    //-----------------------TYPE_DEFINE--------------------------------//
-    typedef vector<string>         VS;
-    typedef vector<int>            VI;
-    typedef set<int>               SI;
-    typedef set<string>            SETS;
-    typedef VS::iterator           VSI;
-    typedef VI::iterator           VII;
-    typedef unordered_map<int,int>      HII;
-    typedef unordered_map<string,int>        HSI;
-    typedef unordered_map<int,string>        HIS;
-    typedef unordered_map<string,string>          HSS;
-    typedef pair<int,int>          PII;
-    typedef pair<int,string>       PIS;
-    typedef pair<string,string>    PSS;
-    typedef pair<string,int>       PSI;
-    typedef HII::iterator          HIII;
-    typedef HSI::iterator          HSII;
-    typedef HIS::iterator          HISI;
-    typedef HSS::iterator          HSSI;
     typedef unsigned short  u_short;
     typedef unsigned int    u_int;
     typedef	int             SOCKET;
