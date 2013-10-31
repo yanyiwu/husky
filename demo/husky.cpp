@@ -19,8 +19,6 @@ class ServerDemo: public IRequestHandler
 	public:
         virtual bool do_GET(const HttpReqInfo& httpReq, string& strSnd)
         {
-            HttpReqInfo info = httpReq;
-            strSnd = info.toString();
             return true;
         }
 };
