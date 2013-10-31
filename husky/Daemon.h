@@ -8,33 +8,21 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <signal.h>
+#include <logger.hpp>
 #include "ServerFrame.h"
-#include "../cppcommon/headers.h"
 
 namespace Husky
 {
-    using namespace CPPCOMMON;
+    using namespace Limonp;
 
-    class CWorker
+    class Daemon
     {
         public:
-            CWorker(IRequestHandler* pHandler);
-            virtual bool Init(unsigned int port, unsigned int threadNum);
-            virtual bool Run();
-            virtual bool Dispose();
-            virtual bool CloseServer();
-
-        private:
-            CServerFrame     m_server;
-            IRequestHandler* m_pHandler;
-
-    };
-
-    class CDaemon
-    {
-        public:
-            CDaemon(CWorker *pWorker);
-            ~CDaemon(){};
+            Daemon(IRequestHandler * pHandler)
+            {
+                m_pHandler = pHandler;
+            }
+            ~Daemon(){};
         public:
             bool Start(unsigned int port, unsigned int threadNum);
             bool Stop();
@@ -44,8 +32,9 @@ namespace Husky
             static void sigChildHandler(int sig);
             static bool isAbnormalExit(int pid, int status);
         private:
-            static	CWorker *m_pWorker;
-            static	int m_nChildPid;
+            static    IRequestHandler* m_pHandler;
+            static    ServerFrame m_ServerFrame;
+            static    int m_nChildPid;
     };
 }
 #endif

@@ -14,19 +14,25 @@
 #include <unistd.h>
 #include <vector>
 #include "globals.h"
-#include "../cppcommon/headers.h"
-#include "ThreadManager.h"
-#include "HttpReqInfo.h"
+#include "ThreadManager.hpp"
+#include "HttpReqInfo.hpp"
+
+#define INVALID_SOCKET  -1 
+#define SOCKET_ERROR    -1 
+#define closesocket     close
+#define  RECV_BUFFER     10240
+#define  LISEN_QUEUR_LEN 1024
 
 
 namespace Husky
 {
+    using namespace Limonp;
+    typedef	int SOCKET;
 
-    using namespace CPPCOMMON;
     class IRequestHandler 
     {
         public:
-            virtual ~IRequestHandler() =0;
+            virtual ~IRequestHandler(){};
         public:
             virtual bool init() = 0;
             virtual bool dispose() = 0;
@@ -34,14 +40,18 @@ namespace Husky
             virtual bool do_GET(const HttpReqInfo& httpReq, string& res) = 0;
 
     };
-    
 
-    class CServerFrame
+    struct SPara
+    {
+        SOCKET hSock;
+        IRequestHandler * pHandler;
+    };
+
+    class ServerFrame
     {
         public:
-
-            CServerFrame(){};
-            ~CServerFrame(){pthread_mutex_destroy(&m_pmAccept);};
+            ServerFrame(){};
+            ~ServerFrame(){pthread_mutex_destroy(&m_pmAccept);};
             bool CreateServer(u_short nPort,u_short nThreadCount,IRequestHandler *pHandler);
             bool CloseServer();
             bool RunServer();
@@ -57,17 +67,12 @@ namespace Husky
             u_short  m_nThreadCount;
             SOCKET   m_lsnSock;
             IRequestHandler *m_pHandler;
-            static bool m_bShutdown ;
+            static bool m_bShutdown;
             static pthread_mutex_t m_pmAccept;
             static const struct timeval m_timev;
 
     }; 
 
 
-    struct SPara
-    {
-        SOCKET hSock;
-        IRequestHandler * pHandler;
-    };
 }
 #endif

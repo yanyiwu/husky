@@ -3,8 +3,10 @@
 #include <string>
 #include <ctype.h>
 #include <string.h>
-#include "../husky/headers.h"
-using namespace CPPCOMMON;
+#include "../husky/Daemon.h"
+#include "../husky/ServerFrame.h"
+#include <ArgvContext.hpp>
+
 using namespace Husky;
 
 class ServerDemo: public IRequestHandler
@@ -15,7 +17,6 @@ class ServerDemo: public IRequestHandler
 		virtual bool init(){return true;};
 		virtual bool dispose(){return true;};
 	public:
-
         virtual bool do_GET(const HttpReqInfo& httpReq, string& strSnd)
         {
             HttpReqInfo info = httpReq;
@@ -37,8 +38,7 @@ int main(int argc,char* argv[])
     threadNum = atoi(arg["-n"].c_str());
 
     ServerDemo s;
-    CWorker worker(&s);
-    CDaemon daemon(&worker);
+    Daemon daemon(&s);
     if(arg["-k"] == "start")
     {
         return !daemon.Start(port, threadNum);

@@ -9,3 +9,5 @@ log
 *.log
 *.pyc
 *.a
+*.demo
+*.pid

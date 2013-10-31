@@ -2,52 +2,23 @@
 
 namespace Husky
 {
-    CWorker::CWorker(IRequestHandler* pHandler):m_pHandler(pHandler){};
 
-    bool CWorker::Init(unsigned int port, unsigned int threadNum)
-    {
-        if(!m_pHandler->init())
-        {
-            return false;
-        }
-        return m_server.CreateServer(port, threadNum, m_pHandler);
-    }
+    IRequestHandler * Daemon::m_pHandler;
+    ServerFrame Daemon::m_ServerFrame;
+    int Daemon::m_nChildPid = 0;
 
-    bool CWorker::Run()
-    {
-        return m_server.RunServer();
-    }
-
-    bool CWorker::Dispose()
-    {
-        return m_pHandler->dispose();
-    } 
-
-    bool CWorker::CloseServer()
-    {
-        return m_server.CloseServer();
-    }
-
-    CWorker *CDaemon::m_pWorker = NULL;
-    int CDaemon::m_nChildPid = 0;
-    CDaemon::CDaemon(CWorker *pWorker){m_pWorker = pWorker;};
-
-    /* modify from book apue
-     * 为防止子进程意外死亡, 主进程会重新生成子进程.
-     * 除非:1.子进程以EXIT方式退出. 2. kill -9 杀死该进程
-     */
-    bool CDaemon::isAbnormalExit(int pid, int status)
+    bool Daemon::isAbnormalExit(int pid, int status)
     {
         bool bRestart = true;
         if (WIFEXITED(status)) //exit()or return 
         {
-            LogInfo("child normal termination, exit pid = %d, status = %d", pid, WEXITSTATUS(status));
+            LogDebug("child normal termination, exit pid = %d, status = %d", pid, WEXITSTATUS(status));
             bRestart = false;
         }
         else if (WIFSIGNALED(status)) //signal方式退出
         {
             LogError("abnormal termination, pid = %d, signal number = %d%s", pid, WTERMSIG(status),
-#ifdef	WCOREDUMP
+#ifdef    WCOREDUMP
                         WCOREDUMP(status) ? " (core file generated)" : 
 #endif
                         ""); 
@@ -69,20 +40,17 @@ namespace Husky
         return bRestart;
     }
 
-
-    bool CDaemon::Start(unsigned int port, unsigned int threadNum)
+    bool Daemon::Start(unsigned int port, unsigned int threadNum)
     {
         string masterPidStr = loadFile2Str(MASTER_PID_FILE);
         int masterPid = atoi(masterPidStr.c_str());
         if(masterPid)
         {
-            LogInfo("readlast masterPid[%d]",masterPid);
             if (kill(masterPid, 0) == 0)
             {
                 LogError("Another instance exist, ready to quit!");
                 return false;
             }
-
         }
 
         initAsDaemon();
@@ -107,26 +75,37 @@ namespace Husky
                 signal(SIGINT,  SIG_IGN);
                 signal(SIGQUIT, SIG_IGN);
 
-                if (!m_pWorker->Init(port, threadNum))
-                {	
-                    LogError("Worker init  fail!");
-                    return false;
-                }
-                LogInfo("Worker init  ok pid = %d",(int)getpid());
-
-                if (!m_pWorker->Run())
+                if(!m_pHandler->init())
                 {
-                    LogError("run finish -fail!");
+                    LogFatal("m_pHandler init failed!");
                     return false;
                 }
+                if (!m_ServerFrame.CreateServer(port, threadNum, m_pHandler))
+                {    
+                    LogFatal("m_ServerFrame CreateServer(%d, %d, m_pHandler) fail!", port, threadNum);
+                    return false;
+                }
+#ifdef DEBUG
+                LogDebug("Worker init  ok pid = %d",(int)getpid());
+#endif
+
+                if (!m_ServerFrame.RunServer())
+                {
+                    LogError("m_ServerFrame.RunServer finish -fail!");
+                    return false;
+                }
+#ifdef DEBUG
                 LogDebug("run finish -ok!");
+#endif
 
-                if(!m_pWorker->Dispose())
+                if(!m_pHandler->dispose())
                 {
-                    LogError("Worker dispose -fail!");
+                    LogError("m_pHandler.dispose -fail!");
                     return false;
                 }
+#ifdef DEBUG
                 LogDebug("Worker dispose -ok!");
+#endif
                 exit(0);
             }
 
@@ -135,7 +114,7 @@ namespace Husky
             pid = wait(&status);
             if (!isAbnormalExit(pid, status))
             {
-                LogInfo("child exit normally! and CDaemon exit");
+                LogDebug("child exit normally! and Daemon exit");
                 break;
             }
         }
@@ -143,39 +122,44 @@ namespace Husky
     }
 
 
-    bool CDaemon::Stop()
+    bool Daemon::Stop()
     {
         string masterPidStr = loadFile2Str(MASTER_PID_FILE);
         int masterPid = atoi(masterPidStr.c_str());
         if(masterPid)
         {
-            LogInfo("readlast masterPid[%d]",masterPid);
+#ifdef DEBUG
+            LogDebug("read last masterPid[%d]",masterPid);
+#endif
             if (kill(masterPid, 0) == 0)
             {
-                LogInfo("find previous daemon pid= %d, current pid= %d", masterPid, getpid());
+#ifdef DEBUG
+                LogDebug("find previous daemon pid= %d, current pid= %d", masterPid, getpid());
+#endif
                 kill(masterPid, SIGTERM);
 
-                int tryTime = 200;		
+                int tryTime = 200;        
                 while (kill(masterPid, 0) == 0 && --tryTime)
                 {
-                  sleep(1);			
+                    sleep(1);            
                 }
 
                 if (!tryTime && kill(masterPid, 0) == 0)
                 {
-                    LogError("Time out shutdown fail!");		
+                    LogError("Time out shutdown fail!");        
                     return false;
                 }
 
+                LogInfo("previous daemon pid[%d] shutdown ok.", masterPid);
                 return true;
             }
 
         }
-        LogInfo("Another instance doesn't exist, ready to quit!");
-        return true;
+        LogError("Another instance doesn't exist, ready to quit!");
+        return false;
     }
 
-    void CDaemon::initAsDaemon()
+    void Daemon::initAsDaemon()
     {
         if (fork() > 0)
           exit(0);
@@ -190,19 +174,18 @@ namespace Husky
         signal(SIGKILL, sigMasterHandler);
     }
 
-    //主进程接收USR1信号处理函数
-    void CDaemon::sigMasterHandler(int sig)
-    {		
+    void Daemon::sigMasterHandler(int sig)
+    {        
         kill(m_nChildPid,SIGUSR1);
         LogDebug("master = %d sig child =%d!",getpid(),m_nChildPid);
 
     }
 
-    void CDaemon::sigChildHandler(int sig)
-    {		
+    void Daemon::sigChildHandler(int sig)
+    {        
         if (sig == SIGUSR1)
         {
-            m_pWorker->CloseServer();
+            m_ServerFrame.CloseServer();
             LogDebug("master = %d signal accept current pid =%d!",getppid(),getpid());
         }
 
