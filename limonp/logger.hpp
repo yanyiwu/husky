@@ -13,7 +13,6 @@
 #include <stdarg.h>
 #include "io_functs.hpp"
 #include "str_functs.hpp"
-#include "typedefs.h"
 
 #define LogDebug(fmt, ...) Logger::LoggingF(LL_DEBUG, __FILE__, __LINE__, fmt, ## __VA_ARGS__)
 #define LogInfo(fmt, ...) Logger::LoggingF(LL_INFO, __FILE__, __LINE__, fmt, ## __VA_ARGS__)
@@ -35,11 +34,6 @@ namespace Limonp
         public:
             static bool Logging(uint level, const string& msg, const char* fileName, int lineNo)
             {
-
-                return Logging(level, msg.c_str(), fileName, lineNo);
-            }
-            static bool Logging(uint level, const char * msg, const char* fileName, int lineNo)
-            {
                 if(level > LL_FATAL)
                 {
                     cerr<<"level's value is out of range"<<endl;
@@ -54,15 +48,7 @@ namespace Limonp
                     fprintf(stderr, "stftime failed.\n");
                     return false;
                 }
-                if(level >= LL_WARN)
-                {
-                    fprintf(stderr, LOG_FORMAT, buf, fileName, lineNo,LOG_LEVEL_ARRAY[level], msg);
-                }
-                else
-                {
-                    fprintf(stdout, LOG_FORMAT, buf, fileName, lineNo, LOG_LEVEL_ARRAY[level], msg);
-                    fflush(stdout);
-                }
+                fprintf(stderr, LOG_FORMAT, buf, fileName, lineNo,LOG_LEVEL_ARRAY[level], msg.c_str());
                 return true;
             }
             static bool LoggingF(uint level, const char* fileName, int lineNo, const string& fmt, ...)
