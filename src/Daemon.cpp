@@ -80,11 +80,6 @@ namespace Husky
                     LogFatal("m_pHandler init failed!");
                     return false;
                 }
-                if (!m_pHandler->init())
-                {    
-                    LogFatal("m_pHandler init fail!");
-                    return false;
-                }
 #ifdef DEBUG
                 LogDebug("Worker init  ok pid = %d",(int)getpid());
 #endif
