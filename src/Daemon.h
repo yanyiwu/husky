@@ -15,27 +15,37 @@ namespace Husky
 {
     using namespace Limonp;
 
+    class IWorkHandler
+    {
+        public:
+            virtual ~IWorkHandler(){}
+            virtual bool init() = 0;
+            virtual bool dispose() = 0;
+            virtual bool run() = 0;
+    };
+
     class Daemon
     {
         public:
-            Daemon(IRequestHandler * pHandler, const char * pidFile)
+            Daemon(IWorkHandler * workHandler, const char* pidFile)
             {
-                m_pHandler = pHandler;
+                m_pHandler = workHandler;
                 m_pidFile = pidFile;
             }
             ~Daemon(){};
         public:
-            bool Start(unsigned int port, unsigned int threadNum);
-            bool Stop();
+            bool start();
+            bool stop();
         public:
             static void initAsDaemon();
             static void sigMasterHandler(int sig);
             static void sigChildHandler(int sig);
             static bool isAbnormalExit(int pid, int status);
         private:
-            static IRequestHandler* m_pHandler;
-            static ServerFrame m_ServerFrame;
+            //static IRequestHandler* m_pHandler;
+            //static ServerFrame m_ServerFrame;
             static int m_nChildPid;
+            static IWorkHandler * m_pHandler;
             static const char* m_pidFile;
     };
 }

@@ -3,8 +3,7 @@
 namespace Husky
 {
 
-    IRequestHandler * Daemon::m_pHandler;
-    ServerFrame Daemon::m_ServerFrame;
+    IWorkHandler * Daemon::m_pHandler;
     int Daemon::m_nChildPid = 0;
     const char* Daemon::m_pidFile = NULL;
 
@@ -41,7 +40,7 @@ namespace Husky
         return bRestart;
     }
 
-    bool Daemon::Start(unsigned int port, unsigned int threadNum)
+    bool Daemon::start()
     {
         string masterPidStr = loadFile2Str(m_pidFile);
         int masterPid = atoi(masterPidStr.c_str());
@@ -81,18 +80,18 @@ namespace Husky
                     LogFatal("m_pHandler init failed!");
                     return false;
                 }
-                if (!m_ServerFrame.CreateServer(port, threadNum, m_pHandler))
+                if (!m_pHandler->init())
                 {    
-                    LogFatal("m_ServerFrame CreateServer(%d, %d, m_pHandler) fail!", port, threadNum);
+                    LogFatal("m_pHandler init fail!");
                     return false;
                 }
 #ifdef DEBUG
                 LogDebug("Worker init  ok pid = %d",(int)getpid());
 #endif
 
-                if (!m_ServerFrame.RunServer())
+                if (!m_pHandler->run())
                 {
-                    LogError("m_ServerFrame.RunServer finish -fail!");
+                    LogError("m_pHandler run finish with failure!");
                     return false;
                 }
 #ifdef DEBUG
@@ -101,7 +100,7 @@ namespace Husky
 
                 if(!m_pHandler->dispose())
                 {
-                    LogError("m_pHandler.dispose -fail!");
+                    LogError("m_pHandler dispose with failure!");
                     return false;
                 }
 #ifdef DEBUG
@@ -123,7 +122,7 @@ namespace Husky
     }
 
 
-    bool Daemon::Stop()
+    bool Daemon::stop()
     {
         string masterPidStr = loadFile2Str(m_pidFile);
         int masterPid = atoi(masterPidStr.c_str());
@@ -186,7 +185,7 @@ namespace Husky
     {        
         if (sig == SIGUSR1)
         {
-            m_ServerFrame.CloseServer();
+            m_pHandler->dispose();
             LogDebug("master = %d signal accept current pid =%d!",getppid(),getpid());
         }
 
