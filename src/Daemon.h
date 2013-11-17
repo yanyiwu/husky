@@ -9,7 +9,6 @@
 #include <sys/stat.h>
 #include <signal.h>
 #include "Limonp/logger.hpp"
-#include "ServerFrame.h"
 
 namespace Husky
 {
