@@ -6,6 +6,7 @@ namespace Husky
     IRequestHandler * Daemon::m_pHandler;
     ServerFrame Daemon::m_ServerFrame;
     int Daemon::m_nChildPid = 0;
+    const char* Daemon::m_pidFile = NULL;
 
     bool Daemon::isAbnormalExit(int pid, int status)
     {
@@ -42,7 +43,7 @@ namespace Husky
 
     bool Daemon::Start(unsigned int port, unsigned int threadNum)
     {
-        string masterPidStr = loadFile2Str(MASTER_PID_FILE);
+        string masterPidStr = loadFile2Str(m_pidFile);
         int masterPid = atoi(masterPidStr.c_str());
         if(masterPid)
         {
@@ -57,7 +58,7 @@ namespace Husky
 
         char buf[64];
         sprintf(buf, "%d", getpid());
-        if (!WriteStr2File(MASTER_PID_FILE,buf ,"w"))
+        if (!WriteStr2File(m_pidFile,buf ,"w"))
         {
             LogFatal("Write master pid fail!");
         }
@@ -124,7 +125,7 @@ namespace Husky
 
     bool Daemon::Stop()
     {
-        string masterPidStr = loadFile2Str(MASTER_PID_FILE);
+        string masterPidStr = loadFile2Str(m_pidFile);
         int masterPid = atoi(masterPidStr.c_str());
         if(masterPid)
         {

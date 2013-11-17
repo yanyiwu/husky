@@ -18,9 +18,10 @@ namespace Husky
     class Daemon
     {
         public:
-            Daemon(IRequestHandler * pHandler)
+            Daemon(IRequestHandler * pHandler, const char * pidFile)
             {
                 m_pHandler = pHandler;
+                m_pidFile = pidFile;
             }
             ~Daemon(){};
         public:
@@ -32,9 +33,10 @@ namespace Husky
             static void sigChildHandler(int sig);
             static bool isAbnormalExit(int pid, int status);
         private:
-            static    IRequestHandler* m_pHandler;
-            static    ServerFrame m_ServerFrame;
-            static    int m_nChildPid;
+            static IRequestHandler* m_pHandler;
+            static ServerFrame m_ServerFrame;
+            static int m_nChildPid;
+            static const char* m_pidFile;
     };
 }
 #endif
