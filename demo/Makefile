@@ -18,7 +18,7 @@ OBJS := $(patsubst %.cpp,%.o,$(SOURCES))
 DEMOS := $(patsubst %.cpp,%.demo,$(SOURCES))
 INC := -I../limonp
 
-SRCDIR = ../husky
+SRCDIR = ../src
 SRCLIB = $(SRCDIR)/libhusky.a
 
 LIBA =  $(SRCLIB) 
