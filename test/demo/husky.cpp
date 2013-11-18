@@ -25,9 +25,9 @@ class ServerDemo: public IRequestHandler
 
 int main(int argc,char* argv[])
 {
-	if(argc != 7)
+	if(argc < 7)
 	{
-		printf("usage: %s -n THREAD_NUMBER -p LISTEN_PORT -k start|stop\n",argv[0]);
+		printf("usage: %s -n THREAD_NUMBER -p LISTEN_PORT --daemon <false|true> -k <start|stop>\n",argv[0]);
 		return -1;
 	}
     ArgvContext arg(argc, argv);
@@ -37,14 +37,21 @@ int main(int argc,char* argv[])
 
     ServerDemo s;
     ServerFrame sf(port, threadNum, &s);
-    Daemon daemon(&sf, "./demo.pid");
-    if(arg["-k"] == "start")
+    if(arg["--daemon"] == "true")
     {
-        return !daemon.start();
+        Daemon daemon(&sf, "./demo.pid");
+        if(arg["-k"] == "start")
+        {
+            return !daemon.start();
+        }
+        else
+        {
+            return !daemon.stop();
+        }
     }
     else
     {
-        return !daemon.stop();
+        return !(sf.init() && sf.run());
     }
 }
 
