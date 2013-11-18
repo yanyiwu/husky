@@ -3,9 +3,9 @@
 #include <string>
 #include <ctype.h>
 #include <string.h>
-#include "../husky/Daemon.h"
-#include "../husky/ServerFrame.h"
-#include <ArgvContext.hpp>
+#include "../../src/Daemon.h"
+#include "../../src/ServerFrame.h"
+#include "../../src/Limonp/ArgvContext.hpp"
 
 using namespace Husky;
 
@@ -36,14 +36,15 @@ int main(int argc,char* argv[])
     threadNum = atoi(arg["-n"].c_str());
 
     ServerDemo s;
-    Daemon daemon(&s);
+    ServerFrame sf(port, threadNum, &s);
+    Daemon daemon(&sf, "./demo.pid");
     if(arg["-k"] == "start")
     {
-        return !daemon.Start(port, threadNum);
+        return !daemon.start();
     }
     else
     {
-        return !daemon.Stop();
+        return !daemon.stop();
     }
 }
 
