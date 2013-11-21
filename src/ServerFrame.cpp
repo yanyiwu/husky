@@ -39,7 +39,10 @@ namespace Husky
             LogError("error [%s]", strerror(errno));
         }
         close(sockfd);
-        LogInfo("dispose ok.");
+        if(!m_pHandler->dispose())
+        {
+            LogFatal("m_pHandler dispose failed.");
+        }
         return true;
     }
 
@@ -185,6 +188,12 @@ namespace Husky
             return false;
         }
         LogInfo("init ok {port:%d, threadNum:%d}", m_nLsnPort, m_nThreadCount);
+
+        if(!m_pHandler->init())
+        {
+            LogFatal("m_pHandler init failed.");
+            return false;
+        }
         return true;
     }
 
