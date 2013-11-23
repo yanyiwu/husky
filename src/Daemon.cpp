@@ -93,13 +93,13 @@ namespace Husky
                 LogDebug("run finish -ok!");
 #endif
 
-                if(!m_pHandler->dispose())
-                {
-                    LogError("m_pHandler dispose with failure!");
-                    return false;
-                }
+                //if(!m_pHandler->dispose())
+                //{
+                //    LogError("m_pHandler dispose with failure!");
+                //    return false;
+                //}
 #ifdef DEBUG
-                LogDebug("Worker dispose -ok!");
+                //LogDebug("Worker dispose -ok!");
 #endif
                 exit(0);
             }
