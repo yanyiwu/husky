@@ -3,7 +3,4 @@ SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 ADD_EXECUTABLE(husky.demo husky.cpp)
 
-#LINK_DIRECTORIES(../../src)
-#INCLUDE_DIRECTORIES(../../src)
-
-TARGET_LINK_LIBRARIES(husky.demo husky pthread)
+TARGET_LINK_LIBRARIES(husky.demo pthread)

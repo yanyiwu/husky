@@ -13,10 +13,8 @@
 #include <errno.h>
 #include <unistd.h>
 #include <vector>
-#include "globals.h"
 #include "ThreadManager.hpp"
 #include "HttpReqInfo.hpp"
-#include "Daemon.h"
 
 #define INVALID_SOCKET  -1 
 #define SOCKET_ERROR    -1 
@@ -31,6 +29,9 @@ namespace Husky
     typedef	int SOCKET;
     const struct timeval SOCKET_TIMEOUT = {2, 0};
     const char* const RESPONSE_FORMAT = "HTTP/1.1 200 OK\r\nConnection: close\r\nServer: FrameServer/1.0.0\r\nContent-Type: text/json; charset=%s\r\nContent-Length: %d\r\n\r\n";
+    const char* const RESPONSE_CHARSET_UTF8 = "UTF-8";
+    const char* const RESPONSE_CHARSET_GB2312 = "GB2312";
+    const char* const CLIENT_IP_K = "CLIENT_IP"; 
     typedef unsigned short  u_short;
     typedef unsigned int    u_int;
 
@@ -54,7 +55,7 @@ namespace Husky
         bool * pShutdown;
     };
 
-    class ServerFrame: public IWorkHandler
+    class ServerFrame//: public IWorkHandler
     {
         private:
             pthread_mutex_t m_pmAccept;

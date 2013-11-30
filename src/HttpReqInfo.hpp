@@ -4,8 +4,6 @@
 #include <iostream>
 #include <string>
 #include "Limonp/logger.hpp"
-#include "Limonp/str_functs.hpp"
-#include "globals.h"
 
 namespace Husky
 {

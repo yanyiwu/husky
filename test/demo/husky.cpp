@@ -3,7 +3,6 @@
 #include <string>
 #include <ctype.h>
 #include <string.h>
-#include "../../src/Daemon.h"
 #include "../../src/ServerFrame.hpp"
 #include "../../src/Limonp/ArgvContext.hpp"
 
@@ -27,9 +26,9 @@ class ServerDemo: public IRequestHandler
 
 int main(int argc,char* argv[])
 {
-	if(argc < 7)
+	if(argc < 5)
 	{
-		printf("usage: %s -n THREAD_NUMBER -p LISTEN_PORT --daemon <false|true> -k <start|stop>\n",argv[0]);
+		printf("usage: %s -n THREAD_NUMBER -p LISTEN_PORT \n",argv[0]);
 		return -1;
 	}
     ArgvContext arg(argc, argv);
@@ -39,21 +38,6 @@ int main(int argc,char* argv[])
 
     ServerDemo s;
     ServerFrame sf(port, threadNum, &s);
-    if(arg["--daemon"] == "true")
-    {
-        Daemon daemon(&sf, "./demo.pid");
-        if(arg["-k"] == "start")
-        {
-            return !daemon.start();
-        }
-        else
-        {
-            return !daemon.stop();
-        }
-    }
-    else
-    {
-        return !(sf.init() && sf.run());
-    }
+    return !(sf.init() && sf.run());
 }
 
