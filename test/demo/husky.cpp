@@ -4,7 +4,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "../../src/Daemon.h"
-#include "../../src/ServerFrame.h"
+#include "../../src/ServerFrame.hpp"
 #include "../../src/Limonp/ArgvContext.hpp"
 
 using namespace Husky;
@@ -19,6 +19,8 @@ class ServerDemo: public IRequestHandler
 	public:
         virtual bool do_GET(const HttpReqInfo& httpReq, string& strSnd)
         {
+            strSnd << httpReq;
+            LogInfo(strSnd);
             return true;
         }
 };
