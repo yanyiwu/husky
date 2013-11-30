@@ -30,6 +30,9 @@ namespace Husky
     using namespace Limonp;
     typedef	int SOCKET;
     const struct timeval SOCKET_TIMEOUT = {2, 0};
+    const char* const RESPONSE_FORMAT = "HTTP/1.1 200 OK\r\nConnection: close\r\nServer: FrameServer/1.0.0\r\nContent-Type: text/json; charset=%s\r\nContent-Length: %d\r\n\r\n";
+    typedef unsigned short  u_short;
+    typedef unsigned int    u_int;
 
     class IRequestHandler 
     {
