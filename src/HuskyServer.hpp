@@ -292,8 +292,6 @@ namespace Husky
             u_short  m_nThreadCount;
             SOCKET   m_lsnSock;
             IRequestHandler *m_pHandler;
-            //static bool m_bShutdown;
-            //static pthread_mutex_t m_pmAccept;
 
     }; 
 
