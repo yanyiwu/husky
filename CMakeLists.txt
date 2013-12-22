@@ -2,3 +2,6 @@ PROJECT(HUSKY)
 cmake_minimum_required(VERSION 2.8)
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(test)
+
+ENABLE_TESTING()
+ADD_TEST(NAME test COMMAND test.run)
