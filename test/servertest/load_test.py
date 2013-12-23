@@ -8,7 +8,7 @@ import sys
 
 # 性能测试页面
 #PERF_TEST_URL = "http://10.2.66.38/?yyid=-1&suv=1309231700203264&callback=xxxxx"
-URLS = [line for line in open(sys.argv[1], "r")]
+URLS = [line for line in open("urls", "r")]
 
 # 配置:压力测试
 THREAD_NUM = 10            # 并发线程总数
