@@ -88,7 +88,7 @@ namespace Husky
                 }
                 string firstline(headerStr, lpos, rpos - lpos);
                 trim(firstline);
-                if(!splitStr(firstline, buf, " ") || 3 != buf.size())
+                if(!split(firstline, buf, " ") || 3 != buf.size())
                 {
                     LogFatal("parse header first line failed.");
                     return false;

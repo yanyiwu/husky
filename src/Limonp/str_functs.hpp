@@ -55,6 +55,7 @@ namespace Limonp
     {
         int size = 256;
         va_list ap;
+        res.clear();
         while (1) {
             res.resize(size);
             va_start(ap, fmt);
@@ -70,28 +71,6 @@ namespace Limonp
               size *= 2;
         }
     }
-
-    //inline bool joinStr(const vector<string>& src, string& dest, const string& connectorStr)
-    //{
-    //    if(src.empty())
-    //    {
-    //        return false;
-    //    }
-    //    for(uint i = 0; i < src.size() - 1; i++)
-    //    {
-    //        dest += src[i];
-    //        dest += connectorStr;
-    //    }
-    //    dest += src[src.size() - 1];
-    //    return true;
-    //}
-
-    //inline string joinStr(const vector<string>& source, const string& connector)
-    //{
-    //    string res;
-    //    joinStr(source, res, connector);
-    //    return res;
-    //}
 
     template<class T>
         void join(T begin, T end, string& res, const string& connector)
@@ -119,9 +98,9 @@ namespace Limonp
             return res;
         }
 
-    
 
-    inline bool splitStr(const string& src, vector<string>& res, const string& pattern)
+
+    inline bool split(const string& src, vector<string>& res, const string& pattern)
     {
         if(src.empty())
         {
@@ -180,20 +159,9 @@ namespace Limonp
     }
 
 
-    inline uint16_t twocharToUint16(char high, char low)
-    {
-        return (((uint16_t(high) & 0x00ff ) << 8) | (uint16_t(low) & 0x00ff));
-    }
 
-    inline pair<char, char> uint16ToChar2(uint16_t in)
-    {
-        pair<char, char> res;
-        res.first = (in>>8) & 0x00ff; //high
-        res.second = (in) & 0x00ff; //low
-        return res;
-    }
 
-    inline bool strStartsWith(const string& str, const string& prefix)
+    inline bool startsWith(const string& str, const string& prefix)
     {
         //return str.substr(0, prefix.size()) == prefix;
         if(prefix.length() > str.length())
@@ -203,7 +171,7 @@ namespace Limonp
         return 0 == str.compare(0, prefix.length(), prefix);
     }
 
-    inline bool strEndsWith(const string& str, const string& suffix)
+    inline bool endsWith(const string& str, const string& suffix)
     {
         if(suffix.length() > str.length())
         {
@@ -217,41 +185,159 @@ namespace Limonp
         return str.find(ch) != string::npos;
     }
 
-    //inline void extractWords(const string& sentence, vector<string>& words)
+    inline uint16_t twocharToUint16(char high, char low)
+    {
+        return (((uint16_t(high) & 0x00ff ) << 8) | (uint16_t(low) & 0x00ff));
+    }
+
+    inline bool utf8ToUnicode(const char * const str, uint len, vector<uint16_t>& vec)
+    {
+        if(!str)
+        {
+            return false;
+        }
+        char ch1, ch2;
+        uint16_t tmp;
+        vec.clear();
+        for(uint i = 0;i < len;)
+        {
+            if(!(str[i] & 0x80)) // 0xxxxxxx
+            {
+                vec.push_back(str[i]);
+                i++;
+            }
+            else if ((unsigned char)str[i] <= 0xdf && i + 1 < len) // 110xxxxxx
+            {
+                ch1 = (str[i] >> 2) & 0x07;
+                ch2 = (str[i+1] & 0x3f) | ((str[i] & 0x03) << 6 );
+                tmp = (((uint16_t(ch1) & 0x00ff ) << 8) | (uint16_t(ch2) & 0x00ff));
+                vec.push_back(tmp);
+                i += 2;
+            }
+            else if((unsigned char)str[i] <= 0xef && i + 2 < len)
+            {
+                ch1 = (str[i] << 4) | ((str[i+1] >> 2) & 0x0f );
+                ch2 = ((str[i+1]<<6) & 0xc0) | (str[i+2] & 0x3f); 
+                tmp = (((uint16_t(ch1) & 0x00ff ) << 8) | (uint16_t(ch2) & 0x00ff));
+                vec.push_back(tmp);
+                i += 3;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    inline bool utf8ToUnicode(const string& str, vector<uint16_t>& vec)
+    {
+        return utf8ToUnicode(str.c_str(), str.size(), vec);
+    }
+
+    inline bool unicodeToUtf8(vector<uint16_t>::const_iterator begin, vector<uint16_t>::const_iterator end, string& res)
+    {
+        if(begin >= end)
+        {
+            return false;
+        }
+        res.clear();
+        uint16_t ui;
+        while(begin != end)
+        {
+            ui = *begin;
+            if(ui <= 0x7f)
+            {
+                res += char(ui);
+            }
+            else if(ui <= 0x7ff)
+            {
+                res += char(((ui>>6) & 0x1f) | 0xc0);
+                res += char((ui & 0x3f) | 0x80);
+            }
+            else
+            {
+                res += char(((ui >> 12) & 0x0f )| 0xe0);
+                res += char(((ui>>6) & 0x3f )| 0x80 );
+                res += char((ui & 0x3f) | 0x80);
+            }
+            begin ++;
+        }
+        return true;
+    }
+
+    
+    inline bool gbkTrans(const char* const str, uint len, vector<uint16_t>& vec)
+    {
+        vec.clear();
+        if(!str)
+        {
+            return false;
+        }
+        uint i = 0;
+        while(i < len)
+        {
+            if(0 == (str[i] & 0x80))
+            {
+                vec.push_back(uint16_t(str[i]));
+                i++;
+            }
+            else
+            {
+                if(i + 1 < len) //&& (str[i+1] & 0x80))
+                {
+                    uint16_t tmp = (((uint16_t(str[i]) & 0x00ff ) << 8) | (uint16_t(str[i+1]) & 0x00ff));
+                    vec.push_back(tmp);
+                    i += 2;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    inline bool gbkTrans(const string& str, vector<uint16_t>& vec)
+    {
+        return gbkTrans(str.c_str(), str.size(), vec);
+    }
+
+    //inline pair<char, char> uint16ToChar2(uint16_t in)
     //{
-    //    bool flag = false;
-    //    uint lhs = 0, len = 0;
-    //    for(uint i = 0; i < sentence.size(); i++)
-    //    {
-    //        char x = sentence[i];
-    //        if((0x0030 <= x && x<= 0x0039) || (0x0041 <= x && x <= 0x005a ) || (0x0061 <= x && x <= 0x007a))
-    //        {
-    //            if(flag)
-    //            {
-    //                len ++;
-    //            }
-    //            else
-    //            {
-    //                lhs = i;
-    //                len = 1;
-    //            }
-    //            flag = true;
-    //        }
-    //        else
-    //        {
-    //            if(flag)
-    //            {
-    //                words.push_back(string(sentence, lhs, len));
-    //            }
-    //            flag = false;
-    //        }
-    //    }
-    //    if(flag)
-    //    {
-    //        words.push_back(string(sentence, lhs, len));
-    //    }
+    //    pair<char, char> res;
+    //    res.first = (in>>8) & 0x00ff; //high
+    //    res.second = (in) & 0x00ff; //low
+    //    return res;
     //}
 
+    inline bool gbkTrans(vector<uint16_t>::const_iterator begin, vector<uint16_t>::const_iterator end, string& res)
+    {
+        if(begin >= end)
+        {
+            return false;
+        }
+        res.clear();
+        //pair<char, char> pa;
+        char first, second;
+        while(begin != end)
+        {
+            //pa = uint16ToChar2(*begin);
+            first = ((*begin)>>8) & 0x00ff;
+            second = (*begin) & 0x00ff;
+            if(first & 0x80)
+            {
+                res += first;
+                res += second;
+            }
+            else
+            {
+                res += second;
+            }
+            begin++;
+        }
+        return true;
+    }
 
 }
 #endif

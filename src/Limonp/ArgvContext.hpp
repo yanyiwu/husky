@@ -22,9 +22,9 @@ namespace Limonp
 
                 for(int i = 0; i < argc; i++)
                 {
-                    if(strStartsWith(argv[i], "-"))
+                    if(startsWith(argv[i], "-"))
                     {
-                        if(i + 1 < argc && !strStartsWith(argv[i + 1], "-"))
+                        if(i + 1 < argc && !startsWith(argv[i + 1], "-"))
                         {
                             _mpss[argv[i]] = argv[i+1];
                             i++;
@@ -43,7 +43,7 @@ namespace Limonp
             ~ArgvContext(){};
         public:
             friend ostream& operator << (ostream& os, const ArgvContext& args); 
-            string operator [](uint i)
+            string operator [](uint i) const
             {
                 if(i < _args.size())
                 {
@@ -51,7 +51,7 @@ namespace Limonp
                 }
                 return "";
             }
-            string operator [](const string& key)
+            string operator [](const string& key) const
             {
                 map<string, string>::const_iterator it = _mpss.find(key);
                 if(it != _mpss.end())
@@ -61,7 +61,7 @@ namespace Limonp
                 return "";
             }
         public:
-            bool hasKey(const string& key)
+            bool hasKey(const string& key) const
             {
                 if(_mpss.find(key) != _mpss.end() || _sset.find(key) != _sset.end())
                 {
