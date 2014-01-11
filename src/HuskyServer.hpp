@@ -72,7 +72,7 @@ namespace Husky
             virtual bool init()  
             {
 
-                if (!BindToLocalHost(m_lsnSock,m_nLsnPort))
+                if (!BindToLocalHost(m_nLsnPort))
                 {
                     LogFatal("BindToLocalHost failed.");
                     return false;
@@ -155,19 +155,20 @@ namespace Husky
 
         protected:
 
-            bool BindToLocalHost(SOCKET &sock,u_short nPort)   
+            bool BindToLocalHost(u_short nPort)   
             {
-                sock=socket(AF_INET,SOCK_STREAM,0);
-                if(INVALID_SOCKET==sock)
+                m_lsnSock = socket(AF_INET,SOCK_STREAM,0);
+                if(INVALID_SOCKET == m_lsnSock)
                 {
                     LogError("error [%s]", strerror(errno));
                     return false;
                 }
 
                 int nRet = 1;
-                if(SOCKET_ERROR==setsockopt(m_lsnSock, SOL_SOCKET, SO_REUSEADDR, (char*)&nRet, sizeof(nRet)))
+                if(SOCKET_ERROR == setsockopt(m_lsnSock, SOL_SOCKET, SO_REUSEADDR, (char*)&nRet, sizeof(nRet)))
                 {	
                     LogError("error [%s]", strerror(errno));
+                    return false;
                 }
 
                 struct sockaddr_in addrSock;
@@ -175,11 +176,11 @@ namespace Husky
                 addrSock.sin_port=htons(nPort);
                 addrSock.sin_addr.s_addr=htonl(INADDR_ANY);
                 int retval;
-                retval = ::bind(sock,(sockaddr*)&addrSock,sizeof(sockaddr));
+                retval = ::bind(m_lsnSock,(sockaddr*)&addrSock,sizeof(sockaddr));
                 if(SOCKET_ERROR==retval)
                 {
                     LogError("error [%s]", strerror(errno));
-                    closesocket(sock);
+                    closesocket(m_lsnSock);
                     return false;
                 }
 
