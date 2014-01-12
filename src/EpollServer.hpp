@@ -21,23 +21,32 @@ const int SOCKET_ERROR = -1;
 
 namespace Husky
 {
+    using namespace Limonp;
     class EpollServer
     {
         private:
             typedef int SOCKET;
         private:
             SOCKET _host_socket;
+            bool _isInited;
+            bool _getInitFlag() const {return _isInited;}
+            bool _setInitFlag(bool flag) {return _isInited = flag;} 
         public:
-            EpollServer(uint port)
+            EpollServer()
             {
                 _host_socket = -1;
-                _bind(uint port);
+                _setInitFlag(false);
+            }
+            explicit EpollServer(uint port)
+            {
+                EpollServer();
+                _setInitFlag(_bind(port));
             };
             ~EpollServer(){};
         public:
-            operator bool()
+            operator bool() const
             {
-                return true;
+                return _getInitFlag();
             }
         public:
             bool _bind(uint port)
@@ -66,6 +75,7 @@ namespace Husky
                     close(_host_socket);
                     return false;
                 }
+                LogInfo("listen port[%u]", port);
                 return true;
             }
     };
