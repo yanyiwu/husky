@@ -197,7 +197,7 @@ namespace Husky
                 pthread_mutex_t* ppmAccept = pPara->ppmAccept;
 
                 int nRetCode;
-                linger lng;
+                linger lng = {1,1};				
                 char chRecvBuf[RECV_BUFFER];
 
                 SOCKET hClientSock;
@@ -221,8 +221,6 @@ namespace Husky
 
                     httpReq[CLIENT_IP_K] = inet_ntoa(clientaddr.sin_addr);// inet_ntoa is not thread safety at some version 
 
-                    lng.l_linger=1;
-                    lng.l_onoff=1;				
                     if(SOCKET_ERROR==setsockopt(hClientSock,SOL_SOCKET,SO_LINGER,(char*)&lng,sizeof(lng)))			
                     {
                         LogError("error [%s]", strerror(errno));
