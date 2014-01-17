@@ -89,6 +89,7 @@ namespace Husky
                         LogFatal(strerror(errno));
                         return false;
                     }
+                    //LogDebug("epoll_wait return %d", nfds);
                     
                     for(int i = 0; i < nfds; i++)
                     {
@@ -203,8 +204,7 @@ namespace Husky
                     return false;
                 }
 
-                HttpReqInfo httpReq;
-                httpReq.load(strRec);
+                HttpReqInfo httpReq(strRec);
                 _reqHandler->do_GET(httpReq, strRetByHandler);
                 string_format(strSnd, HTTP_FORMAT, CHARSET_UTF8, strRetByHandler.length(), strRetByHandler.c_str());
                 if(-1 == send(sockfd, strSnd.c_str(), strSnd.length(), 0))
@@ -216,12 +216,12 @@ namespace Husky
             }
             bool _create_epoll()
             {
-                _epoll_fd = epoll_create(MAXEPOLLSIZE);
-                if(-1 == _epoll_fd)
+                if(-1 == (_epoll_fd = epoll_create(MAXEPOLLSIZE)))
                 {
                     LogError(strerror(errno));
                     return false;
                 }
+
                 struct epoll_event ev;
                 ev.events = EPOLLIN | EPOLLET;
                 ev.data.fd = _host_socket;
@@ -237,8 +237,7 @@ namespace Husky
                     LogError("epoll set insertion error: fd=%d", _host_socket);
                     return false;
                 }
-                LogInfo("socket added into epoll ok.");
-                
+                LogInfo("epoll{socketfd:%d} init ok", _host_socket);
                 return true;
             }
             bool _create_socket(uint port)

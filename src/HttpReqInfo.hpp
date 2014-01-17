@@ -76,22 +76,22 @@ namespace Husky
     class HttpReqInfo
     {
         public:
-            bool load(const string& headerStr)
+            HttpReqInfo(const string& headerStr)
             {
                 size_t lpos = 0, rpos = 0;
                 vector<string> buf;
                 rpos = headerStr.find("\n", lpos);
                 if(string::npos == rpos)
                 {
-                    LogFatal("headerStr illegal.");
-                    return false;
+                    LogError("headerStr illegal.");
+                    return;
                 }
                 string firstline(headerStr, lpos, rpos - lpos);
                 trim(firstline);
                 if(!split(firstline, buf, " ") || 3 != buf.size())
                 {
-                    LogFatal("parse header first line failed.");
-                    return false;
+                    LogError("parse header first line failed.");
+                    return;
                 }
                 _headerMap[KEY_METHOD] = trim(buf[0]); 
                 _headerMap[KEY_PATH] = trim(buf[1]); 
@@ -103,12 +103,11 @@ namespace Husky
                     _parseUrl(firstline, _methodGetMap);
                 }
 
-
                 lpos = rpos + 1;
                 if(lpos >= headerStr.size())
                 {
-                    LogFatal("headerStr illegal");
-                    return false;
+                    LogError("headerStr illegal");
+                    return;
                 }
                 //message header begin
                 while(lpos < headerStr.size() && string::npos != (rpos = headerStr.find('\n', lpos)) && rpos > lpos)
@@ -125,8 +124,8 @@ namespace Husky
                     trim(v);
                     if(k.empty()||v.empty())
                     {
-                        LogFatal("headerStr illegal.");
-                        return false;
+                        LogError("headerStr illegal.");
+                        return;
                     }
                     upper(k);
                     _headerMap[k] = v;
@@ -136,7 +135,6 @@ namespace Husky
 
                 //body begin
 
-                return true;
             }
         public:
             string& operator[] (const string& key)
