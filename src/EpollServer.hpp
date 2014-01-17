@@ -15,14 +15,28 @@
 #include <unistd.h>
 #include <vector>
 #include "logger.hpp"
+#include "HttpReqInfo.hpp"
 
 
 namespace Husky
 {
     using namespace Limonp;
 
+    const char* const HTTP_FORMAT = "HTTP/1.1 200 OK\r\nConnection: close\r\nServer: HuskyServer/1.0.0\r\nContent-Type: text/json; charset=%s\r\nContent-Length: %d\r\n\r\n%s";
+    const char* const CHARSET_UTF8 = "UTF-8";
+    const char* const CLIENT_IP_K = "CLIENT_IP"; 
+
     const struct linger LNG = {1, 1};
-    const struct timeval SOCKET_TIMEOUT = {2, 0};
+    const struct timeval SOCKET_TIMEOUT = {5, 0};
+
+    class IRequestHandler
+    {
+        public:
+            virtual ~IRequestHandler(){};
+        public:
+            virtual bool do_GET(const HttpReqInfo& httpReq, string& res) const = 0;
+    };
+
     class EpollServer
     {
         private:
@@ -32,22 +46,19 @@ namespace Husky
             static const size_t LISTEN_QUEUE_LEN = 1024;
             static const size_t RECV_BUFFER_SIZE = 1024 * 8;
         private:
+            const IRequestHandler* _reqHandler;
             SOCKET _host_socket;
             bool _isInited;
             bool _getInitFlag() const {return _isInited;}
             bool _setInitFlag(bool flag) {return _isInited = flag;} 
         public:
-            EpollServer()
+            explicit EpollServer(uint port, const IRequestHandler* pHandler): _reqHandler(pHandler)
             {
                 _host_socket = -1;
-                _setInitFlag(false);
-            }
-            explicit EpollServer(uint port)
-            {
-                EpollServer();
+                assert(_reqHandler);
                 _setInitFlag(_bind(port));
             };
-            ~EpollServer(){};
+            ~EpollServer(){};// unfinished;
         public:
             operator bool() const
             {
@@ -89,7 +100,7 @@ namespace Husky
                 return true;
             }
         public:
-            bool run()
+            bool start()
             {
                 SOCKET clientSock;
                 sockaddr_in clientaddr;
@@ -97,27 +108,35 @@ namespace Husky
                 //char recvBuf[RECV_BUFFER_SIZE];
                 while(true)
                 {
+                    HttpReqInfo httpReq;
                     clientSock = accept(_host_socket, (sockaddr *)&clientaddr, &nSize);
                     if(SOCKET_ERROR == clientSock)
                     {
                         LogError(strerror(errno));
                         continue;
                     }
+                    
+                    httpReq[CLIENT_IP_K] = inet_ntoa(clientaddr.sin_addr);// inet_ntoa is not thread safety at some version 
                     if(SOCKET_ERROR == setsockopt(clientSock, SOL_SOCKET, SO_LINGER, (const char*)&LNG, sizeof(LNG)))
                     {
                         LogError(strerror(errno));
+                        close(clientSock);
+                        continue;
                     }
                     if(SOCKET_ERROR == setsockopt(clientSock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&SOCKET_TIMEOUT, sizeof(SOCKET_TIMEOUT)))
                     {
                         LogError(strerror(errno));
+                        close(clientSock);
+                        continue;
                     }
                     if(SOCKET_ERROR == setsockopt(clientSock, SOL_SOCKET, SO_SNDTIMEO, (const char*)&SOCKET_TIMEOUT, sizeof(SOCKET_TIMEOUT)))
                     {
                         LogError(strerror(errno));
+                        close(clientSock);
+                        continue;
                     }
-                    string strRec, strSnd;
+                    string strRec, strSnd, strRetByHandler;
                     strRec.resize(RECV_BUFFER_SIZE);
-                    //memset(recvBuf, 0, sizeof(recvBuf));
                     int nRetCode = recv(clientSock, (char*)strRec.c_str(), strRec.size(), 0);
 
                     if(SOCKET_ERROR == nRetCode)
@@ -132,7 +151,16 @@ namespace Husky
                         close(clientSock);
                         continue;
                     }
-                    
+                    const char * tmp = "test\n";
+
+                    httpReq.load(strRec);
+                    _reqHandler->do_GET(httpReq, strRetByHandler);
+                    string_format(strSnd, HTTP_FORMAT, CHARSET_UTF8, strlen(tmp), tmp);
+                    if(SOCKET_ERROR == send(clientSock, strSnd.c_str(), strSnd.length(), 0))
+                    {
+                        LogError(strerror(errno));
+                    }
+                    close(clientSock);
                 }
                 return true;
             }
