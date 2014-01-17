@@ -52,16 +52,17 @@ namespace Husky
             int _host_socket;
             int _epoll_fd;
             bool _isShutDown;
+            int _epollSize;
             unordered_map<int, string> _sockIpMap;
         private:
             bool _isInited;
             bool _getInitFlag() const {return _isInited;}
             bool _setInitFlag(bool flag) {return _isInited = flag;} 
         public:
-            explicit EpollServer(uint port, const IRequestHandler* pHandler): _reqHandler(pHandler), _host_socket(-1), _isShutDown(false)
+            explicit EpollServer(uint port, const IRequestHandler* pHandler): _reqHandler(pHandler), _host_socket(-1), _isShutDown(false), _epollSize(0)
             {
                 assert(_reqHandler);
-                _setInitFlag(_create_socket(port) && _create_epoll());
+                _setInitFlag(_init_epoll(port));
             };
             ~EpollServer(){};// unfinished;
         public:
@@ -79,17 +80,15 @@ namespace Husky
                 struct epoll_event events[MAXEPOLLSIZE];
                 int nfds, clientSock;
                 
-                int curfds = 1;
-                //struct epoll_event ev;
                 while(!_isShutDown)
                 {
-                    //HttpReqInfo httpReq;
-                    if(-1 == (nfds = epoll_wait(_epoll_fd, events, curfds, -1)))
+                    if(-1 == (nfds = epoll_wait(_epoll_fd, events, _epollSize, -1)))
                     {
                         LogFatal(strerror(errno));
                         return false;
                     }
-                    //LogDebug("epoll_wait return %d", nfds);
+
+                    //LogDebug("epoll_wait return event sum[%d]", nfds);
                     
                     for(int i = 0; i < nfds; i++)
                     {
@@ -100,9 +99,10 @@ namespace Husky
                                 LogError(strerror(errno));
                                 continue;
                             }
-                            if(!_epoll_add(clientSock))
+                            if(!_epoll_add(clientSock, EPOLLIN | EPOLLET))
                             {
-                                close(clientSock);
+                                LogError("_epoll_add(%d, EPOLLIN | EPOLLET)", clientSock);
+                                _closesocket(clientSock);
                                 continue;
                             }
 
@@ -111,14 +111,13 @@ namespace Husky
                             /* inet_ntoa is not thread safety at some version  */
                             //_sockIpMap[clientSock] = inet_ntoa(clientaddr.sin_addr);
 
-                            curfds++;
                         }
                         else /*client socket data to be received*/
                         {
                             _response(events[i].data.fd);
 
                             /*close socket will case it to be removed from epoll automatically*/
-                            close(events[i].data.fd);
+                            _closesocket(events[i].data.fd);
                         }
                     }
                     
@@ -152,10 +151,10 @@ namespace Husky
                 {
                     LogError(strerror(errno));
                 }
-                close(sockfd);
+                _closesocket(sockfd);
             }
         private:
-            bool _epoll_add(int sockfd)
+            bool _epoll_add(int sockfd, uint32_t events)
             {
                 if (!_setNonBLock(sockfd)) 
                 {
@@ -163,13 +162,14 @@ namespace Husky
                     return false;
                 }
                 struct epoll_event ev;
-                ev.events = EPOLLIN | EPOLLET;
                 ev.data.fd = sockfd;
+                ev.events = events;
                 if(epoll_ctl(_epoll_fd, EPOLL_CTL_ADD, sockfd, &ev) < 0)
                 {
                     LogError("insert socket '%d' into epoll failed: %s", sockfd, strerror(errno));
                     return false;
                 }
+                _epollSize ++;
                 return true;
             }
             bool _response(int sockfd) const
@@ -205,42 +205,21 @@ namespace Husky
                 }
 
                 HttpReqInfo httpReq(strRec);
-                _reqHandler->do_GET(httpReq, strRetByHandler);
+                if(!_reqHandler->do_GET(httpReq, strRetByHandler))
+                {
+                    LogError("do_GET failed.");
+                    return false;
+                }
                 string_format(strSnd, HTTP_FORMAT, CHARSET_UTF8, strRetByHandler.length(), strRetByHandler.c_str());
                 if(-1 == send(sockfd, strSnd.c_str(), strSnd.length(), 0))
                 {
                     LogError(strerror(errno));
                     return false;
                 }
+                LogInfo("{response:%s, epollsize:%d}", strRetByHandler.c_str(), _epollSize);
                 return true;
             }
-            bool _create_epoll()
-            {
-                if(-1 == (_epoll_fd = epoll_create(MAXEPOLLSIZE)))
-                {
-                    LogError(strerror(errno));
-                    return false;
-                }
-
-                struct epoll_event ev;
-                ev.events = EPOLLIN | EPOLLET;
-                ev.data.fd = _host_socket;
-
-                if(!_setNonBLock(_host_socket))
-                {
-                    LogError(strerror(errno));
-                    return false;
-                }
-
-                if(epoll_ctl(_epoll_fd, EPOLL_CTL_ADD, _host_socket, &ev) < 0)
-                {
-                    LogError("epoll set insertion error: fd=%d", _host_socket);
-                    return false;
-                }
-                LogInfo("epoll{socketfd:%d} init ok", _host_socket);
-                return true;
-            }
-            bool _create_socket(uint port)
+            bool _init_epoll(uint port)
             { 
                 _host_socket = socket(AF_INET, SOCK_STREAM, 0);
                 if(-1 == _host_socket)
@@ -263,7 +242,7 @@ namespace Husky
                 if(-1 == ::bind(_host_socket, (sockaddr*)&addrSock, sizeof(sockaddr)))
                 {
                     LogError(strerror(errno));
-                    close(_host_socket);
+                    _closesocket(_host_socket);
                     return false;
                 }
                 if(-1 == listen(_host_socket, LISTEN_QUEUE_LEN))
@@ -271,8 +250,28 @@ namespace Husky
                     LogError(strerror(errno));
                     return false;
                 }
-                LogInfo("listen port[%u]", port);
+
+                if(-1 == (_epoll_fd = epoll_create(MAXEPOLLSIZE)))
+                {
+                    LogError(strerror(errno));
+                    return false;
+                }
+                if(!_epoll_add(_host_socket, EPOLLIN))
+                {
+                    LogError("_epoll_add(%d, EPOLLIN) failed.", _host_socket);
+                    return false;
+                }
+                LogInfo("create socket listening port[%u], epoll{size:%d} init ok", port, _epollSize);
                 return true;
+            }
+            void _closesocket(int sockfd)
+            {
+                if(-1 == close(sockfd))
+                {
+                    LogError(strerror(errno));
+                    return;
+                }
+                _epollSize--;
             }
             static bool _setNonBLock(int sockfd)
             {
