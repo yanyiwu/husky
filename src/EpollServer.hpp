@@ -49,12 +49,12 @@ namespace Husky
             const IRequestHandler* _reqHandler;
             SOCKET _host_socket;
             bool _isInited;
+            bool _isShutDown;
             bool _getInitFlag() const {return _isInited;}
             bool _setInitFlag(bool flag) {return _isInited = flag;} 
         public:
-            explicit EpollServer(uint port, const IRequestHandler* pHandler): _reqHandler(pHandler)
+            explicit EpollServer(uint port, const IRequestHandler* pHandler): _reqHandler(pHandler), _host_socket(-1), _isShutDown(false)
             {
-                _host_socket = -1;
                 assert(_reqHandler);
                 _setInitFlag(_bind(port));
             };
@@ -106,7 +106,7 @@ namespace Husky
                 sockaddr_in clientaddr;
                 socklen_t nSize = sizeof(clientaddr);
                 //char recvBuf[RECV_BUFFER_SIZE];
-                while(true)
+                while(!_isShutDown)
                 {
                     HttpReqInfo httpReq;
                     clientSock = accept(_host_socket, (sockaddr *)&clientaddr, &nSize);
@@ -151,11 +151,10 @@ namespace Husky
                         close(clientSock);
                         continue;
                     }
-                    const char * tmp = "test\n";
 
                     httpReq.load(strRec);
                     _reqHandler->do_GET(httpReq, strRetByHandler);
-                    string_format(strSnd, HTTP_FORMAT, CHARSET_UTF8, strlen(tmp), tmp);
+                    string_format(strSnd, HTTP_FORMAT, CHARSET_UTF8, strRetByHandler.length(), strRetByHandler.c_str());
                     if(SOCKET_ERROR == send(clientSock, strSnd.c_str(), strSnd.length(), 0))
                     {
                         LogError(strerror(errno));
@@ -163,6 +162,35 @@ namespace Husky
                     close(clientSock);
                 }
                 return true;
+            }
+            void stop()
+            {
+                _isShutDown = true;
+                if(SOCKET_ERROR == close(_host_socket))
+                {
+                    LogError(strerror(errno));
+                    return;
+                }
+                int sockfd;
+                struct sockaddr_in dest;
+                if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+                {
+                    LogError(strerror(errno));
+                    return;
+                }
+                bzero(&dest, sizeof(dest));
+                dest.sin_family = AF_INET;
+                dest.sin_port = htons(_host_socket);
+                if(0 == inet_aton("127.0.0.1", (struct in_addr *) &dest.sin_addr.s_addr))
+                {
+                    LogError(strerror(errno));
+                    return;
+                }
+                if(connect(sockfd, (struct sockaddr *) &dest, sizeof(dest)) < 0)
+                {
+                    LogError(strerror(errno));
+                }
+                close(sockfd);
             }
     };
 }
