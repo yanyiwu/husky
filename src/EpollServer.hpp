@@ -16,7 +16,6 @@
 #include <vector>
 #include <sys/epoll.h>
 #include <fcntl.h>
-#include "logger.hpp"
 #include "HttpReqInfo.hpp"
 
 
