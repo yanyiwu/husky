@@ -4,9 +4,12 @@
 #include "map_functs.hpp"
 #include <map>
 #include <set>
+#include <vector>
+#include <fstream>
 
 namespace std
 {
+    using namespace std;
     template<typename T>
         ostream& operator << (ostream& os, const vector<T>& vec)
         {
@@ -59,14 +62,14 @@ namespace std
             return os;
         }
     template<class T1, class T2>
-        ostream& operator << (ostream& os, const HashMap<T1, T2>& mp)
+        ostream& operator << (ostream& os, const std::unordered_map<T1, T2>& mp)
         {
             if(mp.empty())
             {
                 return os << "{}";
             }
             os<<'{';
-            typename HashMap<T1, T2>::const_iterator it = mp.begin();
+            typename std::unordered_map<T1, T2>::const_iterator it = mp.begin();
             os<<*it;
             it++;
             while(it != mp.end())
@@ -95,6 +98,18 @@ namespace std
             }
             os<<'}';
             return os;
+        }
+
+    template<class KeyType, class ContainType>
+        bool isIn(const ContainType& contain, const KeyType& key)
+        {
+            return contain.end() != contain.find(key);
+        }
+
+    template<class T>
+        basic_string<T> & operator << (basic_string<T> & s, ifstream & ifs)
+        {
+            return s.assign((istreambuf_iterator<T>(ifs)), istreambuf_iterator<T>());
         }
 }
 

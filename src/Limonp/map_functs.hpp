@@ -9,11 +9,11 @@
 
 #include <map>
 #include <set>
+#include <vector>
 #include <iostream>
 #include <sstream>
 
 #include <unordered_map>
-#define HashMap std::unordered_map
 
 namespace Limonp
 {

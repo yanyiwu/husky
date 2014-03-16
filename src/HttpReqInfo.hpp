@@ -3,7 +3,9 @@
 
 #include <iostream>
 #include <string>
+#include <unordered_map>
 #include "Limonp/logger.hpp"
+#include "Limonp/str_functs.hpp"
 
 namespace Husky
 {
@@ -154,15 +156,15 @@ namespace Husky
                 return _find(_methodPostMap, argKey, res);
             }
         private:
-            HashMap<string, string> _headerMap;
-            HashMap<string, string> _methodGetMap;
-            HashMap<string, string> _methodPostMap;
+            std::unordered_map<string, string> _headerMap;
+            std::unordered_map<string, string> _methodGetMap;
+            std::unordered_map<string, string> _methodPostMap;
             //public:
             friend ostream& operator<<(ostream& os, const HttpReqInfo& obj);
         private:
-            bool _find(const HashMap<string, string>& mp, const string& key, string& res)const
+            bool _find(const std::unordered_map<string, string>& mp, const string& key, string& res)const
             {
-                HashMap<string, string>::const_iterator it = mp.find(key);
+                std::unordered_map<string, string>::const_iterator it = mp.find(key);
                 if(it == mp.end())
                 {
                     return false;
@@ -171,7 +173,7 @@ namespace Husky
                 return true;
             }
         private:
-            bool _parseUrl(const string& url, HashMap<string, string>& mp)
+            bool _parseUrl(const string& url, std::unordered_map<string, string>& mp)
             {
                 if(url.empty())
                 {
