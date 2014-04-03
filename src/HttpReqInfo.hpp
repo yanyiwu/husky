@@ -135,7 +135,7 @@ namespace Husky
                 //message header end
 
                 //body begin
-                _body.assign(headerStr, rpos, string::npos);
+                _body.assign(headerStr.substr(rpos));
                 trim(_body);
             }
         public:
