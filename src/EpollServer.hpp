@@ -37,6 +37,7 @@ namespace Husky
             virtual ~IRequestHandler(){};
         public:
             virtual bool do_GET(const HttpReqInfo& httpReq, string& res) const = 0;
+            virtual bool do_POST(const HttpReqInfo& httpReq, string& res) const = 0;
     };
 
     class EpollServer
@@ -204,9 +205,14 @@ namespace Husky
                 }
 
                 HttpReqInfo httpReq(strRec);
-                if(!_reqHandler->do_GET(httpReq, strRetByHandler))
+                if("GET" == httpReq.getMethod() && !_reqHandler->do_GET(httpReq, strRetByHandler))
                 {
                     LogError("do_GET failed.");
+                    return false;
+                }
+                if("POST" == httpReq.getMethod() && !_reqHandler->do_POST(httpReq, strRetByHandler))
+                {
+                    LogError("do_POST failed.");
                     return false;
                 }
                 string_format(strSnd, HTTP_FORMAT, CHARSET_UTF8, strRetByHandler.length(), strRetByHandler.c_str());

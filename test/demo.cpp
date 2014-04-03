@@ -19,6 +19,12 @@ class ReqHandler: public IRequestHandler
             LogInfo(strSnd);
             return true;
         }
+        virtual bool do_POST(const HttpReqInfo& httpReq, string& strSnd) const
+        {
+            strSnd << httpReq;
+            LogInfo(strSnd);
+            return true;
+        }
 };
 
 int main(int argc,char* argv[])

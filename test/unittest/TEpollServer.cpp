@@ -12,6 +12,11 @@ class ReqHandler: public IRequestHandler
             res << httpReq;
             return true;
         }
+        bool do_POST(const HttpReqInfo& httpReq, string& res) const
+        {
+            res << httpReq;
+            return true;
+        }
 };
 
 

@@ -26,4 +26,5 @@ TEST(HttpReqInfoTest, Test2)
     string s;
     ASSERT_TRUE(reqinfo.find("ACCEPT", s));
     ASSERT_EQ(reqinfo.getBody(), "hello world.");
+    ASSERT_EQ("POST", reqinfo.getMethod());
 }

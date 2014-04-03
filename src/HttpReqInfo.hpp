@@ -155,6 +155,10 @@ namespace Husky
             //{
             //    return _find(_methodPostMap, argKey, res);
             //}
+            const string& getMethod() const
+            {
+                return _headerMap.find(KEY_METHOD)->second;
+            }
             const string& getBody() const
             {
                 return _body;
