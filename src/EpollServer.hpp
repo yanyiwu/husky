@@ -105,8 +105,6 @@ namespace Husky
                                 continue;
                             }
 
-                            //LogInfo("connecting from: %d:%d， client socket: %d\n", inet_ntoa(clientaddr.sin_addr), ntohs(clientaddr.sin_port), clientSock);
-
                             /* inet_ntoa is not thread safety at some version  */
                             //_sockIpMap[clientSock] = inet_ntoa(clientaddr.sin_addr);
 
@@ -231,7 +229,7 @@ namespace Husky
                     LogError(strerror(errno));
                     return false;
                 }
-                LogInfo("{response:%s, epollsize:%d}", strRetByHandler.c_str(), _epollSize);
+                LogInfo("response:%s", strRetByHandler.c_str());
                 return true;
             }
             bool _init_epoll(uint port)
@@ -276,7 +274,7 @@ namespace Husky
                     LogError("_epoll_add(%d, EPOLLIN) failed.", _host_socket);
                     return false;
                 }
-                LogInfo("create socket listening port[%u], epoll{size:%d} init ok", port, _epollSize);
+                LogInfo("create socket listening port[%u], epoll{size:%d} init ok", port, MAXEPOLLSIZE);
                 return true;
             }
             void _closesocket(int sockfd)

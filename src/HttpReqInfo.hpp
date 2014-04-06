@@ -37,10 +37,6 @@ namespace Husky
             {      
                 buf[0] = sIn[ix];
             }
-            //else if ( isspace( (BYTE)sIn[ix] ) ) //貌似把空格编码成%20或者+都可以
-            //{
-            //    buf[0] = '+';
-            //}
             else
             {
                 buf[0] = '%';
@@ -151,24 +147,26 @@ namespace Husky
             {
                 return _find(_methodGetMap, argKey, res);
             }
-            //bool POST(const string& argKey, string& res)const
-            //{
-            //    return _find(_methodPostMap, argKey, res);
-            //}
             const string& getMethod() const
             {
                 return _headerMap.find(KEY_METHOD)->second;
+            }
+            const unordered_map<string, string> & getMethodGetMap() const
+            {
+                return _methodGetMap;
+            }
+            const unordered_map<string, string> & getHeaders() const
+            {
+                return _headerMap;
             }
             const string& getBody() const
             {
                 return _body;
             }
         private:
-            std::unordered_map<string, string> _headerMap;
-            std::unordered_map<string, string> _methodGetMap;
-            //std::unordered_map<string, string> _methodPostMap;
+            unordered_map<string, string> _headerMap;
+            unordered_map<string, string> _methodGetMap;
             string _body;
-            //public:
             friend ostream& operator<<(ostream& os, const HttpReqInfo& obj);
         private:
             bool _find(const std::unordered_map<string, string>& mp, const string& key, string& res)const
