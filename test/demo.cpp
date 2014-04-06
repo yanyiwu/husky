@@ -22,9 +22,14 @@ class ReqHandler: public IRequestHandler
         }
 };
 
-int main()
+int main(int argc, char** argv)
 {
-    size_t port = 11257;
+    if(argc < 3)
+    {
+        printf("usage: %s --port 11257 \n", argv[0]);
+        return EXIT_FAILURE;
+    }
+    int port = atoi(argv[2]);
     ReqHandler reqHandler;
     EpollServer server(port, &reqHandler);
     server.start();

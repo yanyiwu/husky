@@ -25,22 +25,26 @@ make
 ### start server
 
 ```
-make && ./husky.demo
+./husky.demo --port 11257
 ```
 
-### GET request
+### GET Request Example
 
 ```
 curl "http://127.0.0.1:11257/?hello=world&myname=aszxqw"
 ```
 
-### POST request
-
+### POST Request Example
 ```
 curl -d "hello world, my name is aszxqw." "http://127.0.0.1:11257"
 ```
+
+## Reference
+
+[limonp]
 
 ## Contact
 
 wuyanyi09@foxmail.com
 
+[limonp]:https://github.com/aszxqw/limonp.git
