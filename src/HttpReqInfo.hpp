@@ -187,14 +187,14 @@ namespace Husky
                     return false;
                 }
 
-                uint pos = url.find('?');
+                size_t pos = url.find('?');
                 if(string::npos == pos)
                 {
                     return false;
                 }
-                uint kleft = 0, kright = 0;
-                uint vleft = 0, vright = 0;
-                for(uint i = pos + 1; i < url.size();)
+                size_t kleft = 0, kright = 0;
+                size_t vleft = 0, vright = 0;
+                for(size_t i = pos + 1; i < url.size();)
                 {
                     kleft = i;
                     while(i < url.size() && url[i] != '=')

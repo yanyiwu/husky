@@ -59,7 +59,7 @@ namespace Husky
             bool _getInitFlag() const {return _isInited;}
             bool _setInitFlag(bool flag) {return _isInited = flag;} 
         public:
-            explicit EpollServer(uint port, const IRequestHandler* pHandler): _reqHandler(pHandler), _host_socket(-1), _isShutDown(false), _epollSize(0)
+            explicit EpollServer(size_t port, const IRequestHandler* pHandler): _reqHandler(pHandler), _host_socket(-1), _isShutDown(false), _epollSize(0)
         {
             assert(_reqHandler);
             _setInitFlag(_init_epoll(port));
@@ -232,7 +232,7 @@ namespace Husky
                 LogInfo("response:%s", strRetByHandler.c_str());
                 return true;
             }
-            bool _init_epoll(uint port)
+            bool _init_epoll(size_t port)
             { 
                 _host_socket = socket(AF_INET, SOCK_STREAM, 0);
                 if(-1 == _host_socket)
