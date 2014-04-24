@@ -59,11 +59,10 @@ namespace Husky
             {
                 _setInitFlag(_init_epoll(port));
             };
-            ~EpollServer(){};// unfinished;
+            ~EpollServer(){};
         public:
             bool start()
             {
-                //int clientSock;
                 sockaddr_in clientaddr;
                 socklen_t nSize = sizeof(clientaddr);
                 struct epoll_event events[MAXEPOLLSIZE];
@@ -130,7 +129,8 @@ namespace Husky
                 _epollSize ++;
                 return true;
             }
-            bool _response(int sockfd) const
+
+            bool _setsockopt(int sockfd) const
             {
                 if(-1 == setsockopt(sockfd, SOL_SOCKET, SO_LINGER, (const char*)&LNG, sizeof(LNG)))
                 {
@@ -147,8 +147,11 @@ namespace Husky
                     LogError(strerror(errno));
                     return false;
                 }
+                return true;
+            }
 
-                string strRec, strSnd, strRetByHandler;
+            bool _receive(int sockfd, string& strRec) const
+            {
                 char recvBuf[RECV_BUFFER_SIZE];
                 int nRetCode = -1;
                 while(true)
@@ -157,19 +160,42 @@ namespace Husky
                     nRetCode = recv(sockfd, recvBuf, sizeof(recvBuf) - 1, 0);
                     if(-1 == nRetCode)
                     {
-                        LogDebug(strerror(errno));
+                        LogError(strerror(errno));
                         return false;
                     }
                     if(0 == nRetCode)
                     {
                         LogDebug("client socket orderly shut down");
-                        return false;
+                        return true;
                     }
                     strRec += recvBuf;
                     if(nRetCode != sizeof(recvBuf) - 1)
                     {
                         break;
                     }
+                }
+                return true;
+            }
+            bool _send(int sockfd, const string& strSnd) const
+            {
+                if(-1 == send(sockfd, strSnd.c_str(), strSnd.length(), 0))
+                {
+                    LogError(strerror(errno));
+                    return false;
+                }
+                return true;
+            }
+
+            bool _response(int sockfd) const
+            {
+                if(!_setsockopt(sockfd))
+                {
+                    return false;
+                }
+                string strRec, strSnd, strRetByHandler;
+                if(!_receive(sockfd, strRec))
+                {
+                    return false;
                 }
 
                 HttpReqInfo httpReq(strRec);
@@ -185,11 +211,11 @@ namespace Husky
                 }
                 string_format(strSnd, HTTP_FORMAT, CHARSET_UTF8, strRetByHandler.length(), strRetByHandler.c_str());
 
-                if(-1 == send(sockfd, strSnd.c_str(), strSnd.length(), 0))
+                if(!_send(sockfd, strSnd))
                 {
-                    LogError(strerror(errno));
                     return false;
                 }
+
                 LogInfo("response:%s", strRetByHandler.c_str());
                 return true;
             }
