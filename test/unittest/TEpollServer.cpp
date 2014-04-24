@@ -23,7 +23,7 @@ class ReqHandler: public IRequestHandler
 TEST(EpollServerTest, Test1)
 {
     ReqHandler handler;
-    EpollServer server(11257, &handler);
+    EpollServer server(11257, handler);
     ASSERT_TRUE(server);
     ASSERT_TRUE(server.start());
 }

@@ -17,6 +17,7 @@
 #include <sys/epoll.h>
 #include <fcntl.h>
 #include "HttpReqInfo.hpp"
+#include "Limonp/InitOnOff.hpp"
 
 
 
@@ -40,7 +41,7 @@ namespace Husky
             virtual bool do_POST(const HttpReqInfo& httpReq, string& res) const = 0;
     };
 
-    class EpollServer
+    class EpollServer: public InitOnOff
     {
         private:
             static const size_t LISTEN_QUEUE_LEN = 1024;
@@ -48,28 +49,17 @@ namespace Husky
             static const int MAXEPOLLSIZE = 512;
 
         private:
-            const IRequestHandler* _reqHandler;
+            const IRequestHandler & _reqHandler;
             int _host_socket;
             int _epoll_fd;
-            bool _isShutDown;
             int _epollSize;
             unordered_map<int, string> _sockIpMap;
-        private:
-            bool _isInited;
-            bool _getInitFlag() const {return _isInited;}
-            bool _setInitFlag(bool flag) {return _isInited = flag;} 
         public:
-            explicit EpollServer(size_t port, const IRequestHandler* pHandler): _reqHandler(pHandler), _host_socket(-1), _isShutDown(false), _epollSize(0)
-        {
-            assert(_reqHandler);
-            _setInitFlag(_init_epoll(port));
-        };
-            ~EpollServer(){};// unfinished;
-        public:
-            operator bool() const
+            explicit EpollServer(size_t port, const IRequestHandler & handler): _reqHandler(handler), _host_socket(-1), _epollSize(0)
             {
-                return _getInitFlag();
-            }
+                _setInitFlag(_init_epoll(port));
+            };
+            ~EpollServer(){};// unfinished;
         public:
             bool start()
             {
@@ -79,7 +69,7 @@ namespace Husky
                 struct epoll_event events[MAXEPOLLSIZE];
                 int nfds, clientSock;
 
-                while(!_isShutDown)
+                while(true)
                 {
                     if(-1 == (nfds = epoll_wait(_epoll_fd, events, _epollSize, -1)))
                     {
@@ -120,35 +110,6 @@ namespace Husky
 
                 }
                 return true;
-            }
-            void stop()
-            {
-                _isShutDown = true;
-                if(-1 == close(_host_socket))
-                {
-                    LogError(strerror(errno));
-                    return;
-                }
-                int sockfd;
-                struct sockaddr_in dest;
-                if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-                {
-                    LogError(strerror(errno));
-                    return;
-                }
-                bzero(&dest, sizeof(dest));
-                dest.sin_family = AF_INET;
-                dest.sin_port = htons(_host_socket);
-                if(0 == inet_aton("127.0.0.1", (struct in_addr *) &dest.sin_addr.s_addr))
-                {
-                    LogError(strerror(errno));
-                    return;
-                }
-                if(connect(sockfd, (struct sockaddr *) &dest, sizeof(dest)) < 0)
-                {
-                    LogError(strerror(errno));
-                }
-                _closesocket(sockfd);
             }
         private:
             bool _epoll_add(int sockfd, uint32_t events)
@@ -212,12 +173,12 @@ namespace Husky
                 }
 
                 HttpReqInfo httpReq(strRec);
-                if("GET" == httpReq.getMethod() && !_reqHandler->do_GET(httpReq, strRetByHandler))
+                if("GET" == httpReq.getMethod() && !_reqHandler.do_GET(httpReq, strRetByHandler))
                 {
                     LogError("do_GET failed.");
                     return false;
                 }
-                if("POST" == httpReq.getMethod() && !_reqHandler->do_POST(httpReq, strRetByHandler))
+                if("POST" == httpReq.getMethod() && !_reqHandler.do_POST(httpReq, strRetByHandler))
                 {
                     LogError("do_POST failed.");
                     return false;

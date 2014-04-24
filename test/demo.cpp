@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     }
     int port = atoi(argv[2]);
     ReqHandler reqHandler;
-    EpollServer server(port, &reqHandler);
+    EpollServer server(port, reqHandler);
     server.start();
     return EXIT_SUCCESS;
 }
