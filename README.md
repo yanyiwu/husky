@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/aszxqw/husky.png?branch=master)](https://travis-ci.org/aszxqw/husky)
+- - -
+
 # Husky
 
 ## Introduction
