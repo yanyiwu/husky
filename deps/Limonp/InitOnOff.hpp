@@ -10,10 +10,10 @@ namespace Limonp
             ~InitOnOff(){};
         protected:
             bool _isInited;
-            bool _getInitFlag()const{return _isInited;};
+            bool _getInitFlag() const {return _isInited;};
             bool _setInitFlag(bool flag){return _isInited = flag;};
         public:
-            operator bool(){return _getInitFlag();};
+            operator bool() const {return _getInitFlag();};
 
     };
 }

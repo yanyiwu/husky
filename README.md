@@ -47,9 +47,6 @@ curl -d "hello world, my name is aszxqw." "http://127.0.0.1:11257"
 
 Its source code is `test/demo.cpp`.  Its code has only 30+ lines. 
 
-you can compile it with `g++ -o husky.demo demo.cpp -I../`.
-
-
 ## Reference
 
 [limonp]
