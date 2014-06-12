@@ -1,4 +1,4 @@
-#include "src/HttpReqInfo.hpp"
+#include "HttpReqInfo.hpp"
 #include "gtest/gtest.h"
 
 using namespace Husky;
