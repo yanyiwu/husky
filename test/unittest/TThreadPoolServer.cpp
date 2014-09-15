@@ -1,4 +1,4 @@
-#include "EpollServer.hpp"
+#include "ThreadPoolServer.hpp"
 #include "gtest/gtest.h"
 
 using namespace Husky;
@@ -20,11 +20,10 @@ class ReqHandler: public IRequestHandler
 };
 
 
-TEST(EpollServerTest, Test1)
+TEST(ThreadPoolServerTest, Test1)
 {
     ReqHandler handler;
-    EpollServer server(11257, handler);
-    ASSERT_TRUE(server);
+    ThreadPoolServer server(4, 256, 11257, handler);
     ASSERT_TRUE(server.start());
 }
 

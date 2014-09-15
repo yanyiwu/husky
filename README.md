@@ -5,14 +5,14 @@
 
 ## Introduction
 
-Husky is a **Simple** HTTP Server Frame Based on Epoll.
+Husky is a **Simple** HTTP Server Frame Based on ThreadPool.
 
 It is just a simple server, not forcussing on performance, but it is **very easy** to use. That is what it born to be.
 
 ## Feature
 
 + Only Headers file: what you need to do is `include` it.
-+ No dependence: **No dependence, No hurts**. (Epoll is native support for linux.)
++ No dependence: **No dependence, No hurts**.
 
 ## Example
 
