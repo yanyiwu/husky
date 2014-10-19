@@ -47,6 +47,36 @@ curl -d "hello world, my name is aszxqw." "http://127.0.0.1:11257"
 
 Its source code is `test/demo.cpp`.  Its code has only 30+ lines. 
 
+## Benchmark
+
+```
+go get github.com/aszxqw/go_http_load
+```
+
+GET
+
+```
+go_http_load -method=GET -get_urls="../test/testdata/get.urls" -goroutines=1 -loop_count=5000
+```
+
+```
+The Number of Queries:10000
+The Time Consumed: 4.539 s
+Query Per Second: 2203.046 q/s
+```
+
+POST
+
+```
+go_http_load -method=POST -post_url="http://127.0.0.1:11257" -post_data_file="../test/testdata/post.data" -goroutines=1 -loop_count=5000
+```
+
+```
+The Number of Queries:5000
+The Time Consumed: 2.448 s
+Query Per Second: 2042.887 q/s
+```
+
 ## Reference
 
 [limonp]
