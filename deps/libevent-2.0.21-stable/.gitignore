@@ -42,3 +42,8 @@ test/test-time
 test/test-weof
 autom4te.cache
 *.lo
+Makefile.in
+aclocal.m4
+include/Makefile.in
+sample/Makefile.in
+test/Makefile.in
