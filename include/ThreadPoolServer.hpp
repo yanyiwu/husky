@@ -1,5 +1,5 @@
-#ifndef HUSKY_EPOLLSERVER_H 
-#define HUSKY_EPOLLSERVER_H 
+#ifndef HUSKY_THREADPOOLSERVER_H
+#define HUSKY_THREADPOOLSERVER_H
 
 #include <stdio.h>
 #include <string.h>
