@@ -29,9 +29,16 @@ namespace Husky
 {
     using namespace Limonp;
 
+    static const size_t RECV_BUFFER_SIZE = 4096; 
+
+    enum SocketState
+    {
+        SOCK_STATE_RECEIVE,
+        SOCK_STATE_SEND
+    };
+
     enum ConnState 
     {
-        CONN_INIT,
         CONN_READ_REQUEST,
         CONN_WAIT_TASK,
         CONN_SEND_RESULT,
@@ -46,12 +53,18 @@ namespace Husky
                 public:
                     NConnection(SocketFd sock, NonblockingServer* server)
                         : 
-                            sock_(sock), 
+                            socket_(sock), 
                             server_(server), 
-                            connState_(CONN_INIT),
+                            connState_(CONN_READ_REQUEST),
+                            socketState_(SOCK_STATE_RECEIVE),
                             event_(NULL),
-                            eventFlags_(0)
+                            eventFlags_(0),
+                            readBuffer_(),
+                            readBufferOffset_(0),
+                            writeBuffer_(),
+                            writeBufferOffset_(0)
                     {
+                        setRead();
                     }
                     ~NConnection()
                     {
@@ -66,11 +79,6 @@ namespace Husky
                         LogDebug("transition");
                         switch(connState_)
                         {
-                            case CONN_INIT:
-                                LogDebug("CONN_INIT");
-                                setRead();
-                                connState_ = CONN_READ_REQUEST;
-                                return;
                             case CONN_READ_REQUEST:
                                 LogDebug("CONN_READ_REQUEST");
                                 return;
@@ -86,7 +94,8 @@ namespace Husky
 
                     void closeConnection()
                     {
-                        close(sock_);
+                        setIdle();
+                        close(socket_);
                         server_->returnConnection(this);
                     }
 
@@ -97,6 +106,10 @@ namespace Husky
                     void setWrite()
                     {
                         setFlags(EV_WRITE|EV_PERSIST);
+                    }
+                    void setIdle()
+                    {
+                        setFlags(0);
                     }
 
                     void setFlags(short flags)
@@ -126,7 +139,7 @@ namespace Husky
                         LIMONP_CHECK(event_ == NULL);
                         event_ = event_new(
                                     server_->getEventBase(), 
-                                    sock_,
+                                    socket_,
                                     eventFlags_,
                                     eventHandler,
                                     this
@@ -137,6 +150,7 @@ namespace Husky
                 private:
                     static void eventHandler(SocketFd fd, short, void * ctx)
                     {
+                        LogDebug("eventHandler");
                         NConnection *self = (NConnection*)ctx;
                         LIMONP_CHECK(fd == self->getSocketFd());
                         self->workSocket();
@@ -144,20 +158,65 @@ namespace Husky
 
                     void workSocket()
                     {
+                        int ret;
+                        switch(socketState_)
+                        {
+                            case SOCK_STATE_RECEIVE:
+                                char buffer[RECV_BUFFER_SIZE];
+                                ret = ::recv(socket_, buffer, sizeof(buffer), 0);
+                                if(ret > 0)
+                                {
+                                    cout << __FILE__ << __LINE__ << endl;
+                                    readBuffer_.append(buffer, ret);
+                                    cout << readBuffer_.size() << endl;
+                                    cout << readBuffer_ << endl;
+                                }
+                                else if(ret == 0) 
+                                {
+                                    LogDebug("socket close from remote");
+                                    closeConnection();
+                                    return;
+                                }
+                                else
+                                {
+                                    LogError(strerror(errno));
+                                }
+                                return;
+                            case SOCK_STATE_SEND:
+                                LIMONP_CHECK(writeBuffer_.size() >= writeBufferOffset_);
+                                size_t sendsize;
+                                const char* sendbuf;
+                                sendsize = writeBuffer_.size() - writeBufferOffset_ ;
+                                sendbuf = writeBuffer_.c_str() + writeBufferOffset_;
+                                ret = ::send(socket_, sendbuf, sendsize, 0);
+                                if(ret == -1)
+                                {
+                                    LogError(strerror(errno));
+                                    return;
+                                }
+                                writeBufferOffset_ += sendsize;
+                                return;
+                            default:
+                                LogFatal("unexpected.");
+                                assert(0);
+                        }
                     }
 
                     SocketFd getSocketFd() const {
-                        return sock_;
+                        return socket_;
                     }
 
-                    SocketFd sock_;
+                    SocketFd socket_;
                     NonblockingServer* server_;
                     ConnState connState_;
+                    SocketState socketState_;
                     struct event* event_;
                     short eventFlags_;
 
                     string readBuffer_;
+                    size_t readBufferOffset_;
                     string writeBuffer_;
+                    size_t writeBufferOffset_;
 
             };
 
