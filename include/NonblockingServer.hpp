@@ -45,12 +45,20 @@ namespace Husky
             {
                 public:
                     NConnection(SocketFd sock, NonblockingServer* server)
-                        : sock_(sock), server_(server)
+                        : 
+                            sock_(sock), 
+                            server_(server), 
+                            connState_(CONN_INIT),
+                            event_(NULL),
+                            eventFlags_(0)
                     {
-                        connState_ = CONN_CLOSE;
                     }
                     ~NConnection()
                     {
+                        if(event_)
+                        {
+                            event_free(event_);
+                        }
                     }
 
                     void transition()
@@ -58,13 +66,17 @@ namespace Husky
                         LogDebug("transition");
                         switch(connState_)
                         {
+                            case CONN_INIT:
+                                LogDebug("CONN_INIT");
+                                setRead();
+                                connState_ = CONN_READ_REQUEST;
+                                return;
                             case CONN_READ_REQUEST:
                                 LogDebug("CONN_READ_REQUEST");
                                 return;
                             case CONN_CLOSE:
                                 LogDebug("CONN_CLOSE");
-                                close(sock_);
-                                server_->returnConnection(this);
+                                closeConnection();
                                 return;
                             default:
                                 LogFatal("Unexpected.");
@@ -72,17 +84,81 @@ namespace Husky
                         }
                     }
 
+                    void closeConnection()
+                    {
+                        close(sock_);
+                        server_->returnConnection(this);
+                    }
+
+                    void setRead()
+                    {
+                        setFlags(EV_READ|EV_PERSIST);
+                    }
+                    void setWrite()
+                    {
+                        setFlags(EV_WRITE|EV_PERSIST);
+                    }
+
+                    void setFlags(short flags)
+                    {
+                        if(flags == eventFlags_) 
+                        {
+                            return ;
+                        }
+                        if(event_ != NULL)
+                        {
+                            if(-1 == event_del(event_))
+                            {
+                                LogError("event_del failed.");
+                                return;
+                            }
+                            event_free(event_);
+                            event_ = NULL;
+                        }
+
+                        eventFlags_ = flags;
+
+                        // Do not call event_set if there are no flags
+                        if(eventFlags_ == 0)
+                        {
+                            return;
+                        }
+                        LIMONP_CHECK(event_ == NULL);
+                        event_ = event_new(
+                                    server_->getEventBase(), 
+                                    sock_,
+                                    eventFlags_,
+                                    eventHandler,
+                                    this
+                        );
+                        event_add(event_, NULL);
+                    }
+
                 private:
+                    static void eventHandler(SocketFd fd, short, void * ctx)
+                    {
+                        NConnection *self = (NConnection*)ctx;
+                        LIMONP_CHECK(fd == self->getSocketFd());
+                        self->workSocket();
+                    }
+
+                    void workSocket()
+                    {
+                    }
+
+                    SocketFd getSocketFd() const {
+                        return sock_;
+                    }
+
                     SocketFd sock_;
                     NonblockingServer* server_;
-
-                    char* readBuffer_;
-                    size_t readBufferSize_;
-
-                    char* writeBuffer_;
-                    size_t writeBufferSize_;
-
                     ConnState connState_;
+                    struct event* event_;
+                    short eventFlags_;
+
+                    string readBuffer_;
+                    string writeBuffer_;
+
             };
 
             NonblockingServer(int port, const IRequestHandler& handler)
@@ -164,6 +240,11 @@ namespace Husky
             {
                 LogDebug("del NConnection");
                 delete conn;
+            }
+            
+            struct event_base* getEventBase() const 
+            {
+                return evbase_;
             }
 
             SocketFd listener_;
