@@ -14,7 +14,7 @@ INCLUDE_DIRECTORIES(
 )
 
 LINK_DIRECTORIES(
-    ${PROJECT_SOURCE_DIR}/deps/libevent
+    ${PROJECT_SOURCE_DIR}/deps/libevent/.libs/
 )
 
 ADD_SUBDIRECTORY(example)

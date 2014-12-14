@@ -29,8 +29,8 @@ int main(int argc, char** argv)
         printf("usage: %s --port 11257 \n", argv[0]);
         return EXIT_FAILURE;
     }
-    size_t threadNumber = 4;
-    size_t queueMaxSize = 256;
+    //size_t threadNumber = 4;
+    //size_t queueMaxSize = 256;
     int port = atoi(argv[2]);
     ReqHandler reqHandler;
     NonblockingServer server(port, reqHandler);
