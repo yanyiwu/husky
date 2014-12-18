@@ -280,7 +280,7 @@ namespace Husky
 
             void addTask(const HttpReqInfo& req)
             {
-                pool_.add(CreateTask<NWorkerThread, const HttpReqInfo&, const IRequestHandler>(req, reqHandler_));
+                pool_.add(CreateTask<NWorkerThread, const HttpReqInfo&, const IRequestHandler&>(req, reqHandler_));
             }
         private:
             static void listenHandler(SocketFd fd, short which, void *ctx)

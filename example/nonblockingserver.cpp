@@ -9,7 +9,6 @@ class ReqHandler: public IRequestHandler
 	public:
         virtual bool do_GET(const HttpReqInfo& httpReq, string& response) const
         {
-            cout << __FILE__ << __LINE__ << endl;
             const unordered_map<string, string>& mp = httpReq.getMethodGetMap();
             string mpStr;
             mpStr << mp;

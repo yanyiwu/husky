@@ -11,9 +11,8 @@ namespace Husky
     {
         public:
             NWorkerThread(const HttpReqInfo& req, const IRequestHandler& reqHandler)
-                : httpReq_(req), reqHandler_(reqHandler_)
+                : httpReq_(req), reqHandler_(reqHandler)
             {
-                cout << __FILE__ << __LINE__ << endl;
             }
             virtual ~NWorkerThread()
             {
@@ -23,9 +22,6 @@ namespace Husky
             {
                 string sendbuf;
                 string result;
-                cout << __FILE__ << __LINE__ << endl;
-                cout << httpReq_ << endl;
-                cout << httpReq_.isGET() << endl;
                 if(httpReq_.isGET() && !reqHandler_.do_GET(httpReq_, result))
                 {
                     LogError("do_GET failed.");
