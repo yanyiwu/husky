@@ -22,7 +22,9 @@
 #include <event2/bufferevent.h>
 
 #include "NetUtils.hpp"
+#include "HttpReqInfo.hpp"
 #include "IRequestHandler.hpp"
+#include "NWorkerThread.hpp"
 #include "Limonp/Logger.hpp"
 
 namespace Husky
@@ -30,6 +32,8 @@ namespace Husky
     using namespace Limonp;
 
     static const size_t RECV_BUFFER_SIZE = 4096; 
+    static const size_t TASK_QUEUE_MAX_SIZE = 1024;
+    static const size_t WORKER_NUMBER = 4;
 
     enum SocketState
     {
@@ -81,6 +85,8 @@ namespace Husky
                         {
                             case CONN_READ_REQUEST:
                                 LogDebug("CONN_READ_REQUEST");
+                                server_->addTask(httpReq_);
+                                cout << httpReq_ << endl;
                                 return;
                             case CONN_CLOSE:
                                 LogDebug("CONN_CLOSE");
@@ -94,6 +100,7 @@ namespace Husky
 
                     void closeConnection()
                     {
+                        LogDebug("closeConnection");
                         setIdle();
                         close(socket_);
                         server_->returnConnection(this);
@@ -101,10 +108,12 @@ namespace Husky
 
                     void setRead()
                     {
+                        socketState_ = SOCK_STATE_RECEIVE;
                         setFlags(EV_READ|EV_PERSIST);
                     }
                     void setWrite()
                     {
+                        socketState_ = SOCK_STATE_SEND;
                         setFlags(EV_WRITE|EV_PERSIST);
                     }
                     void setIdle()
@@ -170,11 +179,18 @@ namespace Husky
                                     readBuffer_.append(buffer, ret);
                                     cout << readBuffer_.size() << endl;
                                     cout << readBuffer_ << endl;
+                                    if(httpReq_.parseHeader(readBuffer_))
+                                    {
+                                        connState_ = CONN_READ_REQUEST;
+                                        transition();
+                                        return;
+                                    }
                                 }
                                 else if(ret == 0) 
                                 {
                                     LogDebug("socket close from remote");
-                                    closeConnection();
+                                    connState_ = CONN_CLOSE;
+                                    transition();
                                     return;
                                 }
                                 else
@@ -218,12 +234,19 @@ namespace Husky
                     string writeBuffer_;
                     size_t writeBufferOffset_;
 
+                    HttpReqInfo httpReq_;
+
             };
 
-            NonblockingServer(int port, const IRequestHandler& handler)
+            NonblockingServer(
+                        int port, 
+                        const IRequestHandler& handler, 
+                        size_t thread_number = WORKER_NUMBER, 
+                        size_t queue_max_size = TASK_QUEUE_MAX_SIZE)
                 : 
                     listener_(-1), 
                     reqHandler_(handler),
+                    pool_(thread_number, queue_max_size),
                     evbase_(NULL)
             {
                 listener_ = CreateAndListenSocket(port);
@@ -247,8 +270,17 @@ namespace Husky
             void start()
             {
                 registerEvents();
+
+                pool_.start();
+                LogInfo("workers start.");
+
                 LogInfo("server start. using libevent %s method %s", event_get_version(), event_base_get_method(evbase_));
                 event_base_dispatch(evbase_);
+            }
+
+            void addTask(const HttpReqInfo& req)
+            {
+                pool_.add(CreateTask<NWorkerThread, const HttpReqInfo&, const IRequestHandler>(req, reqHandler_));
             }
         private:
             static void listenHandler(SocketFd fd, short which, void *ctx)
@@ -308,6 +340,7 @@ namespace Husky
 
             SocketFd listener_;
             const IRequestHandler& reqHandler_;
+            ThreadPool pool_;
 
             struct event_base* evbase_;
     };

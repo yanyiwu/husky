@@ -46,6 +46,9 @@ namespace Husky
         
         return sock;
     }
+
+    const char* const HTTP_FORMAT = "HTTP/1.1 200 OK\r\nConnection: close\r\nServer: HuskyServer/1.0.0\r\nContent-Type: text/json; charset=%s\r\nContent-Length: %d\r\n\r\n%s";
+    const char* const CHARSET_UTF8 = "UTF-8";
 } // namespace Husky
 
 

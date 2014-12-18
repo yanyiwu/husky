@@ -3,17 +3,15 @@
 
 #include "Limonp/ThreadPool.hpp"
 #include "IRequestHandler.hpp"
+#include "NetUtils.hpp"
 
 namespace Husky
 {
-    const char* const HTTP_FORMAT = "HTTP/1.1 200 OK\r\nConnection: close\r\nServer: HuskyServer/1.0.0\r\nContent-Type: text/json; charset=%s\r\nContent-Length: %d\r\n\r\n%s";
-    const char* const CHARSET_UTF8 = "UTF-8";
     const char* const CLIENT_IP_K = "CLIENT_IP"; 
     const size_t RECV_BUFFER_SIZE = 16 * 1024;
 
     const struct linger LNG = {1, 1};
     const struct timeval SOCKET_TIMEOUT = {16, 0};
-
 
     class WorkerThread: public ITask
     {
@@ -36,7 +34,7 @@ namespace Husky
                 {
                     if(!_setsockopt(_sockfd))
                     {
-                        LogFatal("_setsockopt failed.");
+                        LogFatal("_getsockopt failed.");
                         break;
                     }
                     string strSnd, strRetByHandler;

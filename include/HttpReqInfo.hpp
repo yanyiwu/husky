@@ -80,6 +80,10 @@ namespace Husky
                 _contentLength = 0;
             }
         public:
+            bool parseHeader(const string& buffer) 
+            {
+                return parseHeader(buffer.c_str(), buffer.size());
+            }
             bool parseHeader(const char* buffer, size_t len) 
             {
                 string headerStr(buffer, len);
