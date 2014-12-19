@@ -24,8 +24,8 @@
 #include "NetUtils.hpp"
 #include "HttpReqInfo.hpp"
 #include "IRequestHandler.hpp"
-#include "NWorkerThread.hpp"
 #include "Limonp/Logger.hpp"
+#include "Limonp/ThreadPool.hpp"
 
 namespace Husky
 {
@@ -38,11 +38,13 @@ namespace Husky
     enum SocketState
     {
         SOCK_STATE_RECEIVE,
-        SOCK_STATE_SEND
+        SOCK_STATE_SEND,
+        SOCK_STATE_CLOSE
     };
 
     enum ConnState 
     {
+        CONN_INIT,
         CONN_READ_REQUEST,
         CONN_WAIT_TASK,
         CONN_SEND_RESULT,
@@ -59,7 +61,7 @@ namespace Husky
                         : 
                             socket_(sock), 
                             server_(server), 
-                            connState_(CONN_READ_REQUEST),
+                            connState_(CONN_INIT),
                             socketState_(SOCK_STATE_RECEIVE),
                             event_(NULL),
                             eventFlags_(0),
@@ -68,7 +70,7 @@ namespace Husky
                             writeBuffer_(),
                             writeBufferOffset_(0)
                     {
-                        setRead();
+                        this->transition();
                     }
                     ~NConnection()
                     {
@@ -80,16 +82,23 @@ namespace Husky
 
                     void transition()
                     {
-                        LogDebug("transition");
                         switch(connState_)
                         {
+                            case CONN_INIT:
+                                setRead();
+                                return;
                             case CONN_READ_REQUEST:
-                                LogDebug("CONN_READ_REQUEST");
-                                server_->addTask(httpReq_);
-                                cout << httpReq_ << endl;
+                                setConnState(CONN_WAIT_TASK);
+                                transition();
+                                return;
+                            case CONN_WAIT_TASK:
+                                setIdle();
+                                server_->addTask(httpReq_, this);
+                                return;
+                            case CONN_SEND_RESULT:
+                                setWrite();
                                 return;
                             case CONN_CLOSE:
-                                LogDebug("CONN_CLOSE");
                                 closeConnection();
                                 return;
                             default:
@@ -100,10 +109,14 @@ namespace Husky
 
                     void closeConnection()
                     {
-                        LogDebug("closeConnection");
                         setIdle();
                         close(socket_);
                         server_->returnConnection(this);
+                    }
+
+                    NonblockingServer* getServer()
+                    {
+                        return server_;
                     }
 
                     void setRead()
@@ -120,6 +133,15 @@ namespace Husky
                     {
                         setFlags(0);
                     }
+                    void setTaskResult(const string& res)
+                    {
+                        writeBuffer_ = res;
+                    }
+                    void setConnState(ConnState state)
+                    {
+                        connState_ = state;
+                    }
+                private:
 
                     void setFlags(short flags)
                     {
@@ -156,10 +178,8 @@ namespace Husky
                         event_add(event_, NULL);
                     }
 
-                private:
                     static void eventHandler(SocketFd fd, short, void * ctx)
                     {
-                        LogDebug("eventHandler");
                         NConnection *self = (NConnection*)ctx;
                         LIMONP_CHECK(fd == self->getSocketFd());
                         self->workSocket();
@@ -175,22 +195,19 @@ namespace Husky
                                 ret = ::recv(socket_, buffer, sizeof(buffer), 0);
                                 if(ret > 0)
                                 {
-                                    cout << __FILE__ << __LINE__ << endl;
                                     readBuffer_.append(buffer, ret);
-                                    cout << readBuffer_.size() << endl;
-                                    cout << readBuffer_ << endl;
                                     if(httpReq_.parseHeader(readBuffer_))
                                     {
-                                        connState_ = CONN_READ_REQUEST;
-                                        transition();
+                                        setConnState(CONN_READ_REQUEST);
+                                        this->transition();
                                         return;
                                     }
                                 }
                                 else if(ret == 0) 
                                 {
                                     LogDebug("socket close from remote");
-                                    connState_ = CONN_CLOSE;
-                                    transition();
+                                    setConnState(CONN_CLOSE);
+                                    this->transition();
                                     return;
                                 }
                                 else
@@ -204,6 +221,11 @@ namespace Husky
                                 const char* sendbuf;
                                 sendsize = writeBuffer_.size() - writeBufferOffset_ ;
                                 sendbuf = writeBuffer_.c_str() + writeBufferOffset_;
+                                if(sendsize == 0)
+                                {
+                                    socketState_ = SOCK_STATE_CLOSE;
+                                    return;
+                                }
                                 ret = ::send(socket_, sendbuf, sendsize, 0);
                                 if(ret == -1)
                                 {
@@ -211,6 +233,8 @@ namespace Husky
                                     return;
                                 }
                                 writeBufferOffset_ += sendsize;
+                            case SOCK_STATE_CLOSE:
+                                server_->returnConnection(this);
                                 return;
                             default:
                                 LogFatal("unexpected.");
@@ -237,6 +261,40 @@ namespace Husky
                     HttpReqInfo httpReq_;
 
             };
+            class NWorkerThread: public ITask
+            {
+                public:
+                    NWorkerThread(const HttpReqInfo& req, const IRequestHandler& reqHandler, NConnection* conn)
+                        : httpReq_(req), reqHandler_(reqHandler), conn_(conn)
+                    {
+                    }
+                    virtual ~NWorkerThread()
+                    {
+                    }
+                    
+                    void run()
+                    {
+                        string sendbuf;
+                        string result;
+                        if(httpReq_.isGET() && !reqHandler_.do_GET(httpReq_, result))
+                        {
+                            LogError("do_GET failed.");
+                            return;
+                        }
+                        if(httpReq_.isPOST() && !reqHandler_.do_POST(httpReq_, result))
+                        {
+                            LogError("do_POST failed.");
+                            return;
+                        }
+                        sendbuf = string_format(HTTP_FORMAT, CHARSET_UTF8, result.length(), result.c_str());
+                        conn_->setTaskResult(sendbuf);
+                        conn_->getServer()->notify(conn_);
+                    }
+                private:
+                    HttpReqInfo httpReq_;
+                    const IRequestHandler& reqHandler_;
+                    NConnection* conn_;
+            };
 
             NonblockingServer(
                         int port, 
@@ -252,7 +310,8 @@ namespace Husky
                 listener_ = CreateAndListenSocket(port);
                 int ret = evutil_make_socket_nonblocking(listener_);
                 LIMONP_CHECK(ret != -1);
-                
+                notificationPipeFDs_[0] = -1;
+                notificationPipeFDs_[1] = -1;
                 evbase_ = event_base_new();
                 LIMONP_CHECK(evbase_);
             }
@@ -262,6 +321,14 @@ namespace Husky
                 {
                     close(listener_);
                 }
+                if(notificationPipeFDs_[0] > 0) 
+                {
+                    close(notificationPipeFDs_[0]);
+                }
+                if(notificationPipeFDs_[1] > 0)
+                {
+                    close(notificationPipeFDs_[1]);
+                }
                 if(evbase_)
                 {
                     event_base_free(evbase_);
@@ -269,8 +336,8 @@ namespace Husky
             }
             void start()
             {
+                createNotificationPipe();
                 registerEvents();
-
                 pool_.start();
                 LogInfo("workers start.");
 
@@ -278,9 +345,9 @@ namespace Husky
                 event_base_dispatch(evbase_);
             }
 
-            void addTask(const HttpReqInfo& req)
+            void addTask(const HttpReqInfo& req, NConnection* conn)
             {
-                pool_.add(CreateTask<NWorkerThread, const HttpReqInfo&, const IRequestHandler&>(req, reqHandler_));
+                pool_.add(CreateTask<NWorkerThread, const HttpReqInfo&, const IRequestHandler&, NConnection*>(req, reqHandler_, conn));
             }
         private:
             static void listenHandler(SocketFd fd, short which, void *ctx)
@@ -302,9 +369,7 @@ namespace Husky
                     LIMONP_CHECK(ret != -1);
                     
                     NConnection* clientConn = createConnection(clientSock);
-                    //TODO delete
                     clientConn->transition();
-                    //NConnection
                 }
             }
 
@@ -318,19 +383,37 @@ namespace Husky
                     this
                 );
                 event_add(listener_event, NULL);
+
+                struct event* notification_event = event_new(
+                    evbase_,
+                    getNotificationRecvFD(),
+                    EV_READ | EV_PERSIST,
+                    notifyHandler,
+                    this
+                );
+                event_add(notification_event, NULL);
             }
 
             NConnection* createConnection(SocketFd sock)
             {
-                LogDebug("new NConnection");
                 NConnection* result;
                 result = new NConnection(sock, this);
                 return result;
             }
             void returnConnection(NConnection* conn)
             {
-                LogDebug("del NConnection");
                 delete conn;
+            }
+
+            void createNotificationPipe()
+            {
+                int ret;
+                ret = evutil_socketpair(AF_LOCAL, SOCK_STREAM, 0, notificationPipeFDs_);
+                LIMONP_CHECK(ret != -1);
+                ret = evutil_make_socket_nonblocking(notificationPipeFDs_[0]);
+                LIMONP_CHECK(ret != -1);
+                ret = evutil_make_socket_nonblocking(notificationPipeFDs_[1]);
+                LIMONP_CHECK(ret != -1);
             }
             
             struct event_base* getEventBase() const 
@@ -338,7 +421,48 @@ namespace Husky
                 return evbase_;
             }
 
+            void notify(NConnection* conn)
+            {
+                SocketFd fd = getNotificationSendFD();
+                LIMONP_CHECK(fd);
+                const int size = sizeof(conn);
+                if(size != send(fd, &conn, size, 0))
+                {
+                    LogError("send failed.");
+                    return;
+                }
+                return;
+            }
+
+            static void notifyHandler(SocketFd fd, short which, void * ctx)
+            {
+                //NonblockingServer * self = (NonblockingServer*) ctx;
+                while(true)
+                {
+                    NConnection * conn;
+                    int n = recv(fd, &conn, sizeof(conn), 0);
+                    if(n == sizeof(conn))
+                    {
+                        conn->setConnState(CONN_SEND_RESULT);
+                        conn->transition();
+                        continue;
+                    }
+                    LIMONP_CHECK(n <= 0); //TODO
+                    return;
+                }
+            }
+
+            SocketFd getNotificationSendFD()
+            {
+                return notificationPipeFDs_[1];
+            }
+            SocketFd getNotificationRecvFD()
+            {
+                return notificationPipeFDs_[0];
+            }
+
             SocketFd listener_;
+            SocketFd notificationPipeFDs_[2];
             const IRequestHandler& reqHandler_;
             ThreadPool pool_;
 
