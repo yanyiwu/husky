@@ -11,7 +11,7 @@ using namespace Limonp;
 using namespace std;
 
 static const char* const KEY_METHOD = "METHOD";
-static const char* const KEY_PATH = "PATH";
+static const char* const KEY_URI = "URI";
 static const char* const KEY_PROTOCOL = "PROTOCOL";
 
 typedef unsigned char BYTE;
@@ -82,13 +82,9 @@ class HttpReqInfo {
       return false;
     }
     _headerMap[KEY_METHOD] = trim(buf[0]);
-    _headerMap[KEY_PATH] = trim(buf[1]);
+    _headerMap[KEY_URI] = trim(buf[1]);
     _headerMap[KEY_PROTOCOL] = trim(buf[2]);
-    //first request line end
-    //parse path to _methodGetMap
-    if("GET" == _headerMap[KEY_METHOD]) {
-      _parseUrl(firstline, _methodGetMap);
-    }
+    _parseUri(_headerMap[KEY_URI], _path,  _methodGetMap);
 
     lpos = rpos + 1;
     if(lpos >= headerStr.size()) {
@@ -182,12 +178,16 @@ class HttpReqInfo {
   const string& getBody() const {
     return _body;
   }
+  const string& getPath() const {
+    return _path;
+  }
  private:
   bool _isHeaderFinished;
   bool _isBodyFinished;
   size_t _contentLength;
   unordered_map<string, string> _headerMap;
   unordered_map<string, string> _methodGetMap;
+  string _path;
   string _body;
   friend ostream& operator<<(ostream& os, const HttpReqInfo& obj);
  private:
@@ -200,42 +200,43 @@ class HttpReqInfo {
     return true;
   }
  private:
-  bool _parseUrl(const string& url, std::unordered_map<string, string>& mp) {
-    if(url.empty()) {
-      return false;
+  void _parseUri(const string& uri, string& path, std::unordered_map<string, string>& mp) {
+    if(uri.empty()) {
+      return;
     }
 
-    size_t pos = url.find('?');
+    size_t pos = uri.find('?');
+    path = uri.substr(0, pos);
     if(string::npos == pos) {
-      return false;
+      return ;
     }
     size_t kleft = 0, kright = 0;
     size_t vleft = 0, vright = 0;
-    for(size_t i = pos + 1; i < url.size();) {
+    for(size_t i = pos + 1; i < uri.size();) {
       kleft = i;
-      while(i < url.size() && url[i] != '=') {
+      while(i < uri.size() && uri[i] != '=') {
         i++;
       }
-      if(i >= url.size()) {
+      if(i >= uri.size()) {
         break;
       }
       kright = i;
       i++;
       vleft = i;
-      while(i < url.size() && url[i] != '&' && url[i] != ' ') {
+      while(i < uri.size() && uri[i] != '&' && uri[i] != ' ') {
         i++;
       }
       vright = i;
-      mp[url.substr(kleft, kright - kleft)] = url.substr(vleft, vright - vleft);
+      mp[uri.substr(kleft, kright - kleft)] = uri.substr(vleft, vright - vleft);
       i++;
     }
 
-    return true;
+    return;
   }
 };
 
 inline std::ostream& operator << (std::ostream& os, const Husky::HttpReqInfo& obj) {
-  return os << obj._headerMap << obj._methodGetMap/* << obj._methodPostMap*/ << obj._body;
+  return os << obj._headerMap << obj._methodGetMap/* << obj._methodPostMap*/ << obj._path << obj._body ;
 }
 
 }

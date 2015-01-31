@@ -14,6 +14,7 @@ TEST(HttpReqInfoTest, Test1) {
   string s;
   ASSERT_TRUE(reqinfo.find("ACCEPT", s));
   ASSERT_EQ("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", s);
+  ASSERT_EQ(reqinfo.getPath(), "/");
 }
 
 TEST(HttpReqInfoTest, Test2) {
@@ -25,6 +26,7 @@ TEST(HttpReqInfoTest, Test2) {
   ASSERT_TRUE(reqinfo.find("ACCEPT", s));
   ASSERT_EQ(reqinfo.getBody(), "hello world.");
   ASSERT_TRUE(reqinfo.isPOST());
+  ASSERT_EQ(reqinfo.getPath(), "/");
 }
 
 TEST(HttpReqInfoTest, Test3) {
