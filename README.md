@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/aszxqw/husky.png?branch=master)](https://travis-ci.org/aszxqw/husky)
+[![Build Status](https://travis-ci.org/yanyiwu/husky.png?branch=master)](https://travis-ci.org/yanyiwu/husky)
 - - -
 
 # Husky
@@ -37,12 +37,12 @@ or
 ### GET Request Example
 
 ```
-curl "http://127.0.0.1:11257/?hello=world&myname=aszxqw"
+curl "http://127.0.0.1:11257/?hello=world&myname=yanyiwu"
 ```
 
 ### POST Request Example
 ```
-curl -d "hello world, my name is aszxqw." "http://127.0.0.1:11257"
+curl -d "hello world, my name is yanyiwu." "http://127.0.0.1:11257"
 ```
 
 
@@ -53,7 +53,7 @@ Its source code is `test/demo.cpp`.  Its code has only 30+ lines.
 ## Benchmark
 
 ```
-go get github.com/aszxqw/go_http_load
+go get github.com/yanyiwu/go_http_load
 ```
 
 GET
@@ -88,4 +88,4 @@ Query Per Second: 2042.887 q/s
 
 wuyanyi09@foxmail.com
 
-[limonp]:https://github.com/aszxqw/limonp.git
+[limonp]:https://github.com/yanyiwu/limonp.git
