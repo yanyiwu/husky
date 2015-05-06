@@ -93,7 +93,6 @@ class NonblockingServer {
         return;
       default:
         LogFatal("Unexpected.");
-        assert(false);
       }
     }
 
@@ -205,7 +204,6 @@ class NonblockingServer {
         return;
       default:
         LogFatal("unexpected.");
-        assert(0);
       }
     }
 
