@@ -22,7 +22,7 @@ namespace Husky {
 static const size_t LISTEN_QUEUE_LEN = 1024;
 
 typedef int SocketFd;
-SocketFd CreateAndListenSocket(int port) {
+inline SocketFd CreateAndListenSocket(int port) {
   SocketFd sock;
   sock = socket(AF_INET, SOCK_STREAM, 0);
   if (sock == -1) {
