@@ -28,12 +28,6 @@ It is just a simple server, not forcussing on performance, but it is **very easy
 ./threadpoolserver --port 11257
 ```
 
-or
-
-```
-./nonblockingserver --port 11257
-```
-
 ### GET Request Example
 
 ```
@@ -86,6 +80,6 @@ Query Per Second: 2042.887 q/s
 
 ## Contact
 
-wuyanyi09@foxmail.com
+i@yanyiwu.com
 
 [limonp]:https://github.com/yanyiwu/limonp.git
