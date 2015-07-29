@@ -9,12 +9,7 @@ endif()
 
 INCLUDE_DIRECTORIES(
     ${PROJECT_SOURCE_DIR}/deps
-    ${PROJECT_SOURCE_DIR}/deps/libevent/include
     ${PROJECT_SOURCE_DIR}/include
-)
-
-LINK_DIRECTORIES(
-    ${PROJECT_SOURCE_DIR}/deps/libevent/.libs/
 )
 
 ADD_SUBDIRECTORY(example)
