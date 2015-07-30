@@ -34,3 +34,12 @@ TEST(HttpReqInfoTest, Test3) {
   HttpReqInfo reqinfo;
   ASSERT_FALSE(reqinfo.parseHeader(header, strlen(header)));
 }
+
+TEST(HttpReqInfoTest, Chinese) {
+  const char * header = "GET /?wd=%E4%BD%A0%E5%A5%BD HTTP/1.1\r\nHost: 10.109.245.13:11256\r\nConnection: keep-alive\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nUser-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36\r\nAccept-Encoding: gzip,deflate,sdch\r\nAccept-Language: zh-CN,zh;q=0.8\r\n\r\n";
+  HttpReqInfo reqinfo;
+  ASSERT_TRUE(reqinfo.parseHeader(header, strlen(header)));
+  string s;
+  ASSERT_TRUE(reqinfo.GET("wd", s));
+  ASSERT_EQ("你好", s);
+}

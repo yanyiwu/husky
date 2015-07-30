@@ -149,7 +149,12 @@ class HttpReqInfo {
     return _find(_headerMap, key, res);
   }
   bool GET(const string& argKey, string& res)const {
-    return _find(_methodGetMap, argKey, res);
+    string tmp;
+    if (!_find(_methodGetMap, argKey, tmp)) {
+      return false;
+    }
+    URLDecode(tmp, res);
+    return true;
   }
   //const string& getMethod() const
   //{
