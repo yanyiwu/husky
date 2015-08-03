@@ -43,3 +43,28 @@ TEST(HttpReqInfoTest, Chinese) {
   ASSERT_TRUE(reqinfo.GET("wd", s));
   ASSERT_EQ("你好", s);
 }
+
+TEST(HttpReqInfoTest, GETint) {
+  const char * header = "GET /?number=1 HTTP/1.1\r\nHost: 10.109.245.13:11256\r\nConnection: keep-alive\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nUser-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36\r\nAccept-Encoding: gzip,deflate,sdch\r\nAccept-Language: zh-CN,zh;q=0.8\r\n\r\n";
+  HttpReqInfo reqinfo;
+  ASSERT_TRUE(reqinfo.parseHeader(header, strlen(header)));
+  int num;
+  ASSERT_TRUE(reqinfo.GET("number", num));
+  ASSERT_EQ(num, 1);
+}
+
+TEST(HttpReqInfoTest, GETsize_t1) {
+  const char * header = "GET /?number=1 HTTP/1.1\r\nHost: 10.109.245.13:11256\r\nConnection: keep-alive\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nUser-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36\r\nAccept-Encoding: gzip,deflate,sdch\r\nAccept-Language: zh-CN,zh;q=0.8\r\n\r\n";
+  HttpReqInfo reqinfo;
+  ASSERT_TRUE(reqinfo.parseHeader(header, strlen(header)));
+  size_t num;
+  ASSERT_TRUE(reqinfo.GET("number", num));
+  ASSERT_EQ(num, 1u);
+}
+TEST(HttpReqInfoTest, GETsize_t2) {
+  const char * header = "GET /?number=-1 HTTP/1.1\r\nHost: 10.109.245.13:11256\r\nConnection: keep-alive\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nUser-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36\r\nAccept-Encoding: gzip,deflate,sdch\r\nAccept-Language: zh-CN,zh;q=0.8\r\n\r\n";
+  HttpReqInfo reqinfo;
+  ASSERT_TRUE(reqinfo.parseHeader(header, strlen(header)));
+  size_t num;
+  ASSERT_FALSE(reqinfo.GET("number", num));
+}
