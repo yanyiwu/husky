@@ -34,12 +34,12 @@ class WorkerThread: public ITask {
         break;
       }
 
-      if(httpReq.isGET() && !_reqHandler.do_GET(httpReq, strRetByHandler)) {
-        LogError("do_GET failed.");
+      if(httpReq.isGET() && !_reqHandler.doGET(httpReq, strRetByHandler)) {
+        LogError("doGET failed.");
         break;
       }
-      if(httpReq.isPOST() && !_reqHandler.do_POST(httpReq, strRetByHandler)) {
-        LogError("do_POST failed.");
+      if(httpReq.isPOST() && !_reqHandler.doPOST(httpReq, strRetByHandler)) {
+        LogError("doPOST failed.");
         break;
       }
       strSnd = string_format(HTTP_FORMAT, CHARSET_UTF8, strRetByHandler.length(), strRetByHandler.c_str());

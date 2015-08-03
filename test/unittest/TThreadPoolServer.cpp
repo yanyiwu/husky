@@ -7,11 +7,11 @@ class ReqHandler: public IRequestHandler {
   virtual ~ReqHandler() {
   }
 
-  bool do_GET(const HttpReqInfo& httpReq, string& res) {
+  bool doGET(const HttpReqInfo& httpReq, string& res) {
     res << httpReq;
     return true;
   }
-  bool do_POST(const HttpReqInfo& httpReq, string& res) {
+  bool doPOST(const HttpReqInfo& httpReq, string& res) {
     res << httpReq;
     return true;
   }

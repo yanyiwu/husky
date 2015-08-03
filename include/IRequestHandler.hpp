@@ -9,8 +9,8 @@ class IRequestHandler {
   virtual ~IRequestHandler() {
   }
 
-  virtual bool do_GET(const HttpReqInfo& httpReq, string& res) = 0;
-  virtual bool do_POST(const HttpReqInfo& httpReq, string& res) = 0;
+  virtual bool doGET(const HttpReqInfo& httpReq, string& res) = 0;
+  virtual bool doPOST(const HttpReqInfo& httpReq, string& res) = 0;
 };
 }
 
