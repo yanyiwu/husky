@@ -14,14 +14,11 @@ const struct timeval SOCKET_TIMEOUT = {16, 0};
 
 class WorkerThread: public ITask {
  public:
-  WorkerThread(int sockfs, const IRequestHandler& reqHandler):
+  WorkerThread(int sockfs, IRequestHandler& reqHandler):
     _sockfd(sockfs), _reqHandler(reqHandler) {
   }
   virtual ~WorkerThread() {
   }
- private:
-  int _sockfd;
-  const IRequestHandler& _reqHandler;
 
  public:
   void run() {
@@ -101,7 +98,9 @@ class WorkerThread: public ITask {
     }
     return true;
   }
-
+ private:
+  int _sockfd;
+  IRequestHandler& _reqHandler;
 };
 }
 

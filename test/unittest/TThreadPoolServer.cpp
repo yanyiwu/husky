@@ -4,13 +4,14 @@
 using namespace Husky;
 class ReqHandler: public IRequestHandler {
  public:
-  virtual ~ReqHandler() {}
- public:
-  bool do_GET(const HttpReqInfo& httpReq, string& res) const {
+  virtual ~ReqHandler() {
+  }
+
+  bool do_GET(const HttpReqInfo& httpReq, string& res) {
     res << httpReq;
     return true;
   }
-  bool do_POST(const HttpReqInfo& httpReq, string& res) const {
+  bool do_POST(const HttpReqInfo& httpReq, string& res) {
     res << httpReq;
     return true;
   }
