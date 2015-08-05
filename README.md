@@ -19,7 +19,9 @@ It is just a simple server, not forcussing on performance, but it is **very easy
 ### configure & compile
 
 ```
-./build.sh
+mkdir build
+cmake ..
+make
 ```
 
 ### start server
