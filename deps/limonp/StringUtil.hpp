@@ -23,7 +23,7 @@
 #include <algorithm>
 #include "StdExtension.hpp"
 
-namespace Limonp {
+namespace limonp {
 using namespace std;
 inline string string_format(const char* fmt, ...) {
   int size = 256;
@@ -68,39 +68,6 @@ string join(T begin, T end, const string& connector) {
   return res;
 }
 
-
-
-inline bool split(const string& src, vector<string>& res, const string& pattern, size_t offset = 0, size_t len = string::npos) {
-  if(src.empty()) {
-    return false;
-  }
-  res.clear();
-
-  size_t start = 0;
-  size_t end = 0;
-  size_t cnt = 0;
-  while(start < src.size() && res.size() < len) {
-    end = src.find_first_of(pattern, start);
-    if(string::npos == end) {
-      if(cnt >= offset) {
-        res.push_back(src.substr(start));
-      }
-      return true;
-    }
-    //if(end == src.size() - 1)
-    //{
-    //    res.push_back("");
-    //    return true;
-    //}
-    if(cnt >= offset) {
-      res.push_back(src.substr(start, end - start));
-    }
-    cnt ++;
-    start = end + 1;
-  }
-  return true;
-}
-
 inline string& upper(string& str) {
   transform(str.begin(), str.end(), str.begin(), (int (*)(int))toupper);
   return str;
@@ -111,33 +78,55 @@ inline string& lower(string& str) {
   return str;
 }
 
-inline std::string &ltrim(std::string &s) {
+inline std::string& ltrim(std::string &s) {
   s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
   return s;
 }
 
-inline std::string &rtrim(std::string &s) {
+inline std::string& rtrim(std::string &s) {
   s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
   return s;
 }
 
-inline std::string &trim(std::string &s) {
+inline std::string& trim(std::string &s) {
   return ltrim(rtrim(s));
 }
 
-inline std::string & ltrim(std::string & s, char x) {
+inline std::string& ltrim(std::string & s, char x) {
   s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::bind2nd(std::equal_to<char>(), x))));
   return s;
 }
 
-inline std::string & rtrim(std::string & s, char x) {
+inline std::string& rtrim(std::string & s, char x) {
   s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::bind2nd(std::equal_to<char>(), x))).base(), s.end());
   return s;
 }
 
-inline std::string &trim(std::string &s, char x) {
+inline std::string& trim(std::string &s, char x) {
   return ltrim(rtrim(s, x), x);
 }
+
+inline void split(const string& src, vector<string>& res, const string& pattern, size_t maxsplit = string::npos) {
+  res.clear();
+  size_t start = 0;
+  size_t end = 0;
+  string sub;
+  while(start < src.size()) {
+    end = src.find_first_of(pattern, start);
+    if(string::npos == end || res.size() >= maxsplit) {
+      sub = src.substr(start);
+      trim(sub);
+      res.push_back(sub);
+      return;
+    }
+    sub = src.substr(start, end - start);
+    trim(sub);
+    res.push_back(sub);
+    start = end + 1;
+  }
+  return;
+}
+
 
 inline bool startsWith(const string& str, const string& prefix) {
   if(prefix.length() > str.length()) {
@@ -197,10 +186,7 @@ bool utf8ToUnicode(const string& str, Uint16Container& vec) {
 }
 
 template <class Uint16ContainerConIter>
-bool unicodeToUtf8(Uint16ContainerConIter begin, Uint16ContainerConIter end, string& res) {
-  if(begin >= end) {
-    return false;
-  }
+void unicodeToUtf8(Uint16ContainerConIter begin, Uint16ContainerConIter end, string& res) {
   res.clear();
   uint16_t ui;
   while(begin != end) {
@@ -217,7 +203,6 @@ bool unicodeToUtf8(Uint16ContainerConIter begin, Uint16ContainerConIter end, str
     }
     begin ++;
   }
-  return true;
 }
 
 
@@ -225,7 +210,7 @@ template <class Uint16Container>
 bool gbkTrans(const char* const str, size_t len, Uint16Container& vec) {
   vec.clear();
   if(!str) {
-    return false;
+    return true;
   }
   size_t i = 0;
   while(i < len) {
@@ -251,10 +236,7 @@ bool gbkTrans(const string& str, Uint16Container& vec) {
 }
 
 template <class Uint16ContainerConIter>
-bool gbkTrans(Uint16ContainerConIter begin, Uint16ContainerConIter end, string& res) {
-  if(begin >= end) {
-    return false;
-  }
+void gbkTrans(Uint16ContainerConIter begin, Uint16ContainerConIter end, string& res) {
   res.clear();
   //pair<char, char> pa;
   char first, second;
@@ -270,7 +252,6 @@ bool gbkTrans(Uint16ContainerConIter begin, Uint16ContainerConIter end, string& 
     }
     begin++;
   }
-  return true;
 }
 
 /*

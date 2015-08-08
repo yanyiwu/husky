@@ -3,11 +3,11 @@
 
 #include <iostream>
 #include <string>
-#include "Limonp/Logger.hpp"
-#include "Limonp/StringUtil.hpp"
+#include "limonp/Logger.hpp"
+#include "limonp/StringUtil.hpp"
 
 namespace Husky {
-using namespace Limonp;
+using namespace limonp;
 using namespace std;
 
 static const char* const KEY_METHOD = "METHOD";
@@ -77,7 +77,8 @@ class HttpReqInfo {
     }
     string firstline(headerStr, lpos, rpos - lpos);
     trim(firstline);
-    if(!split(firstline, buf, " ") || 3 != buf.size()) {
+    split(firstline, buf, " ");
+    if (3 != buf.size()) {
       LogError("parse header firstline[%s] failed.", firstline.c_str());
       return false;
     }
