@@ -6,7 +6,7 @@
 #include "limonp/Logger.hpp"
 #include "limonp/StringUtil.hpp"
 
-namespace Husky {
+namespace husky {
 using namespace limonp;
 using namespace std;
 
@@ -258,7 +258,7 @@ class HttpReqInfo {
   }
 };
 
-inline std::ostream& operator << (std::ostream& os, const Husky::HttpReqInfo& obj) {
+inline std::ostream& operator << (std::ostream& os, const husky::HttpReqInfo& obj) {
   return os << obj._headerMap << obj._methodGetMap/* << obj._methodPostMap*/ << obj._path << obj._body ;
 }
 

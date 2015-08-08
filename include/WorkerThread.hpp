@@ -5,7 +5,7 @@
 #include "IRequestHandler.hpp"
 #include "NetUtils.hpp"
 
-namespace Husky {
+namespace husky {
 const char* const CLIENT_IP_K = "CLIENT_IP";
 const size_t RECV_BUFFER_SIZE = 16 * 1024;
 

@@ -1,7 +1,7 @@
 #include "ThreadPoolServer.hpp"
 #include "gtest/gtest.h"
 
-using namespace Husky;
+using namespace husky;
 class ReqHandler: public IRequestHandler {
  public:
   virtual ~ReqHandler() {

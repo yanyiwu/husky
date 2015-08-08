@@ -1,6 +1,6 @@
 #include "ThreadPoolServer.hpp"
 
-using namespace Husky;
+using namespace husky;
 
 class ReqHandler: public IRequestHandler {
  public:

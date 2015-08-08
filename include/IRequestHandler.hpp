@@ -3,7 +3,7 @@
 
 #include "HttpReqInfo.hpp"
 
-namespace Husky {
+namespace husky {
 class IRequestHandler {
  public:
   virtual ~IRequestHandler() {

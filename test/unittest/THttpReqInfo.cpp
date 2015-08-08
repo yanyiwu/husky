@@ -1,7 +1,7 @@
 #include "HttpReqInfo.hpp"
 #include "gtest/gtest.h"
 
-using namespace Husky;
+using namespace husky;
 TEST(HttpReqInfoTest, Test1) {
   //string url("http://127.0.0.1/?k1=v1&k2=v2 hh");
   //HashMap<string, string> mp;

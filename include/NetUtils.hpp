@@ -18,7 +18,7 @@
 #include "limonp/StdExtension.hpp"
 #include "limonp/Logger.hpp"
 
-namespace Husky {
+namespace husky {
 static const size_t LISTEN_QUEUE_LEN = 1024;
 
 typedef int SocketFd;
@@ -50,7 +50,7 @@ inline SocketFd CreateAndListenSocket(int port) {
 
 const char* const HTTP_FORMAT = "HTTP/1.1 200 OK\r\nConnection: close\r\nServer: HuskyServer/1.0.0\r\nContent-Type: text/json; charset=%s\r\nContent-Length: %d\r\n\r\n%s";
 const char* const CHARSET_UTF8 = "UTF-8";
-} // namespace Husky
+} // namespace husky
 
 
 #endif

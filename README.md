@@ -1,11 +1,11 @@
 [![Build Status](https://travis-ci.org/yanyiwu/husky.png?branch=master)](https://travis-ci.org/yanyiwu/husky)
 - - -
 
-# Husky
+# husky
 
 ## Introduction
 
-Husky is a **Simple** HTTP Server Frame Based on ThreadPool.
+husky is a **Simple** HTTP Server Frame Based on ThreadPool.
 
 It is just a simple server, not forcussing on performance, but it is **very easy** to use. That is what it born to be.
 

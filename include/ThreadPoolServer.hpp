@@ -4,7 +4,7 @@
 #include "NetUtils.hpp"
 #include "WorkerThread.hpp"
 
-namespace Husky {
+namespace husky {
 using namespace limonp;
 
 class ThreadPoolServer {
