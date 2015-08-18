@@ -1,8 +1,8 @@
 #ifndef HUSKY_THREADPOOLSERVER_H
 #define HUSKY_THREADPOOLSERVER_H
 
-#include "NetUtils.hpp"
-#include "WorkerThread.hpp"
+#include "net_util.h"
+#include "worker_thread.h"
 
 namespace husky {
 using namespace limonp;

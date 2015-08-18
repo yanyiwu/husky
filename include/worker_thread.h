@@ -2,8 +2,8 @@
 #define HUSKY_WORKER_HPP
 
 #include "limonp/ThreadPool.hpp"
-#include "IRequestHandler.hpp"
-#include "NetUtils.hpp"
+#include "irequest_handler.h"
+#include "net_util.h"
 
 namespace husky {
 const char* const CLIENT_IP_K = "CLIENT_IP";

@@ -1,7 +1,7 @@
 #ifndef HUSKY_IREQUESTHANDLER_HPP
 #define HUSKY_IREQUESTHANDLER_HPP
 
-#include "HttpReqInfo.hpp"
+#include "http_req_info.h"
 
 namespace husky {
 class IRequestHandler {
