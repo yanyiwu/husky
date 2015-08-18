@@ -7,15 +7,15 @@ class ReqHandler: public IRequestHandler {
   virtual ~ReqHandler() {
   }
  public:
-  virtual bool doGET(const HttpReqInfo& httpReq, string& response) {
-    const unordered_map<string, string>& mp = httpReq.getMethodGetMap();
+  virtual bool DoGET(const HttpReqInfo& httpReq, string& response) {
+    const unordered_map<string, string>& mp = httpReq.GetMethodGetMap();
     string mpStr;
     mpStr << mp;
     response = string_format("{method:GET, arguments:%s}", mpStr.c_str());
     return true;
   }
-  virtual bool doPOST(const HttpReqInfo& httpReq, string& response) {
-    response = string_format("{body:%s}", httpReq.getBody().c_str());
+  virtual bool DoPOST(const HttpReqInfo& httpReq, string& response) {
+    response = string_format("{body:%s}", httpReq.GetBody().c_str());
     return true;
   }
 };
@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
   int port = atoi(argv[2]);
   ReqHandler reqHandler;
   ThreadPoolServer server(threadNumber, queueMaxSize, port, reqHandler);
-  server.start();
+  server.Start();
   return EXIT_SUCCESS;
 }
 

@@ -7,11 +7,11 @@ class ReqHandler: public IRequestHandler {
   virtual ~ReqHandler() {
   }
 
-  bool doGET(const HttpReqInfo& httpReq, string& res) {
+  bool DoGET(const HttpReqInfo& httpReq, string& res) {
     res << httpReq;
     return true;
   }
-  bool doPOST(const HttpReqInfo& httpReq, string& res) {
+  bool DoPOST(const HttpReqInfo& httpReq, string& res) {
     res << httpReq;
     return true;
   }
@@ -21,6 +21,6 @@ class ReqHandler: public IRequestHandler {
 TEST(ThreadPoolServerTest, Test1) {
   ReqHandler handler;
   ThreadPoolServer server(4, 256, 11257, handler);
-  ASSERT_TRUE(server.start());
+  ASSERT_TRUE(server.Start());
 }
 

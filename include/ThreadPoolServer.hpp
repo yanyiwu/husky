@@ -10,31 +10,31 @@ using namespace limonp;
 class ThreadPoolServer {
  public:
   ThreadPoolServer(size_t thread_number, size_t queue_max_size, size_t port, IRequestHandler & handler):
-    _pool(thread_number, queue_max_size), _reqHandler(handler), _host_socket(-1) {
-    _host_socket = CreateAndListenSocket(port);
+    pool_(thread_number, queue_max_size), req_handler_(handler), host_socket_(-1) {
+    host_socket_ = CreateAndListenSocket(port);
   }
   ~ThreadPoolServer() {};
 
-  bool start() {
-    _pool.start();
+  bool Start() {
+    pool_.start();
     sockaddr_in clientaddr;
     socklen_t nSize = sizeof(clientaddr);
     int clientSock;
 
     while(true) {
-      if(-1 == (clientSock = accept(_host_socket, (struct sockaddr*) &clientaddr, &nSize))) {
+      if(-1 == (clientSock = accept(host_socket_, (struct sockaddr*) &clientaddr, &nSize))) {
         LogError(strerror(errno));
         break;
       }
-      _pool.add(CreateTask<WorkerThread,int, IRequestHandler&>(clientSock, _reqHandler));
+      pool_.add(CreateTask<WorkerThread,int, IRequestHandler&>(clientSock, req_handler_));
     }
     return true;
   }
 
  private:
-  ThreadPool _pool;
-  IRequestHandler & _reqHandler;
-  int _host_socket;
+  ThreadPool pool_;
+  IRequestHandler & req_handler_;
+  int host_socket_;
 }; // class ThreadPoolServer
 } // namespace husky
 

@@ -15,60 +15,59 @@ const struct timeval SOCKET_TIMEOUT = {16, 0};
 class WorkerThread: public ITask {
  public:
   WorkerThread(int sockfs, IRequestHandler& reqHandler):
-    _sockfd(sockfs), _reqHandler(reqHandler) {
+    sockfd_(sockfs), req_handler_(reqHandler) {
   }
   virtual ~WorkerThread() {
   }
 
- public:
-  void run() {
+  virtual void run() {
     do {
-      if(!_setsockopt(_sockfd)) {
+      if(!SetSockopt(sockfd_)) {
         LogError("_getsockopt failed.");
         break;
       }
       string strSnd, strRetByHandler;
       HttpReqInfo httpReq;
-      if(!_receive(_sockfd, httpReq)) {
-        LogError("_receive failed.");
+      if(!Receive(sockfd_, httpReq)) {
+        LogError("Receive failed.");
         break;
       }
 
-      if(httpReq.isGET() && !_reqHandler.doGET(httpReq, strRetByHandler)) {
-        LogError("doGET failed.");
+      if(httpReq.IsGET() && !req_handler_.DoGET(httpReq, strRetByHandler)) {
+        LogError("DoGET failed.");
         break;
       }
-      if(httpReq.isPOST() && !_reqHandler.doPOST(httpReq, strRetByHandler)) {
-        LogError("doPOST failed.");
+      if(httpReq.IsPOST() && !req_handler_.DoPOST(httpReq, strRetByHandler)) {
+        LogError("DoPOST failed.");
         break;
       }
       strSnd = string_format(HTTP_FORMAT, CHARSET_UTF8, strRetByHandler.length(), strRetByHandler.c_str());
 
-      if(!_send(_sockfd, strSnd)) {
-        LogError("_send failed.");
+      if(!Send(sockfd_, strSnd)) {
+        LogError("Send failed.");
         break;
       }
       LogInfo("response:%s", strRetByHandler.c_str());
     } while(false);
 
 
-    if(-1 == close(_sockfd)) {
+    if(-1 == close(sockfd_)) {
       LogError(strerror(errno));
     }
   }
  private:
-  bool _receive(int sockfd, HttpReqInfo& httpInfo) const {
+  bool Receive(int sockfd, HttpReqInfo& httpInfo) const {
     char recvBuf[RECV_BUFFER_SIZE];
     int n = 0;
-    while(!httpInfo.isBodyFinished() && (n = recv(sockfd, recvBuf, RECV_BUFFER_SIZE, 0)) > 0) {
-      if(!httpInfo.isHeaderFinished()) {
-        if(!httpInfo.parseHeader(recvBuf, n)) {
-          LogError("parseHeader failed. ");
+    while(!httpInfo.IsBodyFinished() && (n = recv(sockfd, recvBuf, RECV_BUFFER_SIZE, 0)) > 0) {
+      if(!httpInfo.IsHeaderFinished()) {
+        if(!httpInfo.ParseHeader(recvBuf, n)) {
+          LogError("ParseHeader failed. ");
           return false;
         }
         continue;
       }
-      httpInfo.appendBody(recvBuf, n);
+      httpInfo.AppendBody(recvBuf, n);
     }
     if(n < 0) {
       LogError(strerror(errno));
@@ -76,14 +75,14 @@ class WorkerThread: public ITask {
     }
     return true;
   }
-  bool _send(int sockfd, const string& strSnd) const {
+  bool Send(int sockfd, const string& strSnd) const {
     if(-1 == send(sockfd, strSnd.c_str(), strSnd.length(), 0)) {
       LogError(strerror(errno));
       return false;
     }
     return true;
   }
-  bool _setsockopt(int sockfd) const {
+  bool SetSockopt(int sockfd) const {
     if(-1 == setsockopt(sockfd, SOL_SOCKET, SO_LINGER, (const char*)&LNG, sizeof(LNG))) {
       LogError(strerror(errno));
       return false;
@@ -98,9 +97,9 @@ class WorkerThread: public ITask {
     }
     return true;
   }
- private:
-  int _sockfd;
-  IRequestHandler& _reqHandler;
+
+  int sockfd_;
+  IRequestHandler& req_handler_;
 };
 }
 
