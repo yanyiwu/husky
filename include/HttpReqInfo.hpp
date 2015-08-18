@@ -114,7 +114,7 @@ class HttpReqInfo {
     rpos ++;
     _isHeaderFinished = true;
     string content_length;
-    if(!find("CONTENT-LENGTH", content_length)) {
+    if(!find("CONTENT-LENGTH", content_length) || 0 == (_contentLength = atoi(content_length.c_str()))) {
       _isBodyFinished = true;
       return true;
     }
