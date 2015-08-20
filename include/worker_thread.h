@@ -47,7 +47,6 @@ class WorkerThread: public ITask {
         LogError("Send failed.");
         break;
       }
-      LogInfo("response:%s", strRetByHandler.c_str());
     } while(false);
 
 
