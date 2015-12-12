@@ -11,11 +11,11 @@ class ReqHandler: public IRequestHandler {
     const unordered_map<string, string>& mp = httpReq.GetMethodGetMap();
     string mpStr;
     mpStr << mp;
-    response = string_format("{method:GET, arguments:%s}", mpStr.c_str());
+    response = StringFormat("{method:GET, arguments:%s}", mpStr.c_str());
     return true;
   }
   virtual bool DoPOST(const HttpReqInfo& httpReq, string& response) {
-    response = string_format("{body:%s}", httpReq.GetBody().c_str());
+    response = StringFormat("{body:%s}", httpReq.GetBody().c_str());
     return true;
   }
 };

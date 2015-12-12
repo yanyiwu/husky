@@ -16,17 +16,17 @@ class ThreadPoolServer {
   ~ThreadPoolServer() {};
 
   bool Start() {
-    pool_.start();
+    pool_.Start();
     sockaddr_in clientaddr;
     socklen_t nSize = sizeof(clientaddr);
     int clientSock;
 
     while(true) {
       if(-1 == (clientSock = accept(host_socket_, (struct sockaddr*) &clientaddr, &nSize))) {
-        LogError(strerror(errno));
+        LOG(ERROR) << strerror(errno);
         break;
       }
-      pool_.add(CreateTask<WorkerThread,int, IRequestHandler&>(clientSock, req_handler_));
+      pool_.Add(CreateTask<WorkerThread,int, IRequestHandler&>(clientSock, req_handler_));
     }
     return true;
   }

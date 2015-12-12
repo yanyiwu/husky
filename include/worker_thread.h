@@ -20,38 +20,38 @@ class WorkerThread: public ITask {
   virtual ~WorkerThread() {
   }
 
-  virtual void run() {
+  virtual void Run() {
     do {
       if(!SetSockopt(sockfd_)) {
-        LogError("_getsockopt failed.");
+        LOG(ERROR) << "_getsockopt failed.";
         break;
       }
       string strSnd, strRetByHandler;
       HttpReqInfo httpReq;
       if(!Receive(sockfd_, httpReq)) {
-        LogError("Receive failed.");
+        LOG(ERROR) << "Receive failed.";
         break;
       }
 
       if(httpReq.IsGET() && !req_handler_.DoGET(httpReq, strRetByHandler)) {
-        LogError("DoGET failed.");
+        LOG(ERROR) << "DoGET failed.";
         break;
       }
       if(httpReq.IsPOST() && !req_handler_.DoPOST(httpReq, strRetByHandler)) {
-        LogError("DoPOST failed.");
+        LOG(ERROR) << "DoPOST failed.";
         break;
       }
-      strSnd = string_format(HTTP_FORMAT, CHARSET_UTF8, strRetByHandler.length(), strRetByHandler.c_str());
+      strSnd = StringFormat(HTTP_FORMAT, CHARSET_UTF8, strRetByHandler.length(), strRetByHandler.c_str());
 
       if(!Send(sockfd_, strSnd)) {
-        LogError("Send failed.");
+        LOG(ERROR) << "Send failed.";
         break;
       }
     } while(false);
 
 
     if(-1 == close(sockfd_)) {
-      LogError(strerror(errno));
+      LOG(ERROR) << strerror(errno);
     }
   }
  private:
@@ -61,7 +61,7 @@ class WorkerThread: public ITask {
     while(!httpInfo.IsBodyFinished() && (n = recv(sockfd, recvBuf, RECV_BUFFER_SIZE, 0)) > 0) {
       if(!httpInfo.IsHeaderFinished()) {
         if(!httpInfo.ParseHeader(recvBuf, n)) {
-          LogError("ParseHeader failed. ");
+          LOG(ERROR) << "ParseHeader failed. ";
           return false;
         }
         continue;
@@ -69,29 +69,29 @@ class WorkerThread: public ITask {
       httpInfo.AppendBody(recvBuf, n);
     }
     if(n < 0) {
-      LogError(strerror(errno));
+      LOG(ERROR) << strerror(errno);
       return false;
     }
     return true;
   }
   bool Send(int sockfd, const string& strSnd) const {
     if(-1 == send(sockfd, strSnd.c_str(), strSnd.length(), 0)) {
-      LogError(strerror(errno));
+      LOG(ERROR) << strerror(errno);
       return false;
     }
     return true;
   }
   bool SetSockopt(int sockfd) const {
     if(-1 == setsockopt(sockfd, SOL_SOCKET, SO_LINGER, (const char*)&LNG, sizeof(LNG))) {
-      LogError(strerror(errno));
+      LOG(ERROR) << strerror(errno);
       return false;
     }
     if(-1 == setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&SOCKET_TIMEOUT, sizeof(SOCKET_TIMEOUT))) {
-      LogError(strerror(errno));
+      LOG(ERROR) << strerror(errno);
       return false;
     }
     if(-1 == setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, (const char*)&SOCKET_TIMEOUT, sizeof(SOCKET_TIMEOUT))) {
-      LogError(strerror(errno));
+      LOG(ERROR) << strerror(errno);
       return false;
     }
     return true;

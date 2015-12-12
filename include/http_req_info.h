@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <string>
-#include "limonp/Logger.hpp"
+#include "limonp/Logging.hpp"
 #include "limonp/StringUtil.hpp"
 
 namespace husky {
@@ -72,24 +72,24 @@ class HttpReqInfo {
     vector<string> buf;
     rpos = headerStr.find("\n", lpos);
     if(string::npos == rpos) {
-      LogError("headerStr[%s] illegal.", headerStr.c_str());
+      LOG(ERROR) << "headerStr[" << headerStr << "] illegal.";
       return false;
     }
     string firstline(headerStr, lpos, rpos - lpos);
-    trim(firstline);
-    split(firstline, buf, " ");
+    Trim(firstline);
+    Split(firstline, buf, " ");
     if (3 != buf.size()) {
-      LogError("parse header firstline[%s] failed.", firstline.c_str());
+      LOG(ERROR) << "parse header firstline [" << firstline << "] failed.";
       return false;
     }
-    header_map_[KEY_METHOD] = trim(buf[0]);
-    header_map_[KEY_URI] = trim(buf[1]);
-    header_map_[KEY_PROTOCOL] = trim(buf[2]);
+    header_map_[KEY_METHOD] = Trim(buf[0]);
+    header_map_[KEY_URI] = Trim(buf[1]);
+    header_map_[KEY_PROTOCOL] = Trim(buf[2]);
     ParseUri(header_map_[KEY_URI], path_,  method_get_map_);
 
     lpos = rpos + 1;
     if(lpos >= headerStr.size()) {
-      LogError("headerStr[%s] illegal.", headerStr.c_str());
+      LOG(ERROR) << "headerStr[" << headerStr << "] illegal.";
       return false;
     }
     //message header begin
@@ -101,13 +101,13 @@ class HttpReqInfo {
       }
       string k(s, 0, p);
       string v(s, p+1);
-      trim(k);
-      trim(v);
+      Trim(k);
+      Trim(v);
       if(k.empty()||v.empty()) {
-        LogError("headerStr[%s] illegal.", headerStr.c_str());
+        LOG(ERROR) << "headerStr[" << headerStr << "] illegal.";
         return false;
       }
-      upper(k);
+      Upper(k);
       header_map_[k] = v;
       lpos = rpos + 1;
     }
