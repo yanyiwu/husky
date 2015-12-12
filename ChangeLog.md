@@ -1,5 +1,9 @@
 # Husky ChangeLog
 
+## v0.2.1
+
++ Fix error in Travis-Ci
+
 ## v0.2.0
 
 + Fix bug: server is waiting for body even if http header contain `content-length: 0` 
