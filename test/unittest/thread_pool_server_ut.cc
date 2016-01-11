@@ -20,7 +20,7 @@ class ReqHandler: public IRequestHandler {
 
 TEST(ThreadPoolServerTest, Test1) {
   ReqHandler handler;
-  ThreadPoolServer server(4, 256, 11257, handler);
+  ThreadPoolServer server(4, 11257, handler);
   ASSERT_TRUE(server.Start());
 }
 

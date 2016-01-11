@@ -1,5 +1,9 @@
 # Husky ChangeLog
 
+## next version
+
++ Upgrade [limonp] to v0.5.1 
+
 ## v0.2.1
 
 + Fix error in Travis-Ci

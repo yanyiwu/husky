@@ -26,10 +26,9 @@ int main(int argc, char** argv) {
     return EXIT_FAILURE;
   }
   size_t threadNumber = 4;
-  size_t queueMaxSize = 256;
   int port = atoi(argv[2]);
   ReqHandler reqHandler;
-  ThreadPoolServer server(threadNumber, queueMaxSize, port, reqHandler);
+  ThreadPoolServer server(threadNumber, port, reqHandler);
   server.Start();
   return EXIT_SUCCESS;
 }
