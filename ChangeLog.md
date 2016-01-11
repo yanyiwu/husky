@@ -1,6 +1,6 @@
 # Husky ChangeLog
 
-## next version
+## v0.2.2
 
 + Upgrade [limonp] to v0.5.1 
 
