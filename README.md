@@ -22,6 +22,7 @@ It is just a simple server, not forcussing on performance, but it is **very easy
 
 ```
 mkdir build
+cd build
 cmake ..
 make
 ```
