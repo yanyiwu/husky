@@ -72,14 +72,14 @@ class HttpReqInfo {
     vector<string> buf;
     rpos = headerStr.find("\n", lpos);
     if(string::npos == rpos) {
-      LOG(ERROR) << "headerStr[" << headerStr << "] illegal.";
+      XLOG(ERROR) << "headerStr[" << headerStr << "] illegal.";
       return false;
     }
     string firstline(headerStr, lpos, rpos - lpos);
     Trim(firstline);
     Split(firstline, buf, " ");
     if (3 != buf.size()) {
-      LOG(ERROR) << "parse header firstline [" << firstline << "] failed.";
+      XLOG(ERROR) << "parse header firstline [" << firstline << "] failed.";
       return false;
     }
     header_map_[KEY_METHOD] = Trim(buf[0]);
@@ -89,7 +89,7 @@ class HttpReqInfo {
 
     lpos = rpos + 1;
     if(lpos >= headerStr.size()) {
-      LOG(ERROR) << "headerStr[" << headerStr << "] illegal.";
+      XLOG(ERROR) << "headerStr[" << headerStr << "] illegal.";
       return false;
     }
     //message header begin
@@ -104,7 +104,7 @@ class HttpReqInfo {
       Trim(k);
       Trim(v);
       if(k.empty()||v.empty()) {
-        LOG(ERROR) << "headerStr[" << headerStr << "] illegal.";
+        XLOG(ERROR) << "headerStr[" << headerStr << "] illegal.";
         return false;
       }
       Upper(k);

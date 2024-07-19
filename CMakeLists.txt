@@ -5,12 +5,9 @@ SET(CMAKE_CXX_FLAGS "-std=c++11")
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 ADD_DEFINITIONS(-O3 -Wall -g)
-IF(APPLE) # mac os
-    ADD_DEFINITIONS(-std=c++11)
-endif()
 
 INCLUDE_DIRECTORIES(
-    ${PROJECT_SOURCE_DIR}/deps
+    ${PROJECT_SOURCE_DIR}/submodules/limonp/include
     ${PROJECT_SOURCE_DIR}/include
 )
 

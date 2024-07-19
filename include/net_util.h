@@ -24,17 +24,17 @@ static const size_t LISTEN_QUEUE_LEN = 1024;
 typedef int SocketFd;
 inline SocketFd CreateAndListenSocket(int port) {
   SocketFd sock = socket(AF_INET, SOCK_STREAM, 0);
-  CHECK(sock != -1);
+  XCHECK(sock != -1);
 
   int optval = 1; // nozero
-  CHECK(-1 != setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)));
+  XCHECK(-1 != setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)));
 
   struct sockaddr_in addr;
   addr.sin_family = AF_INET;
   addr.sin_port = htons(port);
   addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  CHECK(-1 != ::bind(sock, (sockaddr*)&addr, sizeof(addr)));
-  CHECK(-1 != ::listen(sock, LISTEN_QUEUE_LEN));
+  XCHECK(-1 != ::bind(sock, (sockaddr*)&addr, sizeof(addr)));
+  XCHECK(-1 != ::listen(sock, LISTEN_QUEUE_LEN));
 
   return sock;
 }

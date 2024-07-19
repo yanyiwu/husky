@@ -2,9 +2,10 @@
 
 ## Next Version
 
++ Added [github/actions] for CI/CD
++ [submodules] using `git submodule` to manage deps/limonp for latest version
 + Merged [pr#2]
 + Merged [pr#3]
-+ add [github/actions]
 
 ## v0.2.2
 

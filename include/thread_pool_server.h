@@ -31,7 +31,7 @@ class ThreadPoolServer {
 
     while(true) {
       if(-1 == (clientSock = accept(host_socket_, (struct sockaddr*) &clientaddr, &nSize))) {
-        LOG(ERROR) << strerror(errno);
+        XLOG(ERROR) << strerror(errno);
         break;
       }
       pool_.Add(NewClosure(this, &ThreadPoolServer::Run, clientSock));
@@ -44,35 +44,35 @@ class ThreadPoolServer {
   void Run(int sockfd) {
     do {
       if(!SetSockopt(sockfd)) {
-        LOG(ERROR) << "_getsockopt failed.";
+        XLOG(ERROR) << "_getsockopt failed.";
         break;
       }
       string strSnd, strRetByHandler;
       HttpReqInfo httpReq;
       if(!Receive(sockfd, httpReq)) {
-        LOG(ERROR) << "Receive failed.";
+        XLOG(ERROR) << "Receive failed.";
         break;
       }
 
       if(httpReq.IsGET() && !req_handler_.DoGET(httpReq, strRetByHandler)) {
-        LOG(ERROR) << "DoGET failed.";
+        XLOG(ERROR) << "DoGET failed.";
         break;
       }
       if(httpReq.IsPOST() && !req_handler_.DoPOST(httpReq, strRetByHandler)) {
-        LOG(ERROR) << "DoPOST failed.";
+        XLOG(ERROR) << "DoPOST failed.";
         break;
       }
       strSnd = StringFormat(HTTP_FORMAT, CHARSET_UTF8, strRetByHandler.length(), strRetByHandler.c_str());
 
       if(!Send(sockfd, strSnd)) {
-        LOG(ERROR) << "Send failed.";
+        XLOG(ERROR) << "Send failed.";
         break;
       }
     } while(false);
 
 
     if(-1 == close(sockfd)) {
-      LOG(ERROR) << strerror(errno);
+      XLOG(ERROR) << strerror(errno);
     }
   }
   bool Receive(int sockfd, HttpReqInfo& httpInfo) const {
@@ -81,7 +81,7 @@ class ThreadPoolServer {
     while(!httpInfo.IsBodyFinished() && (n = recv(sockfd, recvBuf, RECV_BUFFER_SIZE, 0)) > 0) {
       if(!httpInfo.IsHeaderFinished()) {
         if(!httpInfo.ParseHeader(recvBuf, n)) {
-          LOG(ERROR) << "ParseHeader failed. ";
+          XLOG(ERROR) << "ParseHeader failed. ";
           return false;
         }
         continue;
@@ -89,29 +89,29 @@ class ThreadPoolServer {
       httpInfo.AppendBody(recvBuf, n);
     }
     if(n < 0) {
-      LOG(ERROR) << strerror(errno);
+      XLOG(ERROR) << strerror(errno);
       return false;
     }
     return true;
   }
   bool Send(int sockfd, const string& strSnd) const {
     if(-1 == send(sockfd, strSnd.c_str(), strSnd.length(), 0)) {
-      LOG(ERROR) << strerror(errno);
+      XLOG(ERROR) << strerror(errno);
       return false;
     }
     return true;
   }
   bool SetSockopt(int sockfd) const {
     if(-1 == setsockopt(sockfd, SOL_SOCKET, SO_LINGER, (const char*)&LNG, sizeof(LNG))) {
-      LOG(ERROR) << strerror(errno);
+      XLOG(ERROR) << strerror(errno);
       return false;
     }
     if(-1 == setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&SOCKET_TIMEOUT, sizeof(SOCKET_TIMEOUT))) {
-      LOG(ERROR) << strerror(errno);
+      XLOG(ERROR) << strerror(errno);
       return false;
     }
     if(-1 == setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, (const char*)&SOCKET_TIMEOUT, sizeof(SOCKET_TIMEOUT))) {
-      LOG(ERROR) << strerror(errno);
+      XLOG(ERROR) << strerror(errno);
       return false;
     }
     return true;
