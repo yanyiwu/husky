@@ -1,5 +1,11 @@
 # Husky ChangeLog
 
+## Next Version
+
++ Merged [pr#2]
++ Merged [pr#3]
++ add [github/actions]
+
 ## v0.2.2
 
 + Upgrade [limonp] to v0.5.1 
