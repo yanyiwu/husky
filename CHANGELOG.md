@@ -1,6 +1,6 @@
 # Husky ChangeLog
 
-## Next Version
+## v0.3.0
 
 + Added [github/actions] for CI/CD
 + [submodules] using `git submodule` to manage deps/limonp for latest version
