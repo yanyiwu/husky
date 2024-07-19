@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/yanyiwu/husky.png?branch=master)](https://travis-ci.org/yanyiwu/husky)
-[![Author](https://img.shields.io/badge/author-@yanyiwu-blue.svg?style=flat)](http://yanyiwu.com/) 
-[![License](https://img.shields.io/badge/license-MIT-yellow.svg?style=flat)](http://yanyiwu.mit-license.org)
+[![Test](https://github.com/yanyiwu/husky/actions/workflows/test.yml/badge.svg)](https://github.com/yanyiwu/husky/actions/workflows/test.yml)
 - - -
 
 # husky
@@ -21,6 +19,8 @@ It is just a simple server, not forcussing on performance, but it is **very easy
 ### configure & compile
 
 ```
+git clone --recurse-submodules https://github.com/yanyiwu/husky.git
+cd husky
 mkdir build
 cd build
 cmake ..
@@ -82,9 +82,5 @@ Query Per Second: 2042.887 q/s
 ## Reference
 
 [limonp]
-
-## Contact
-
-i@yanyiwu.com
 
 [limonp]:https://github.com/yanyiwu/limonp.git
