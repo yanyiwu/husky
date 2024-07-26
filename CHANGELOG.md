@@ -1,4 +1,8 @@
-# Husky ChangeLog
+# ChangeLog
+
+## Next Version
+
++ [googletest] git submodule add googletest-1.6.0
 
 ## v0.3.0
 
